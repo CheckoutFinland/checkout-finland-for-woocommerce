@@ -20,6 +20,9 @@
         "wordpress", "woocommerce", "payment gateway", "checkout finland"
     ],
     "license": "MIT",
+    "autoload": {
+        "psr-4": {"CheckoutFinland\\WooCommercePaymentGateway\\": "src/"}
+    },
     "require": {
         "php": ">=7.0",
         "composer/installers": ">=1.0.12"
