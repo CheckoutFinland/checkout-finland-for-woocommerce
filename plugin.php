@@ -73,9 +73,29 @@ final class Plugin {
     protected $errors = [];
 
     /**
+     * Plugin info
+     *
+     * @var array
+     */
+    protected $plugin_info = [
+        'Plugin Name',
+        'Plugin URI',
+        'Description',
+        'Version',
+        'Author',
+        'Author URI',
+        'Text Domain',
+        'Domain Path',
+    ];
+
+    /**
      * Constructor function
      */
-    protected function __construct() {}
+    protected function __construct() {
+        $this->plugin_dir     = __DIR__;
+        $this->plugin_dir_url = plugin_dir_url( __FILE__ );
+        $this->plugin_info    = array_combine( $this->plugin_info, get_file_data( __FILE__, $this->plugin_info ) );
+    }
 
     /**
      * Singleton instance getter function
@@ -174,6 +194,33 @@ final class Plugin {
         ) {
             $this->errors[] = esc_html__( 'Checkout Finland payment gateway plugin requires WooCommerce version of 3.5 or greater.', 'woocommerce-payment-gateway-checkout-finland' );
         }
+    }
+
+    /**
+     * Get plugin directory.
+     *
+     * @return string
+     */
+    public function get_plugin_dir() : string {
+        return $this->plugin_dir;
+    }
+
+    /**
+     * Get plugin directory URL.
+     *
+     * @return string
+     */
+    public function get_plugin_dir_url() : string {
+        return $this->plugin_dir_url;
+    }
+
+    /**
+     * Get plugin info.
+     *
+     * @return array
+     */
+    public function get_plugin_info() : array {
+        return $this->plugin_info;
     }
 }
 

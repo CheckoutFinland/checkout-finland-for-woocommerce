@@ -1,0 +1,6 @@
+# Node Package Manager
+node_modules
+
+# Libraries installed by Composer
+vendor/*
+!vendor/.gitkeep
