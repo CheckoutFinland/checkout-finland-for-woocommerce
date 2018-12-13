@@ -10,6 +10,7 @@ use CheckoutFinland\SDK\Model\Customer;
 use CheckoutFinland\SDK\Model\Address;
 use CheckoutFinland\SDK\Model\Item;
 use CheckoutFinland\SDK\Model\CallbackUrl;
+use CheckoutFinland\SDK\Exception\HmacException;
 
 
 /**
@@ -120,6 +121,7 @@ final class Gateway extends \WC_Payment_Gateway {
     protected function add_actions() {
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
         add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
+        add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_reference_search' ], 10, 2 );
     }
 
     /**
@@ -224,30 +226,30 @@ final class Gateway extends \WC_Payment_Gateway {
 
         // Handle the response only if the status exists.
         if ( $status ) {
+            // Check the HMAC
+            try {
+                $this->client->validateHmac( filter_input_array( INPUT_GET ), '', filter_input( INPUT_GET, 'signature' ) );
+            }
+            catch ( HmacException $e ) {
+                $order->update_status( 'cancelled' );
+            }
+
             if ( $status === 'ok' ) {
                 $reference = filter_input( INPUT_GET, 'checkout-reference' );
 
-                $posts = \get_posts( [
-                    'post_type'   => 'shop_order',
-                    'post_status' => array_values( \get_post_stati() ),
-                    'meta_query'  => [
-                        [
-                            'key'     => 'checkout_reference_' . $reference,
-                            'compare' => 'EXISTS',
-                        ],
-                    ],
-                ] );
+                $orders = \wc_get_orders( [ 'checkout_reference' => $reference ] );
 
-                if ( empty( $posts ) ) {
+                if ( empty( $orders ) ) {
                     return;
                 }
                 else {
-                    $post = $posts[0];
+                    $order = $orders[0];
                 }
 
-                $order = wc_get_order( $post->ID );
-
                 $order->update_status( 'completed' );
+            }
+            else {
+                $order->update_status( 'cancelled' );
             }
         }
     }
@@ -579,5 +581,23 @@ final class Gateway extends \WC_Payment_Gateway {
         $plugin_version = $plugin_instance->get_plugin_info()['Version'];
 
         wp_register_style( 'woocommerce-gateway-checkout-finland-payment-fields', $plugin_dir_url . 'assets/dist/main.css', [], $plugin_version );
+    }
+
+    /**
+     * Handle a custom "checkout_reference" query var to get order by certain reference.
+     *
+     * @param array $query      Args for WP_Query.
+     * @param array $query_vars Query vars from WC_Order_Query.
+     * @return array
+     */
+    public function handle_reference_search( array $query, array $query_vars ) : array {
+        if ( ! empty( $query_vars['checkout_reference'] ) ) {
+            $query['meta_query'][] = [
+                'key'     => 'checkout_reference_' . esc_attr( $query_vars['checkout_reference'] ),
+                'compare' => 'EXISTS',
+            ];
+        }
+
+        return $query;
     }
 }
