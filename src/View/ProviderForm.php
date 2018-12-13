@@ -12,7 +12,7 @@ wp_enqueue_style( 'woocommerce-gateway-checkout-finland-payment-fields' );
 
 echo '<ul class="woocommerce-gateway-checkout-finland-payment-fields">';
 
-array_walk( $data->providers, function( $provider ) {
+array_walk( $data, function( $provider ) {
     printf(
         '<li class="woocommerce-gateway-checkout-finland-payment-fields--list-item">
             <label>
@@ -22,8 +22,8 @@ array_walk( $data->providers, function( $provider ) {
                 </div>
             </label>
         </li>',
-        esc_html( $provider->id ),
-        esc_html( $provider->svg )
+        esc_html( $provider->getId() ),
+        esc_html( $provider->getSvg() )
     );
 });
 
