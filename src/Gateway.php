@@ -231,7 +231,7 @@ final class Gateway extends \WC_Payment_Gateway {
                 $this->client->validateHmac( filter_input_array( INPUT_GET ), '', filter_input( INPUT_GET, 'signature' ) );
             }
             catch ( HmacException $e ) {
-                $order->update_status( 'cancelled' );
+                wp_die( esc_html__( 'HMAC signature is invalid.', 'woocommerce-payment-gateway-checkout-finland' ) );
             }
 
             if ( $status === 'ok' ) {
