@@ -5,12 +5,14 @@
 
 namespace CheckoutFinland\WooCommercePaymentGateway;
 
-use CheckoutFinland\SDK\Request\Payment as RequestPayment;
+use CheckoutFinland\SDK\Request\PaymentRequest;
 use CheckoutFinland\SDK\Model\Customer;
 use CheckoutFinland\SDK\Model\Address;
 use CheckoutFinland\SDK\Model\Item;
 use CheckoutFinland\SDK\Model\CallbackUrl;
 use CheckoutFinland\SDK\Exception\HmacException;
+use CheckoutFinland\SDK\Request\RefundRequest;
+use CheckoutFinland\SDK\Client;
 
 
 /**
@@ -45,6 +47,16 @@ final class Gateway extends \WC_Payment_Gateway {
      * @var boolean
      */
     public $debug = false;
+
+    /**
+     * Supported features.
+     *
+     * @var array
+     */
+    public $supports = [
+        'products',
+        'refunds',
+    ];
 
     /**
      * WooCommerce logger instance
@@ -98,7 +110,7 @@ final class Gateway extends \WC_Payment_Gateway {
         }
 
         // Create SDK client instance
-        $this->client = new \CheckoutFinland\SDK\Client( $this->merchant_id, $this->secret_key );
+        $this->client = new Client( $this->merchant_id, $this->secret_key );
 
         // Whether we are in debug mode or not.
         $this->debug = 'yes' === $this->get_option( 'debug', 'no' );
@@ -122,6 +134,7 @@ final class Gateway extends \WC_Payment_Gateway {
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
         add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
         add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_reference_search' ], 10, 2 );
+        add_filter( 'woocommerce_admin_order_items_after_refunds', [ $this, 'refund_items' ], 10, 1 );
     }
 
     /**
@@ -246,10 +259,17 @@ final class Gateway extends \WC_Payment_Gateway {
                     $order = $orders[0];
                 }
 
-                $order->update_status( 'completed' );
+                $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
+
+                // Mark payment completed and store the transaction ID.
+                $order->payment_complete( $transaction_id );
+                // Translators: placeholder is transaction ID.
+                $order->add_order_note( sprintf( esc_html__( 'Payment completed with transaction ID %s.', 'woocommerce-payment-gateway-checkout-finland' ), $transaction_id ) );
             }
             else {
-                $order->update_status( 'cancelled' );
+                $order->update_status( 'failed' );
+                $order->add_order_note( __( 'Payment failed.', 'woocommerce-payment-gateway-checkout-finland' ) );
+
             }
         }
     }
@@ -291,7 +311,7 @@ final class Gateway extends \WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
         $order = wc_get_order( $order_id );
 
-        $payment = new RequestPayment();
+        $payment = new PaymentRequest();
 
         // Set the order ID as the stamp to the payment request
         $payment->setStamp( get_current_blog_id() . '-' . $order_id . '-' . time() );
@@ -303,10 +323,10 @@ final class Gateway extends \WC_Payment_Gateway {
         $payment->setReference( $reference );
 
         // Save the reference for possible later use.
-        update_post_meta( $order->get_id(), 'checkout_reference', $reference );
+        update_post_meta( $order->get_id(), '_checkout_reference', $reference );
 
         // Save it also as a key for fast indexed searches.
-        update_post_meta( $order->get_id(), 'checkout_reference_' . $reference, true );
+        update_post_meta( $order->get_id(), '_checkout_reference_' . $reference, true );
 
         // Fetch current currency and the cart total
         $currency   = get_woocommerce_currency();
@@ -370,7 +390,7 @@ final class Gateway extends \WC_Payment_Gateway {
         // Get the wanted payment provider and save it to the order
         $payment_provider = filter_input( INPUT_POST, 'payment_provider' );
 
-        $order->update_meta_data( 'checkout_payment_provider', $payment_provider );
+        $order->update_meta_data( '_checkout_payment_provider', $payment_provider );
 
         // Create a payment via Checkout SDK
         try {
@@ -392,10 +412,98 @@ final class Gateway extends \WC_Payment_Gateway {
 
         WC()->session->set( 'payment_provider', $wanted_provider );
 
+        $order->add_order_note( __( 'Payment request created.', 'woocommerce-payment-gateway-checkout-finland' ) );
+
         return [
             'result'   => 'success',
             'redirect' => $order->get_checkout_payment_url( true ),
         ];
+    }
+
+    /**
+     * Process refunds.
+     *
+     * @param integer $order_id Order ID to refund from.
+     * @param integer $amount   Optionally the refund amount if not the whole sum.
+     * @param string  $reason   Optional reason for the refund.
+     * @return boolean
+     */
+    public function process_refund( $order_id, $amount = null, $reason = '' ) {
+        $order = \wc_get_order( $order_id );
+
+        $refund = new RefundRequest();
+
+        if ( $amount ) {
+            $refund->setAmount( $amount );
+        }
+        else {
+            $refund->setAmount( $order->get_total() );
+            $amount = $order->get_total();
+        }
+
+        $price = $amount;
+
+        $url = new CallbackUrl();
+
+        $url->setSuccess( get_home_url() . '?success=true' )
+            ->setCancel( get_home_url() . '?success=false' );
+
+        $refund->setCallbackUrls( $url );
+
+        $transaction_id = $order->get_transaction_id();
+
+        $this->client->refund( $refund, $transaction_id );
+
+        $order->add_order_note(
+            sprintf(
+                // Translators: placeholder is the optional reason for the refund.
+                __( 'Refunding process started.%s', 'woocommerce-payment-gateway-checkout-finland' ),
+                $reason ? esc_html__( ' Reason: ', 'woocommerce-payment-gateway-checkout-finland' ) . esc_html( $reason ) : ''
+            )
+        );
+
+        add_action( 'woocommerce_order_refunded', function( $order_id, $refund_id ) use ( $amount, $price ) {
+            $refund = new \WC_Order_Refund( $refund_id );
+            $reason = $refund->get_reason();
+
+            update_post_meta( $refund->get_id(), '_checkout_refund_amount', $amount );
+            update_post_meta( $refund->get_id(), '_checkout_refund_reason', $reason );
+            update_post_meta( $refund->get_id(), '_checkout_refund_processing', true );
+
+            $refund->set_amount( 0 );
+
+            $refund->set_reason( $reason . ' Refund is still being processed. The status and the amount (' . $price . ') of the refund will update when the processing is completed.' );
+
+            $refund->save();
+        }, 10, 2 );
+
+        return true;
+    }
+
+    /**
+     * Make processing refund items amounts to show in italic
+     *
+     * @param int $order_id Order ID to handle.
+     * @return void
+     */
+    public function refund_items( $order_id ) {
+        $order = new \WC_Order( $order_id );
+
+        $refunds = $order->get_refunds();
+
+        if ( $refunds ) {
+            array_walk( $refunds, function( $refund ) {
+                $meta = get_post_meta( $refund->get_id(), '_checkout_refund_processing', true );
+
+                if ( $meta ) {
+                    echo '<style>';
+                    echo '[data-order_refund_id=' . esc_html( $refund->get_id() ) . '] span.amount {';
+                    echo 'font-style: italic;';
+                    echo '}';
+                    echo '</style>';
+                };
+            });
+        }
     }
 
     /**
@@ -459,6 +567,7 @@ final class Gateway extends \WC_Payment_Gateway {
             ->setCounty( $order->{ 'get_' . $prefix . 'state' }() ?? null )
             ->setCountry( $order->{ 'get_' . $prefix . 'country' }() ?? null );
 
+        // If we have any of the listed properties, we are good to go
         $has_values = array_filter(
             [ 'StreetAddress', 'PostalCode', 'City', 'County' ],
             function( $key ) use ( $address ) {
@@ -593,7 +702,7 @@ final class Gateway extends \WC_Payment_Gateway {
     public function handle_reference_search( array $query, array $query_vars ) : array {
         if ( ! empty( $query_vars['checkout_reference'] ) ) {
             $query['meta_query'][] = [
-                'key'     => 'checkout_reference_' . esc_attr( $query_vars['checkout_reference'] ),
+                'key'     => '_checkout_reference_' . esc_attr( $query_vars['checkout_reference'] ),
                 'compare' => 'EXISTS',
             ];
         }
