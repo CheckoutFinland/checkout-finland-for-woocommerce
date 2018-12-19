@@ -13,6 +13,7 @@ use CheckoutFinland\SDK\Model\CallbackUrl;
 use CheckoutFinland\SDK\Exception\HmacException;
 use CheckoutFinland\SDK\Request\RefundRequest;
 use CheckoutFinland\SDK\Client;
+use CheckoutFinland\SDK\Request\EmailRefundRequest;
 
 
 /**
@@ -133,8 +134,8 @@ final class Gateway extends \WC_Payment_Gateway {
     protected function add_actions() {
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
         add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
-        add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_reference_search' ], 10, 2 );
         add_filter( 'woocommerce_admin_order_items_after_refunds', [ $this, 'refund_items' ], 10, 1 );
+        add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_custom_searches' ], 10, 2 );
     }
 
     /**
@@ -235,30 +236,44 @@ final class Gateway extends \WC_Payment_Gateway {
      * @return void
      */
     public function check_checkout_response() {
-        $status = filter_input( INPUT_GET, 'checkout-status' );
+        $status           = filter_input( INPUT_GET, 'checkout-status' );
+        $refund_callback  = filter_input( INPUT_GET, 'refund_callback' );
+        $refund_unique_id = filter_input( INPUT_GET, 'refund_unique_id' );
+        $order_id         = filter_input( INPUT_GET, 'order_id' );
 
         // Handle the response only if the status exists.
-        if ( $status ) {
-            // Check the HMAC
-            try {
-                $this->client->validateHmac( filter_input_array( INPUT_GET ), '', filter_input( INPUT_GET, 'signature' ) );
-            }
-            catch ( HmacException $e ) {
-                wp_die( esc_html__( 'HMAC signature is invalid.', 'woocommerce-payment-gateway-checkout-finland' ) );
-            }
+        if ( $status && ! $refund_callback ) {
+            $this->handle_payment_response( $status );
+        }
+        elseif ( $status && $refund_callback ) {
+            $this->handle_refund_response( $refund_callback, $refund_unique_id, $order_id );
+        }
+    }
+
+    /**
+     * Handle payment response functionalities
+     *
+     * @param string $status The status of the response.
+     *
+     * @return void
+     */
+    public function handle_payment_response( string $status ) {
+        // Check the HMAC
+        try {
+            $this->client->validateHmac( filter_input_array( INPUT_GET ), '', filter_input( INPUT_GET, 'signature' ) );
+        }
+        catch ( HmacException $e ) {
+            wp_die( esc_html__( 'HMAC signature is invalid.', 'woocommerce-payment-gateway-checkout-finland' ) );
+        }
+
+        $reference = filter_input( INPUT_GET, 'checkout-reference' );
+
+        $orders = \wc_get_orders( [ 'checkout_reference' => $reference ] );
+
+        if ( ! empty( $orders ) ) {
+            $order = $orders[0];
 
             if ( $status === 'ok' ) {
-                $reference = filter_input( INPUT_GET, 'checkout-reference' );
-
-                $orders = \wc_get_orders( [ 'checkout_reference' => $reference ] );
-
-                if ( empty( $orders ) ) {
-                    return;
-                }
-                else {
-                    $order = $orders[0];
-                }
-
                 $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
 
                 // Mark payment completed and store the transaction ID.
@@ -269,9 +284,75 @@ final class Gateway extends \WC_Payment_Gateway {
             else {
                 $order->update_status( 'failed' );
                 $order->add_order_note( __( 'Payment failed.', 'woocommerce-payment-gateway-checkout-finland' ) );
-
             }
         }
+    }
+
+    /**
+     * Handle refund response functionalities
+     *
+     * @param string $refund_callback  Refund callback status.
+     * @param string $refund_unique_id Unique ID for the refund.
+     * @param string $order_id         Order ID.
+     * @return void
+     */
+    public function handle_refund_response( string $refund_callback, string $refund_unique_id, string $order_id ) {
+        // Remove the callback indicators from the GET array
+        $get = filter_input_array( INPUT_GET );
+
+        unset( $get['refund_callback'] );
+        unset( $get['refund_unique_id'] );
+        unset( $get['order_id'] );
+
+        // Check the HMAC
+        try {
+            $this->client->validateHmac( $get, '', filter_input( INPUT_GET, 'signature' ) );
+        }
+        catch ( HmacException $e ) {
+            wp_die( esc_html__( 'HMAC signature is invalid.', 'woocommerce-payment-gateway-checkout-finland' ) );
+        }
+
+        $refunds = \wc_get_orders( [
+            'type'                      => 'shop_order_refund',
+            'checkout_refund_unique_id' => $refund_unique_id,
+        ]);
+
+        if ( empty( $refunds ) ) {
+            wp_die( esc_html__( 'Refund cannot be found.', 'woocommerce-payment-gateway-checkout-finland' ) );
+        }
+        else {
+            $refund = $refunds[0];
+        }
+
+        switch ( $refund_callback ) {
+            case 'success':
+                $amount = get_post_meta( $refund->get_id(), '_checkout_refund_amount', true );
+                $reason = get_post_meta( $refund->get_id(), '_checkout_refund_reason', true );
+
+                $refund->set_amount( $amount );
+                $refund->set_reason( $reason );
+                $refund->save();
+
+                $order = \wc_get_order( $order_id );
+
+                $order->add_order_note(
+                    __( 'Refund process completed.', 'woocommerce-payment-gateway-checkout-finland' )
+                );
+
+                update_post_meta( $refund->get_id(), '_checkout_refund_processing', false );
+                break;
+            case 'cancel':
+                $refund->delete( true );
+
+                $order->add_order_note(
+                    __( 'Refund was cancelled by the payment provider.', 'woocommerce-payment-gateway-checkout-finland' )
+                );
+
+                do_action( 'woocommerce_refund_delete', $refund->get_id(), $order_id );
+                break;
+        }
+
+        die( 'ok' );
     }
 
     /**
@@ -429,55 +510,116 @@ final class Gateway extends \WC_Payment_Gateway {
      * @return boolean
      */
     public function process_refund( $order_id, $amount = null, $reason = '' ) {
-        $order = \wc_get_order( $order_id );
+        try {
+            $order = \wc_get_order( $order_id );
 
-        $refund = new RefundRequest();
+            // Create a unique identifier for the refund
+            $refund_unique_id = sha1( uniqid( true ) );
 
-        if ( $amount ) {
-            $refund->setAmount( $amount );
+            $refund = new RefundRequest();
+
+            if ( $amount ) {
+                $refund->setAmount( $this->handle_currency( $amount ) );
+            }
+            else {
+                $refund->setAmount( $this->handle_currency( $order->get_total() ) );
+                $amount = $order->get_total();
+            }
+
+            $price = $amount;
+
+            $url = new CallbackUrl();
+
+            $callbacks = $this->create_redirect_url( $order );
+
+            $url->setSuccess( $callbacks->getSuccess() . '?refund_callback=success&refund_unique_id=' . $refund_unique_id . '&order_id=' . $order_id )
+                ->setCancel( $callbacks->getSuccess() . '?refund_callback=cancel&refund_unique_id=' . $refund_unique_id . '&order_id=' . $order_id );
+
+            $refund->setCallbackUrls( $url );
+
+            $transaction_id = $order->get_transaction_id();
+
+            $order->add_order_note(
+                sprintf(
+                    // Translators: placeholder is the optional reason for the refund.
+                    __( 'Refunding process started.%s', 'woocommerce-payment-gateway-checkout-finland' ),
+                    $reason ? esc_html__( ' Reason: ', 'woocommerce-payment-gateway-checkout-finland' ) . esc_html( $reason ) : ''
+                )
+            );
+
+            // Do some additional stuff after the refund object has been created
+            add_action( 'woocommerce_order_refunded', function( $order_id, $refund_id ) use ( $order, $refund, $transaction_id, $amount, $price, $refund_unique_id ) {
+                $refund_object = new \WC_Order_Refund( $refund_id );
+
+                try {
+                    $this->client->refund( $refund, $transaction_id );
+                }
+                catch ( \Exception $e ) {
+                    switch ( $e->getCode() ) {
+                        case 422:
+                            // An email refund request is needed
+                            $email = $order->get_billing_email();
+
+                            $email_refund_request = new EmailRefundRequest();
+
+                            $email_refund_request->setEmail( $email );
+                            $email_refund_request->setAmount( $refund->getAmount() );
+                            $email_refund_request->setCallbackUrls( $refund->getCallbackUrls() );
+
+                            if ( count( $refund->getItems() ) > 0 ) {
+                                $email_refund_request->setItems( $refund->getItems() );
+                            }
+
+                            try {
+                                $this->client->emailRefund( $email_refund_request, $transaction_id );
+                            }
+                            catch ( \Exception $e ) {
+                                switch ( $e->getCode() ) {
+                                    case 422:
+                                        $refund_object->delete( true );
+                                        $order->add_order_note(
+                                            __( 'The payment provider does not support either regular or email refunds. The refund was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                                        );
+                                        break;
+                                    // Default, should be 400.
+                                    default:
+                                        $refund_object->delete( true );
+                                        $order->add_order_note(
+                                            __( 'Something went wrong with the email refund and it was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                                        );
+                                        break;
+                                }
+                            }
+                            break;
+                        // Default, should be 400.
+                        default:
+                            $refund_object->delete( true );
+                            $order->add_order_note(
+                                __( 'Something went wrong with the refund and it was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                            );
+                            break;
+                    }
+                }
+
+                $reason = $refund_object->get_reason();
+
+                update_post_meta( $refund_object->get_id(), '_checkout_refund_amount', $amount );
+                update_post_meta( $refund_object->get_id(), '_checkout_refund_reason', $reason );
+                update_post_meta( $refund_object->get_id(), '_checkout_refund_unique_id', $refund_unique_id );
+                update_post_meta( $refund_object->get_id(), '_checkout_refund_processing', true );
+
+                $refund_object->set_amount( 0 );
+
+                $refund_object->set_reason( $reason . ' Refund is still being processed. The status and the amount (' . $price . ') of the refund will update when the processing is completed.' );
+
+                $refund_object->save();
+            }, 10, 2 );
+
+            return true;
         }
-        else {
-            $refund->setAmount( $order->get_total() );
-            $amount = $order->get_total();
+        catch ( \Exception $e ) {
+            die( $e->getMessage() );
         }
-
-        $price = $amount;
-
-        $url = new CallbackUrl();
-
-        $url->setSuccess( get_home_url() . '?success=true' )
-            ->setCancel( get_home_url() . '?success=false' );
-
-        $refund->setCallbackUrls( $url );
-
-        $transaction_id = $order->get_transaction_id();
-
-        $this->client->refund( $refund, $transaction_id );
-
-        $order->add_order_note(
-            sprintf(
-                // Translators: placeholder is the optional reason for the refund.
-                __( 'Refunding process started.%s', 'woocommerce-payment-gateway-checkout-finland' ),
-                $reason ? esc_html__( ' Reason: ', 'woocommerce-payment-gateway-checkout-finland' ) . esc_html( $reason ) : ''
-            )
-        );
-
-        add_action( 'woocommerce_order_refunded', function( $order_id, $refund_id ) use ( $amount, $price ) {
-            $refund = new \WC_Order_Refund( $refund_id );
-            $reason = $refund->get_reason();
-
-            update_post_meta( $refund->get_id(), '_checkout_refund_amount', $amount );
-            update_post_meta( $refund->get_id(), '_checkout_refund_reason', $reason );
-            update_post_meta( $refund->get_id(), '_checkout_refund_processing', true );
-
-            $refund->set_amount( 0 );
-
-            $refund->set_reason( $reason . ' Refund is still being processed. The status and the amount (' . $price . ') of the refund will update when the processing is completed.' );
-
-            $refund->save();
-        }, 10, 2 );
-
-        return true;
     }
 
     /**
@@ -678,6 +820,32 @@ final class Gateway extends \WC_Payment_Gateway {
     }
 
     /**
+     * Handle custom search query vars to get orders by certain reference or refund identifier.
+     *
+     * @param array $query      Args for WP_Query.
+     * @param array $query_vars Query vars from WC_Order_Query.
+     * @return array
+     */
+    public function handle_custom_searches( array $query, array $query_vars ) : array {
+        if ( ! empty( $query_vars['checkout_reference'] ) ) {
+            $query['meta_query'][] = [
+                'key'     => '_checkout_reference_' . esc_attr( $query_vars['checkout_reference'] ),
+                'compare' => 'EXISTS',
+            ];
+        }
+
+        if ( ! empty( $query_vars['checkout_refund_unique_id'] ) ) {
+            $query['meta_query'][] = [
+                'key'     => '_checkout_refund_unique_id',
+                'compare' => '=',
+                esc_attr( $query_vars['checkout_refund_unique_id'] ),
+            ];
+        }
+
+        return $query;
+    }
+
+    /**
      * Register payment fields styles
      *
      * @return void
@@ -690,23 +858,5 @@ final class Gateway extends \WC_Payment_Gateway {
         $plugin_version = $plugin_instance->get_plugin_info()['Version'];
 
         wp_register_style( 'woocommerce-gateway-checkout-finland-payment-fields', $plugin_dir_url . 'assets/dist/main.css', [], $plugin_version );
-    }
-
-    /**
-     * Handle a custom "checkout_reference" query var to get order by certain reference.
-     *
-     * @param array $query      Args for WP_Query.
-     * @param array $query_vars Query vars from WC_Order_Query.
-     * @return array
-     */
-    public function handle_reference_search( array $query, array $query_vars ) : array {
-        if ( ! empty( $query_vars['checkout_reference'] ) ) {
-            $query['meta_query'][] = [
-                'key'     => '_checkout_reference_' . esc_attr( $query_vars['checkout_reference'] ),
-                'compare' => 'EXISTS',
-            ];
-        }
-
-        return $query;
     }
 }
