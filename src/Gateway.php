@@ -554,6 +554,16 @@ final class Gateway extends \WC_Payment_Gateway {
                 $amount = $order->get_total();
             }
 
+            if ( $refund->getAmount() === 0 ) {
+                return new \WP_Error(
+                    '400',
+                    __(
+                        'The refund amount must be larger than 0.',
+                        'woocommerce-payment-gateway-checkout-finland'
+                    )
+                );
+            }
+
             $price = $amount;
 
             $url = new CallbackUrl();
