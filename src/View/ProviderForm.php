@@ -10,6 +10,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 wp_enqueue_style( 'woocommerce-gateway-checkout-finland-payment-fields' );
 
+// Something went wrong loading the providers.
+if ( ! empty( $data['error'] ) ) {
+    printf(
+        '<p class="woocommerce-gateway-checkout-finland-payment-fields__error">%s</p>',
+        esc_html( $data['error'] )
+    );
+    return;
+}
+
 echo '<ul class="woocommerce-gateway-checkout-finland-payment-fields">';
 
 array_walk( $data, function( $provider ) {
