@@ -13,8 +13,8 @@ A WooCommerce extension to add support for Checkout Finland payment methods.
 ### Manually
 
 1. Download the plugin zip file.
-    a. Either extract the plugin to your `wp-content/plugins` directory.
-    b. Or add the zip file via Admin's `Plugins > Add New` feature.
+    - Either extract the plugin to your `wp-content/plugins` directory.
+    - Or add the zip file via Admin's `Plugins > Add New` feature.
 2. Activate the plugin.
 3. Go to WooCommerce Settings and open Payments tab.
 4. Enable Checkout Finland with the switch.
@@ -23,9 +23,14 @@ A WooCommerce extension to add support for Checkout Finland payment methods.
 ### Via Composer
 
 1. If you have Composer installed:
-    a. You can use the command line:
-```$ composer require checkoutfinland/woocommerce-gateway-checkout-finland```
-    b. Or add it in your `composer.json`:
+    - You can use the command line:
+
+```
+$ composer require checkoutfinland/woocommerce-gateway-checkout-finland
+```
+
+    - Or add it in your `composer.json`:
+
 ```json
 {
   "require": {
