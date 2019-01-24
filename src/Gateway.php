@@ -5,6 +5,7 @@
 
 namespace CheckoutFinland\WooCommercePaymentGateway;
 
+use CheckoutFinland\SDK\Exception\ValidationException;
 use CheckoutFinland\SDK\Request\PaymentRequest;
 use CheckoutFinland\SDK\Model\Customer;
 use CheckoutFinland\SDK\Model\Address;
@@ -262,8 +263,8 @@ final class Gateway extends \WC_Payment_Gateway {
         try {
             $this->client->validateHmac( filter_input_array( INPUT_GET ), '', filter_input( INPUT_GET, 'signature' ) );
         }
-        catch ( HmacException $e ) {
-            wp_die( esc_html__( 'HMAC signature is invalid.', 'woocommerce-payment-gateway-checkout-finland' ) );
+        catch ( HmacException $exception ) {
+            $this->signature_error( $exception );
         }
 
         $reference = filter_input( INPUT_GET, 'checkout-reference' );
@@ -276,10 +277,26 @@ final class Gateway extends \WC_Payment_Gateway {
             if ( $status === 'ok' ) {
                 $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
 
+                $order_status = $order->get_status();
+
+                if ( $order_status === 'completed' || $order_status === 'processing' ) {
+                    // This order has already been processed.
+                    return;
+                }
+
                 // Mark payment completed and store the transaction ID.
                 $order->payment_complete( $transaction_id );
-                // Translators: placeholder is transaction ID.
-                $order->add_order_note( sprintf( esc_html__( 'Payment completed with transaction ID %s.', 'woocommerce-payment-gateway-checkout-finland' ), $transaction_id ) );
+
+                $order_note = sprintf(
+                    // Translators: The placeholder is a transaction ID.
+                    esc_html__(
+                        'Payment completed with transaction ID %s.',
+                        'woocommerce-payment-gateway-checkout-finland'
+                    ),
+                    $transaction_id
+                );
+
+                $order->add_order_note( $order_note );
 
                 // Clear the cart.
                 WC()->cart->empty_cart();
@@ -311,8 +328,8 @@ final class Gateway extends \WC_Payment_Gateway {
         try {
             $this->client->validateHmac( $get, '', filter_input( INPUT_GET, 'signature' ) );
         }
-        catch ( HmacException $e ) {
-            wp_die( esc_html__( 'HMAC signature is invalid.', 'woocommerce-payment-gateway-checkout-finland' ) );
+        catch ( HmacException $exception ) {
+            $this->signature_error( $exception );
         }
 
         $refunds = \wc_get_orders(
@@ -323,7 +340,7 @@ final class Gateway extends \WC_Payment_Gateway {
         );
 
         if ( empty( $refunds ) ) {
-            wp_die( esc_html__( 'Refund cannot be found.', 'woocommerce-payment-gateway-checkout-finland' ) );
+            wp_die( esc_html__( 'Refund cannot be found.', 'woocommerce-payment-gateway-checkout-finland' ), '', 404 );
         }
         else {
             $refund = $refunds[0];
@@ -349,40 +366,18 @@ final class Gateway extends \WC_Payment_Gateway {
             case 'cancel':
                 $refund->delete( true );
 
-                $order->add_order_note(
-                    __( 'Refund was cancelled by the payment provider.', 'woocommerce-payment-gateway-checkout-finland' )
+                $order_note = __(
+                    'Refund was cancelled by the payment provider.',
+                    'woocommerce-payment-gateway-checkout-finland'
                 );
+
+                $order->add_order_note( $order_note );
 
                 do_action( 'woocommerce_refund_delete', $refund->get_id(), $order_id );
                 break;
         }
 
         die( 'ok' );
-    }
-
-    /**
-     * Insert new message to the log.
-     *
-     * @param string $message Message to log.
-     * @param string $level   Log level. Defaults to 'info'. Possible values:
-     *                        emergency|alert|critical|error|warning|notice|info|debug.
-     * @param mixed  $context The log context data.
-     */
-    public function log( $message, $level = 'info', $context = [] ) {
-        if ( $this->debug ) {
-            if ( empty( $this->logger ) ) {
-                $this->logger = \wc_get_logger();
-            }
-
-            if ( empty( $context ) ) {
-                $context = [ 'source' => Plugin::GATEWAY_ID ];
-            }
-
-            // You can use this filter to modify the context data.
-            $context = apply_filters( 'checkout_finland_error_context', $context );
-
-            $this->logger->log( $level, $message, $context );
-        }
     }
 
     /**
@@ -400,7 +395,7 @@ final class Gateway extends \WC_Payment_Gateway {
      * Process the payment and return the result.
      *
      * @param  int $order_id Order ID.
-     * @return array|void
+     * @return array
      */
     public function process_payment( $order_id ) {
         $order = wc_get_order( $order_id );
@@ -492,8 +487,24 @@ final class Gateway extends \WC_Payment_Gateway {
         try {
             $response = $this->client->createPayment( $payment );
         }
-        catch ( \Exception $e ) {
-            var_dump( $e->getMessages() );
+        catch ( ValidationException $exception ) {
+            $message = __(
+                'An error occurred validating the payment.',
+                'woocommerce-payment-gateway-checkout-finland'
+            );
+
+            $this->general_error( $exception, $message );
+        }
+        catch ( HmacException $exception ) {
+            $this->signature_error( $exception );
+        }
+        catch ( RequestException $exception ) {
+            $message = __(
+                'An error occurred performing the payment request.',
+                'woocommerce-payment-gateway-checkout-finland'
+            );
+
+            $this->general_error( $exception, $message );
         }
 
         $providers = $response->getProviders();
@@ -524,7 +535,7 @@ final class Gateway extends \WC_Payment_Gateway {
      * @param integer $order_id Order ID to refund from.
      * @param integer $amount   Optionally the refund amount if not the whole sum.
      * @param string  $reason   Optional reason for the refund.
-     * @return boolean
+     * @return boolean|\WP_Error
      */
     public function process_refund( $order_id, $amount = null, $reason = '' ) {
         try {
@@ -596,14 +607,20 @@ final class Gateway extends \WC_Payment_Gateway {
                                         case 422:
                                             $refund_object->delete( true );
                                             $order->add_order_note(
-                                                __( 'The payment provider does not support either regular or email refunds. The refund was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                                                __(
+                                                    'The payment provider does not support either regular or email refunds. The refund was cancelled.',
+                                                    'woocommerce-payment-gateway-checkout-finland'
+                                                )
                                             );
                                             break;
                                         // Default, should be 400.
                                         default:
                                             $refund_object->delete( true );
                                             $order->add_order_note(
-                                                __( 'Something went wrong with the email refund and it was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                                                __(
+                                                    'Something went wrong with the email refund and it was cancelled.',
+                                                    'woocommerce-payment-gateway-checkout-finland'
+                                                )
                                             );
                                             break;
                                     }
@@ -613,7 +630,10 @@ final class Gateway extends \WC_Payment_Gateway {
                             default:
                                 $refund_object->delete( true );
                                 $order->add_order_note(
-                                    __( 'Something went wrong with the refund and it was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                                    __(
+                                        'Something went wrong with the refund and it was cancelled.',
+                                        'woocommerce-payment-gateway-checkout-finland'
+                                    )
                                 );
                                 break;
                         }
@@ -637,16 +657,9 @@ final class Gateway extends \WC_Payment_Gateway {
             return true;
         }
         catch ( \Exception $exception ) {
+            $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
 
-            // Log the error if debug mode is on.
-            $context = [
-                'order_id' => $order_id,
-                'trace'    => $exception->getTrace(),
-            ];
-
-            $this->logger->error( $exception->getMessage(), $context );
-
-            die( esc_html( $exception->getMessage() ) );
+            return new \WP_Error( $exception->getCode(), $exception->getMessage() );
         }
     }
 
@@ -687,8 +700,9 @@ final class Gateway extends \WC_Payment_Gateway {
         $cart_total = $this->get_cart_total();
 
         $error_handler = function( Gateway $gateway, \Exception $exception ) : array {
+
             // Log the error message.
-            $gateway->log( $exception->getMessage(), 'error', $exception->getTrace() );
+            $gateway->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
 
             $error = __(
                 'An error occurred loading the payment providers.',
@@ -756,7 +770,8 @@ final class Gateway extends \WC_Payment_Gateway {
                 break;
         }
 
-        $address_suffix = empty( $order->{ 'get_' . $prefix . 'address_2' }() ) ? null : ' ' . $order->{ 'get_' . $prefix . 'address_2' }();
+        $address_suffix = empty( $order->{ 'get_' . $prefix . 'address_2' }() )
+            ? null : ' ' . $order->{ 'get_' . $prefix . 'address_2' }();
 
         // Append 2nd address line to the address field if present
         $address->setStreetAddress( ( $order->{ 'get_' . $prefix . 'address_1' }() ?? '' . $address_suffix ) ?: null )
@@ -913,6 +928,65 @@ final class Gateway extends \WC_Payment_Gateway {
 
         $plugin_version = $plugin_instance->get_plugin_info()['Version'];
 
-        wp_register_style( 'woocommerce-gateway-checkout-finland-payment-fields', $plugin_dir_url . 'assets/dist/main.css', [], $plugin_version );
+        wp_register_style(
+            'woocommerce-gateway-checkout-finland-payment-fields',
+            $plugin_dir_url . 'assets/dist/main.css',
+            [],
+            $plugin_version
+        );
+    }
+
+    /**
+     * Insert new message to the log.
+     *
+     * @param string $message Message to log.
+     * @param string $level   Log level. Defaults to 'info'. Possible values:
+     *                        emergency|alert|critical|error|warning|notice|info|debug.
+     */
+    public function log( $message, $level = 'info' ) {
+        if ( $this->debug ) {
+            if ( empty( $this->logger ) ) {
+                $this->logger = \wc_get_logger();
+            }
+
+            $context = [ 'source' => Plugin::GATEWAY_ID ];
+
+            $this->logger->log( $level, $message, $context );
+        }
+    }
+
+    /**
+     * A wrapper for killing the process, logging and displaying error messages.
+     *
+     * @param \Exception $exception An exception instance.
+     * @param string     $message   A message to print out for the end user.
+     */
+    protected function general_error( \Exception $exception, string $message ) {
+        $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+
+        // You can use this filter to modify the error message.
+        $error = apply_filters( 'checkout_finland_general_error', $message, $exception );
+
+        wp_die( esc_html( $error ), '', esc_html( $exception->getCode() ) );
+    }
+
+    /**
+     * Kills the process and prints out a signature error message.
+     *
+     * @param HmacException $exception The exception instance.
+     */
+    protected function signature_error( HmacException $exception ) {
+        // Log the error message.
+        $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+
+        $message = __(
+            'An error occurred validating the signature.',
+            'woocommerce-payment-gateway-checkout-finland'
+        );
+
+        // You can use this filter to modify the error message.
+        $message = apply_filters( 'checkout_finland_signature_error', $message, $exception );
+
+        wp_die( esc_html( $message ), '', 403 );
     }
 }
