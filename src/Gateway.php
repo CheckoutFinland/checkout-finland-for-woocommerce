@@ -302,7 +302,7 @@ final class Gateway extends \WC_Payment_Gateway {
                 WC()->cart->empty_cart();
             }
             else {
-                $order->update_status( 'failed' );
+                $order->set_rea( 'failed' );
                 $order->add_order_note( __( 'Payment failed.', 'woocommerce-payment-gateway-checkout-finland' ) );
             }
         }
@@ -587,7 +587,9 @@ final class Gateway extends \WC_Payment_Gateway {
 
             // Do some additional stuff after the refund object has been created
             add_action(
-                'woocommerce_order_refunded', function( $order_id, $refund_id ) use ( $order, $refund, $transaction_id, $amount, $price, $refund_unique_id ) {
+                'woocommerce_order_refunded',
+                function( $order_id, $refund_id )
+                use ( $order, $refund, $reason, $transaction_id, $amount, $price, $refund_unique_id ) {
                     $refund_object = new \WC_Order_Refund( $refund_id );
 
                     try {
@@ -622,7 +624,7 @@ final class Gateway extends \WC_Payment_Gateway {
                                                     'woocommerce-payment-gateway-checkout-finland'
                                                 )
                                             );
-                                            break;
+                                            return false; // Return when an error occurred.
                                         // Default, should be 400.
                                         default:
                                             $refund_object->delete( true );
@@ -632,10 +634,10 @@ final class Gateway extends \WC_Payment_Gateway {
                                                     'woocommerce-payment-gateway-checkout-finland'
                                                 )
                                             );
-                                            break;
+                                            return false; // Return when an error occurred.
                                     }
                                 }
-                                break;
+                                break; // Break the email refund processing.
                             // Default, should be 400.
                             default:
                                 $refund_object->delete( true );
@@ -645,7 +647,7 @@ final class Gateway extends \WC_Payment_Gateway {
                                         'woocommerce-payment-gateway-checkout-finland'
                                     )
                                 );
-                                break;
+                                return false; // Return when an error occurred.
                         }
                     }
 
@@ -661,6 +663,8 @@ final class Gateway extends \WC_Payment_Gateway {
                     $refund_object->set_reason( $reason . ' Refund is still being processed. The status and the amount (' . $price . ') of the refund will update when the processing is completed.' );
 
                     $refund_object->save();
+
+                    return true;
                 }, 10, 2
             );
 
