@@ -280,6 +280,9 @@ final class Gateway extends \WC_Payment_Gateway {
                 $order->payment_complete( $transaction_id );
                 // Translators: placeholder is transaction ID.
                 $order->add_order_note( sprintf( esc_html__( 'Payment completed with transaction ID %s.', 'woocommerce-payment-gateway-checkout-finland' ), $transaction_id ) );
+
+                // Clear the cart.
+                WC()->cart->empty_cart();
             }
             else {
                 $order->update_status( 'failed' );
