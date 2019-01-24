@@ -14,7 +14,7 @@ use CheckoutFinland\SDK\Exception\HmacException;
 use CheckoutFinland\SDK\Request\RefundRequest;
 use CheckoutFinland\SDK\Client;
 use CheckoutFinland\SDK\Request\EmailRefundRequest;
-
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * The gateway class
@@ -198,23 +198,23 @@ final class Gateway extends \WC_Payment_Gateway {
     }
 
     /**
-	 * Save admin options.
-	 *
-	 * @return boolean
-	 */
-	public function process_admin_options() {
-		$saved = parent::process_admin_options();
+     * Save admin options.
+     *
+     * @return boolean
+     */
+    public function process_admin_options() {
+        $saved = parent::process_admin_options();
 
-		// Clear logs if debugging was disabled.
-		if ( 'yes' !== $this->get_option( 'debug', 'no' ) ) {
-			if ( empty( $this->logger ) ) {
-				$this->logger = wc_get_logger();
+        // Clear logs if debugging was disabled.
+        if ( 'yes' !== $this->get_option( 'debug', 'no' ) ) {
+            if ( empty( $this->logger ) ) {
+                $this->logger = wc_get_logger();
             }
 
-			$this->logger->clear( Plugin::GATEWAY_ID );
-		}
+            $this->logger->clear( Plugin::GATEWAY_ID );
+        }
 
-		return $saved;
+        return $saved;
     }
 
     /**
@@ -280,6 +280,9 @@ final class Gateway extends \WC_Payment_Gateway {
                 $order->payment_complete( $transaction_id );
                 // Translators: placeholder is transaction ID.
                 $order->add_order_note( sprintf( esc_html__( 'Payment completed with transaction ID %s.', 'woocommerce-payment-gateway-checkout-finland' ), $transaction_id ) );
+
+                // Clear the cart.
+                WC()->cart->empty_cart();
             }
             else {
                 $order->update_status( 'failed' );
@@ -312,10 +315,12 @@ final class Gateway extends \WC_Payment_Gateway {
             wp_die( esc_html__( 'HMAC signature is invalid.', 'woocommerce-payment-gateway-checkout-finland' ) );
         }
 
-        $refunds = \wc_get_orders( [
-            'type'                      => 'shop_order_refund',
-            'checkout_refund_unique_id' => $refund_unique_id,
-        ]);
+        $refunds = \wc_get_orders(
+            [
+                'type'                      => 'shop_order_refund',
+                'checkout_refund_unique_id' => $refund_unique_id,
+            ]
+        );
 
         if ( empty( $refunds ) ) {
             wp_die( esc_html__( 'Refund cannot be found.', 'woocommerce-payment-gateway-checkout-finland' ) );
@@ -356,20 +361,28 @@ final class Gateway extends \WC_Payment_Gateway {
     }
 
     /**
-	 * Insert new message to the log.
-	 *
-	 * @param string $message Message to log.
-	 * @param string $level   Log level. Defaults to 'info'. Possible values:
-	 *                        emergency|alert|critical|error|warning|notice|info|debug.
-	 */
-	public function log( $message, $level = 'info' ) {
-		if ( $this->debug ) {
-			if ( empty( $this->logger ) ) {
-				$this->logger = \wc_get_logger();
+     * Insert new message to the log.
+     *
+     * @param string $message Message to log.
+     * @param string $level   Log level. Defaults to 'info'. Possible values:
+     *                        emergency|alert|critical|error|warning|notice|info|debug.
+     * @param mixed  $context The log context data.
+     */
+    public function log( $message, $level = 'info', $context = [] ) {
+        if ( $this->debug ) {
+            if ( empty( $this->logger ) ) {
+                $this->logger = \wc_get_logger();
             }
 
-			$this->logger->log( $level, $message, [ 'source' => Plugin::GATEWAY_ID ] );
-		}
+            if ( empty( $context ) ) {
+                $context = [ 'source' => Plugin::GATEWAY_ID ];
+            }
+
+            // You can use this filter to modify the context data.
+            $context = apply_filters( 'checkout_finland_error_context', $context );
+
+            $this->logger->log( $level, $message, $context );
+        }
     }
 
     /**
@@ -384,12 +397,12 @@ final class Gateway extends \WC_Payment_Gateway {
     }
 
     /**
-	 * Process the payment and return the result.
-	 *
-	 * @param  int $order_id Order ID.
-	 * @return array|void
-	 */
-	public function process_payment( $order_id ) {
+     * Process the payment and return the result.
+     *
+     * @param  int $order_id Order ID.
+     * @return array|void
+     */
+    public function process_payment( $order_id ) {
         $order = wc_get_order( $order_id );
 
         $payment = new PaymentRequest();
@@ -456,9 +469,11 @@ final class Gateway extends \WC_Payment_Gateway {
         $items = WC()->cart->get_cart_contents();
 
         // Convert items to SDK Item objects.
-        $items = array_map( function( $item ) {
-            return $this->create_item( $item );
-        }, $items );
+        $items = array_map(
+            function( $item ) {
+                    return $this->create_item( $item );
+            }, $items
+        );
 
         $items[] = $this->create_shipping_item( $order );
 
@@ -483,13 +498,15 @@ final class Gateway extends \WC_Payment_Gateway {
 
         $providers = $response->getProviders();
 
-        $wanted_provider = array_reduce( $providers, function( $carry, $item = null ) use ( $payment_provider ) {
-            if ( $item && $item->getId() === $payment_provider ) {
-                return $item;
-            }
+        $wanted_provider = array_reduce(
+            $providers, function( $carry, $item = null ) use ( $payment_provider ) {
+                if ( $item && $item->getId() === $payment_provider ) {
+                    return $item;
+                }
 
-            return $carry;
-        });
+                return $carry;
+            }
+        );
 
         WC()->session->set( 'payment_provider', $wanted_provider );
 
@@ -548,77 +565,88 @@ final class Gateway extends \WC_Payment_Gateway {
             );
 
             // Do some additional stuff after the refund object has been created
-            add_action( 'woocommerce_order_refunded', function( $order_id, $refund_id ) use ( $order, $refund, $transaction_id, $amount, $price, $refund_unique_id ) {
-                $refund_object = new \WC_Order_Refund( $refund_id );
+            add_action(
+                'woocommerce_order_refunded', function( $order_id, $refund_id ) use ( $order, $refund, $transaction_id, $amount, $price, $refund_unique_id ) {
+                    $refund_object = new \WC_Order_Refund( $refund_id );
 
-                try {
-                    $this->client->refund( $refund, $transaction_id );
-                }
-                catch ( \Exception $e ) {
-                    switch ( $e->getCode() ) {
-                        case 422:
-                            // An email refund request is needed
-                            $email = $order->get_billing_email();
-
-                            $email_refund_request = new EmailRefundRequest();
-
-                            $email_refund_request->setEmail( $email );
-                            $email_refund_request->setAmount( $refund->getAmount() );
-                            $email_refund_request->setCallbackUrls( $refund->getCallbackUrls() );
-
-                            if ( count( $refund->getItems() ) > 0 ) {
-                                $email_refund_request->setItems( $refund->getItems() );
-                            }
-
-                            try {
-                                $this->client->emailRefund( $email_refund_request, $transaction_id );
-                            }
-                            catch ( \Exception $e ) {
-                                switch ( $e->getCode() ) {
-                                    case 422:
-                                        $refund_object->delete( true );
-                                        $order->add_order_note(
-                                            __( 'The payment provider does not support either regular or email refunds. The refund was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
-                                        );
-                                        break;
-                                    // Default, should be 400.
-                                    default:
-                                        $refund_object->delete( true );
-                                        $order->add_order_note(
-                                            __( 'Something went wrong with the email refund and it was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
-                                        );
-                                        break;
-                                }
-                            }
-                            break;
-                        // Default, should be 400.
-                        default:
-                            $refund_object->delete( true );
-                            $order->add_order_note(
-                                __( 'Something went wrong with the refund and it was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
-                            );
-                            break;
+                    try {
+                        $this->client->refund( $refund, $transaction_id );
                     }
-                }
+                    catch ( \Exception $e ) {
+                        switch ( $e->getCode() ) {
+                            case 422:
+                                // An email refund request is needed
+                                $email = $order->get_billing_email();
 
-                $reason = $refund_object->get_reason();
+                                $email_refund_request = new EmailRefundRequest();
 
-                update_post_meta( $refund_object->get_id(), '_checkout_refund_amount', $amount );
-                update_post_meta( $refund_object->get_id(), '_checkout_refund_reason', $reason );
-                update_post_meta( $refund_object->get_id(), '_checkout_refund_unique_id', $refund_unique_id );
-                update_post_meta( $refund_object->get_id(), '_checkout_refund_processing', true );
+                                $email_refund_request->setEmail( $email );
+                                $email_refund_request->setAmount( $refund->getAmount() );
+                                $email_refund_request->setCallbackUrls( $refund->getCallbackUrls() );
 
-                $refund_object->set_amount( 0 );
+                                if ( count( $refund->getItems() ) > 0 ) {
+                                    $email_refund_request->setItems( $refund->getItems() );
+                                }
 
-                $refund_object->set_reason( $reason . ' Refund is still being processed. The status and the amount (' . $price . ') of the refund will update when the processing is completed.' );
+                                try {
+                                    $this->client->emailRefund( $email_refund_request, $transaction_id );
+                                }
+                                catch ( \Exception $e ) {
+                                    switch ( $e->getCode() ) {
+                                        case 422:
+                                            $refund_object->delete( true );
+                                            $order->add_order_note(
+                                                __( 'The payment provider does not support either regular or email refunds. The refund was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                                            );
+                                            break;
+                                        // Default, should be 400.
+                                        default:
+                                            $refund_object->delete( true );
+                                            $order->add_order_note(
+                                                __( 'Something went wrong with the email refund and it was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                                            );
+                                            break;
+                                    }
+                                }
+                                break;
+                            // Default, should be 400.
+                            default:
+                                $refund_object->delete( true );
+                                $order->add_order_note(
+                                    __( 'Something went wrong with the refund and it was cancelled.', 'woocommerce-payment-gateway-checkout-finland' )
+                                );
+                                break;
+                        }
+                    }
 
-                $refund_object->save();
-            }, 10, 2 );
+                    $reason = $refund_object->get_reason();
+
+                    update_post_meta( $refund_object->get_id(), '_checkout_refund_amount', $amount );
+                    update_post_meta( $refund_object->get_id(), '_checkout_refund_reason', $reason );
+                    update_post_meta( $refund_object->get_id(), '_checkout_refund_unique_id', $refund_unique_id );
+                    update_post_meta( $refund_object->get_id(), '_checkout_refund_processing', true );
+
+                    $refund_object->set_amount( 0 );
+
+                    $refund_object->set_reason( $reason . ' Refund is still being processed. The status and the amount (' . $price . ') of the refund will update when the processing is completed.' );
+
+                    $refund_object->save();
+                }, 10, 2
+            );
 
             return true;
         }
-        catch ( \Exception $e ) {
-            die( $e->getMessage() );
+        catch ( \Exception $exception ) {
+
+            // Log the error if debug mode is on.
+            $context = [
+                'order_id' => $order_id,
+                'trace'    => $exception->getTrace(),
+            ];
+
+            $this->logger->error( $exception->getMessage(), $context );
+
+            die( esc_html( $exception->getMessage() ) );
         }
     }
 
@@ -634,17 +662,19 @@ final class Gateway extends \WC_Payment_Gateway {
         $refunds = $order->get_refunds();
 
         if ( $refunds ) {
-            array_walk( $refunds, function( $refund ) {
-                $meta = get_post_meta( $refund->get_id(), '_checkout_refund_processing', true );
+            array_walk(
+                $refunds, function( $refund ) {
+                    $meta = get_post_meta( $refund->get_id(), '_checkout_refund_processing', true );
 
-                if ( $meta ) {
-                    echo '<style>';
-                    echo '[data-order_refund_id=' . esc_html( $refund->get_id() ) . '] span.amount {';
-                    echo 'font-style: italic;';
-                    echo '}';
-                    echo '</style>';
-                };
-            });
+                    if ( $meta ) {
+                        echo '<style>';
+                        echo '[data-order_refund_id=' . esc_html( $refund->get_id() ) . '] span.amount {';
+                        echo 'font-style: italic;';
+                        echo '}';
+                        echo '</style>';
+                    };
+                }
+            );
         }
     }
 
@@ -656,7 +686,33 @@ final class Gateway extends \WC_Payment_Gateway {
     protected function provider_form() {
         $cart_total = $this->get_cart_total();
 
-        $providers = $this->client->getPaymentProviders( $cart_total );
+        $error_handler = function( Gateway $gateway, \Exception $exception ) : array {
+            // Log the error message.
+            $gateway->log( $exception->getMessage(), 'error', $exception->getTrace() );
+
+            $error = __(
+                'An error occurred loading the payment providers.',
+                'woocommerce-payment-gateway-checkout-finland'
+            );
+
+            // You can use this filter to modify the error message.
+            $error     = apply_filters( 'checkout_finland_provider_form_error', $error );
+            $providers = [
+                'error' => $error,
+            ];
+
+            return $providers;
+        };
+
+        try {
+            $providers = $this->client->getPaymentProviders( $cart_total );
+        }
+        catch ( HmacException $exception ) {
+            $providers = $error_handler( $this, $exception );
+        }
+        catch ( RequestException $exception ) {
+            $providers = $error_handler( $this, $exception );
+        }
 
         $provider_form_view = new View( 'ProviderForm' );
 
