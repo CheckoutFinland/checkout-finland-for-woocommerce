@@ -23,13 +23,11 @@ A WooCommerce extension to add support for Checkout Finland payment methods.
 ### Via Composer
 
 1. If you have Composer installed:
-    - You can use the command line:
+    - You can use the command line or add json in your `composer.json` file:
 
 ```
 $ composer require checkoutfinland/woocommerce-gateway-checkout-finland
 ```
-
-    - Or add it in your `composer.json`:
 
 ```json
 {
