@@ -302,7 +302,7 @@ final class Gateway extends \WC_Payment_Gateway {
                 WC()->cart->empty_cart();
             }
             else {
-                $order->set_rea( 'failed' );
+                $order->update_status( 'failed' );
                 $order->add_order_note( __( 'Payment failed.', 'woocommerce-payment-gateway-checkout-finland' ) );
             }
         }
