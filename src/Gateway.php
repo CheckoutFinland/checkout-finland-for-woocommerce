@@ -15,6 +15,8 @@ use CheckoutFinland\SDK\Exception\HmacException;
 use CheckoutFinland\SDK\Request\RefundRequest;
 use CheckoutFinland\SDK\Client;
 use CheckoutFinland\SDK\Request\EmailRefundRequest;
+use \WC_Order_Item_Product;
+use \WC_Order_Item_Fee;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -85,7 +87,7 @@ final class Gateway extends \WC_Payment_Gateway {
         $this->has_fields = true;
 
         // These strings will show in the backend.
-        $this->method_title       = 'Checkout Finland - TODO METHOD TITLE';
+        $this->method_title       = 'Checkout Finland';
         $this->method_description = 'TODO METHOD DESCRIPTION';
 
         // Set gateway admin settings fields.
@@ -461,15 +463,22 @@ final class Gateway extends \WC_Payment_Gateway {
         $payment->setLanguage( $locale );
 
         // Get the items from the cart
-        $items = WC()->cart->get_cart_contents();
+        $order_items = $order->get_items( [ 'line_item', 'fee' ] );
 
         // Convert items to SDK Item objects.
         $items = array_map(
             function( $item ) {
-                    return $this->create_item( $item );
-            }, $items
+                switch ( get_class( $item ) ) {
+                    case WC_Order_Item_Product::class:
+                        return $this->create_item_from_product( $item );
+                    case WC_Order_Item_Fee::class:
+                        return $this->create_item_from_fee( $item );
+                    // TODO: handle shipping item here!
+                }
+            }, $order_items
         );
 
+        // TODO: move shipping handling to the array_map above!
         $items[] = $this->create_shipping_item( $order );
 
         // Assign the items to the payment request
@@ -588,8 +597,7 @@ final class Gateway extends \WC_Payment_Gateway {
             // Do some additional stuff after the refund object has been created
             add_action(
                 'woocommerce_order_refunded',
-                function( $order_id, $refund_id )
-                use ( $order, $refund, $reason, $transaction_id, $amount, $price, $refund_unique_id ) {
+                function( $order_id, $refund_id ) use ( $order, $refund, $reason, $transaction_id, $amount, $price, $refund_unique_id ) {
                     $refund_object = new \WC_Order_Refund( $refund_id );
 
                     try {
@@ -806,21 +814,56 @@ final class Gateway extends \WC_Payment_Gateway {
     }
 
     /**
-     * Create SDK item object.
+     * Create a SDK item object.
      *
-     * @param array $cart_item The cart item array to create the item ovject from.
+     * @param WC_Order_Item_Product $product_item The order item object to create the item object from.
      *
-     * @return Item
+     * @return Item|null
      */
-    protected function create_item( array $cart_item ) : Item {
-        $product = $cart_item['data'];
-
+    protected function create_item_from_product( WC_Order_Item_Product $product_item ) : Item {
         $item = new Item();
 
-        $item->setUnitPrice( $this->handle_currency( $product->get_price() ) )
-            ->setUnits( $cart_item['quantity'] );
+        $item->setUnitPrice( $this->handle_currency( $product_item->get_subtotal_tax() ) )
+            ->setUnits( (int) $product_item->get_quantity() );
 
-        $tax_rates = \WC_Tax::get_rates( $product->get_tax_class() );
+        $tax_rates = \WC_Tax::get_rates( $product_item->get_tax_class() );
+
+        if ( empty( $tax_rates ) ) {
+            $tax_rate = 0;
+        }
+        else {
+            // Checkout Finland supports only one tax rate per item
+            // thus use the first one.
+            $tax_rate = reset( $tax_rates );
+            $tax_rate = $tax_rate['rate'];
+        }
+
+        // If no sku is set, use the product id as the product code.
+        $product_code = $product_item->get_product()->get_sku() ?: $product_item->get_product()->get_id();
+
+        $item->setVatPercentage( $tax_rate )
+            ->setProductCode( $product_code )
+            ->setDeliveryDate( date( 'Y-m-d' ) )
+            ->setDescription( $product_item->get_product()->get_description() )
+            ->setStamp( $product_item->get_product()->get_id() );
+
+        return $item;
+    }
+
+    /**
+     * Create a SDK item object.
+     *
+     * @param WC_Order_Item_Fee $fee_item The order item object to create the item object from.
+     *
+     * @return Item|null
+     */
+    protected function create_item_from_fee( WC_Order_Item_Fee $fee_item ) : Item {
+        $item = new Item();
+
+        $item->setUnitPrice( $this->handle_currency( $fee_item->get_total() ) )
+             ->setUnits( (int) $fee_item->get_quantity() );
+
+        $tax_rates = \WC_Tax::get_rates( $fee_item->get_tax_class() );
 
         // TODO: What to do if the are more than one tax rate for a product?
         if ( empty( $tax_rates ) ) {
@@ -832,10 +875,10 @@ final class Gateway extends \WC_Payment_Gateway {
         }
 
         $item->setVatPercentage( $tax_rate )
-            ->setProductCode( $product->get_sku() )
-            ->setDeliveryDate( date( 'Y-m-d' ) )
-            ->setDescription( $product->get_description() )
-            ->setStamp( $product->get_id() );
+             ->setProductCode( 'fee' )
+             ->setDeliveryDate( date( 'Y-m-d' ) )
+             ->setDescription( $fee_item->get_name() )
+             ->setStamp( $fee_item->get_id() );
 
         return $item;
     }
@@ -851,7 +894,8 @@ final class Gateway extends \WC_Payment_Gateway {
 
         $vat_percentage = ( $order->get_shipping_tax() / $order->get_shipping_total() ) * 100;
 
-        $item->setUnitPrice( $this->handle_currency( $order->get_shipping_total() + $order->get_shipping_tax() ) )
+        $combined = $order->get_shipping_total() + $order->get_shipping_tax();
+        $item->setUnitPrice( $this->handle_currency( $combined ) )
             ->setUnits( 1 )
             ->setVatPercentage( $vat_percentage )
             ->setProductCode( 'shipping' )
