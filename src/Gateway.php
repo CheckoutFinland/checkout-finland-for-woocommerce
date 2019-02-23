@@ -15,8 +15,11 @@ use CheckoutFinland\SDK\Exception\HmacException;
 use CheckoutFinland\SDK\Request\RefundRequest;
 use CheckoutFinland\SDK\Client;
 use CheckoutFinland\SDK\Request\EmailRefundRequest;
-use \WC_Order_Item_Product;
-use \WC_Order_Item_Fee;
+use WC_Order;
+use WC_Order_Item;
+use WC_Order_Item_Product;
+use WC_Order_Item_Fee;
+use WC_Order_Item_Shipping;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -398,6 +401,7 @@ final class Gateway extends \WC_Payment_Gateway {
      *
      * @param  int $order_id Order ID.
      * @return array
+     * @throws \Exception If the processing fails, this error is handled by WooCommerce.
      */
     public function process_payment( $order_id ) {
         $order = wc_get_order( $order_id );
@@ -420,12 +424,12 @@ final class Gateway extends \WC_Payment_Gateway {
         update_post_meta( $order->get_id(), '_checkout_reference_' . $reference, true );
 
         // Fetch current currency and the cart total
-        $currency   = get_woocommerce_currency();
-        $cart_total = $this->get_cart_total();
+        $currency    = get_woocommerce_currency();
+        $order_total = $this->handle_currency( $order->get_total() );
 
         // Set the aforementioned values to the payment request
         $payment->setCurrency( $currency )
-            ->setAmount( $cart_total );
+            ->setAmount( $order_total );
 
         // Create a customer object from the order
         $customer = $this->create_customer( $order );
@@ -463,26 +467,17 @@ final class Gateway extends \WC_Payment_Gateway {
         $payment->setLanguage( $locale );
 
         // Get the items from the cart
-        $order_items = $order->get_items( [ 'line_item', 'fee' ] );
+        $order_items = $order->get_items( [ 'line_item', 'fee', 'shipping' ] );
 
         // Convert items to SDK Item objects.
         $items = array_map(
-            function( $item ) {
-                switch ( get_class( $item ) ) {
-                    case WC_Order_Item_Product::class:
-                        return $this->create_item_from_product( $item );
-                    case WC_Order_Item_Fee::class:
-                        return $this->create_item_from_fee( $item );
-                    // TODO: handle shipping item here!
-                }
+            function( $item ) use ( $order ) {
+                return $this->create_item( $item, $order );
             }, $order_items
         );
 
-        // TODO: move shipping handling to the array_map above!
-        $items[] = $this->create_shipping_item( $order );
-
-        // Assign the items to the payment request
-        $payment->setItems( $items );
+        // Assign the items to the payment request.
+        $payment->setItems( array_filter( $items ) );
 
         // Create and assign the return urls
         $payment->setRedirectUrls( $this->create_redirect_url( $order ) );
@@ -491,6 +486,16 @@ final class Gateway extends \WC_Payment_Gateway {
         $payment_provider = filter_input( INPUT_POST, 'payment_provider' );
 
         $order->update_meta_data( '_checkout_payment_provider', $payment_provider );
+
+        // Define if the process should die if an error occurs.
+        if ( filter_input( INPUT_POST, 'woocommerce_pay' ) ) {
+            // Die on a payment page.
+            $die_on_error = true;
+        }
+        else {
+            // Do not die on a checkout page.
+            $die_on_error = false;
+        }
 
         // Create a payment via Checkout SDK
         try {
@@ -502,10 +507,10 @@ final class Gateway extends \WC_Payment_Gateway {
                 'woocommerce-payment-gateway-checkout-finland'
             );
 
-            $this->general_error( $exception, $message );
+            $this->error( $exception, $message, $die_on_error );
         }
         catch ( HmacException $exception ) {
-            $this->signature_error( $exception );
+            $this->signature_error( $exception, $die_on_error );
         }
         catch ( RequestException $exception ) {
             $message = __(
@@ -513,7 +518,7 @@ final class Gateway extends \WC_Payment_Gateway {
                 'woocommerce-payment-gateway-checkout-finland'
             );
 
-            $this->general_error( $exception, $message );
+            $this->error( $exception, $message, $die_on_error );
         }
 
         $providers = $response->getProviders();
@@ -816,92 +821,89 @@ final class Gateway extends \WC_Payment_Gateway {
     /**
      * Create a SDK item object.
      *
-     * @param WC_Order_Item_Product $product_item The order item object to create the item object from.
+     * @param WC_Order_Item $order_item The order item object to create the item object from.
+     * @param WC_Order      $order      The current order object.
      *
      * @return Item|null
      */
-    protected function create_item_from_product( WC_Order_Item_Product $product_item ) : Item {
+    protected function create_item( WC_Order_Item $order_item, WC_Order $order ) : Item {
         $item = new Item();
 
-        $item->setUnitPrice( $this->handle_currency( $product_item->get_subtotal_tax() ) )
-            ->setUnits( (int) $product_item->get_quantity() );
+        // Get the item total with taxes and without rounding.
+        // Then convert it into the integer format required by Checkout Finland.
+        $sub_total = $this->handle_currency( $order->get_item_total( $order_item, true, false ) );
+        $item->setUnitPrice( $sub_total )
+            ->setUnits( (int) $order_item->get_quantity() );
 
-        $tax_rates = \WC_Tax::get_rates( $product_item->get_tax_class() );
-
-        if ( empty( $tax_rates ) ) {
-            $tax_rate = 0;
-        }
-        else {
-            // Checkout Finland supports only one tax rate per item
-            // thus use the first one.
-            $tax_rate = reset( $tax_rates );
-            $tax_rate = $tax_rate['rate'];
-        }
-
-        // If no sku is set, use the product id as the product code.
-        $product_code = $product_item->get_product()->get_sku() ?: $product_item->get_product()->get_id();
+        $tax_rate = $this->get_item_tax_rate( $order_item, $order );
 
         $item->setVatPercentage( $tax_rate )
-            ->setProductCode( $product_code )
-            ->setDeliveryDate( date( 'Y-m-d' ) )
-            ->setDescription( $product_item->get_product()->get_description() )
-            ->setStamp( $product_item->get_product()->get_id() );
+            ->setProductCode( $this->get_item_produt_code( $order_item ) )
+            ->setDeliveryDate( apply_filters( 'checkout_finland_delivery_date', date( 'Y-m-d' ) ) )
+            ->setDescription( $this->get_item_description( $order_item ) )
+            ->setStamp( $order_item->get_id() );
 
         return $item;
     }
 
     /**
-     * Create a SDK item object.
+     * Get an order item product code text.
      *
-     * @param WC_Order_Item_Fee $fee_item The order item object to create the item object from.
+     * @param WC_Order_Item $item An order item.
      *
-     * @return Item|null
+     * @return string
      */
-    protected function create_item_from_fee( WC_Order_Item_Fee $fee_item ) : Item {
-        $item = new Item();
-
-        $item->setUnitPrice( $this->handle_currency( $fee_item->get_total() ) )
-             ->setUnits( (int) $fee_item->get_quantity() );
-
-        $tax_rates = \WC_Tax::get_rates( $fee_item->get_tax_class() );
-
-        // TODO: What to do if the are more than one tax rate for a product?
-        if ( empty( $tax_rates ) ) {
-            $tax_rate = 0;
+    protected function get_item_produt_code( WC_Order_Item $item ) : string {
+        $product_code = '';
+        switch ( get_class( $item ) ) {
+            case WC_Order_Item_Product::class:
+                $product_code = $item->get_product()->get_sku() ?: $item->get_product()->get_id();
+                break;
+            case WC_Order_Item_Fee::class:
+                $product_code = __( 'fee', 'woocommerce-payment-gateway-checkout-finland' );
+                $item->get_type();
+                break;
+            case WC_Order_Item_Shipping::class:
+                $product_code = __( 'shipping', 'woocommerce-payment-gateway-checkout-finland' );
+                break;
         }
-        else {
-            $tax_rate = reset( $tax_rates );
-            $tax_rate = $tax_rate['rate'];
-        }
-
-        $item->setVatPercentage( $tax_rate )
-             ->setProductCode( 'fee' )
-             ->setDeliveryDate( date( 'Y-m-d' ) )
-             ->setDescription( $fee_item->get_name() )
-             ->setStamp( $fee_item->get_id() );
-
-        return $item;
+        return apply_filters( 'checkout_finland_item_product_code', $product_code, $item );
     }
 
     /**
-     * Create SDK item object for shipping
+     * Get an order item description text.
      *
-     * @param \WC_Order $order The order object.
-     * @return Item
+     * @param WC_Order_Item $item An order item.
+     *
+     * @return string
      */
-    protected function create_shipping_item( \WC_Order $order ) : Item {
-        $item = new Item();
+    protected function get_item_description( WC_Order_Item $item ) : string {
+        switch ( get_class( $item ) ) {
+            case WC_Order_Item_Product::class:
+                $description = $item->get_product()->get_description();
+                break;
+            default:
+                $description = $item->get_name();
+                break;
+        }
+        return apply_filters( 'checkout_finland_item_description', $description, $item );
+    }
 
-        $vat_percentage = ( $order->get_shipping_tax() / $order->get_shipping_total() ) * 100;
+    /**
+     * Get the tax rate of an order line item.
+     *
+     * @param WC_Order_Item $item  The order line item.
+     * @param WC_Order      $order The current order object.
+     *
+     * @return int The tax percentage.
+     */
+    protected function get_item_tax_rate( WC_Order_Item $item, WC_Order $order ) {
+        $total     = $order->get_line_total( $item, false );
+        $tax_total = $order->get_line_tax( $item );
 
-        $combined = $order->get_shipping_total() + $order->get_shipping_tax();
-        $item->setUnitPrice( $this->handle_currency( $combined ) )
-            ->setUnits( 1 )
-            ->setVatPercentage( $vat_percentage )
-            ->setProductCode( 'shipping' )
-            ->setDeliveryDate( date( 'Y-m-d' ) );
+        $tax_rate = round( ( $tax_total / $total ) * 100 );
 
-        return $item;
+        return (int) $tax_rate;
     }
 
     /**
@@ -937,10 +939,13 @@ final class Gateway extends \WC_Payment_Gateway {
      * @return integer
      */
     protected function handle_currency( $sum ) : int {
-        $currency = get_woocommerce_currency();
+        $currency = \get_woocommerce_currency();
 
         switch ( $currency ) {
             case 'EUR':
+                $sum = round( $sum * 100 );
+                break;
+            default:
                 $sum = round( $sum * 100 );
                 break;
         }
@@ -1018,25 +1023,38 @@ final class Gateway extends \WC_Payment_Gateway {
      *
      * @param \Exception $exception An exception instance.
      * @param string     $message   A message to print out for the end user.
+     * @param bool       $die       Defines if the process should be terminated.
+     * @throws \Exception If the process is not killed, the error is passed on.
      */
-    protected function general_error( \Exception $exception, string $message ) {
-        $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+    protected function error( \Exception $exception, string $message, bool $die = true ) {
+        $glue = PHP_EOL . '- ';
+        if ( method_exists( $exception, 'getMessages' ) ) {
+            $log_message = $message . $glue . implode( $glue, $exception->getMessages() ) . $glue;
+        }
+        else {
+            $log_message = $message . $glue;
+        }
+
+        $this->log( $log_message . PHP_EOL . $exception->getTraceAsString(), 'error' );
 
         // You can use this filter to modify the error message.
-        $error = apply_filters( 'checkout_finland_general_error', $message, $exception );
+        $error = apply_filters( 'checkout_finland_error_message', $message, $exception );
 
-        wp_die( esc_html( $error ), '', esc_html( $exception->getCode() ) );
+        if ( $die === true ) {
+            wp_die( esc_html( $error ), '', esc_html( $exception->getCode() ) );
+        }
+        else {
+            throw $exception;
+        }
     }
 
     /**
      * Kills the process and prints out a signature error message.
      *
      * @param HmacException $exception The exception instance.
+     * @param bool          $die       Defines if the process should be terminated.
      */
-    protected function signature_error( HmacException $exception ) {
-        // Log the error message.
-        $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
-
+    protected function signature_error( HmacException $exception, bool $die = true ) {
         $message = __(
             'An error occurred validating the signature.',
             'woocommerce-payment-gateway-checkout-finland'
@@ -1045,6 +1063,6 @@ final class Gateway extends \WC_Payment_Gateway {
         // You can use this filter to modify the error message.
         $message = apply_filters( 'checkout_finland_signature_error', $message, $exception );
 
-        wp_die( esc_html( $message ), '', 403 );
+        $this->error( $exception, $message, $die );
     }
 }
