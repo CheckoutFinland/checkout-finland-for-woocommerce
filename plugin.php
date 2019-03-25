@@ -38,6 +38,16 @@ final class Plugin {
     public const TEST_SECRET_KEY = 'SAIPPUAKAUPPIAS';
 
     /**
+     * The URL from which the method description should be fetched.
+     */
+    public const METHOD_INFO_URL = 'https://cdn2.hubspot.net/hubfs/2610868/ext-media/op-psp-service-info.json';
+
+    /**
+     * The URL of the payment method icon
+     */
+    public const ICON_URL = 'https://cdn2.hubspot.net/hubfs/2610868/ext-media/op-psp-master-logo.svg';
+
+    /**
      * Singleton instance.
      *
      * @var Plugin

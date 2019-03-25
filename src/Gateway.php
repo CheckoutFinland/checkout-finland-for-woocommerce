@@ -28,6 +28,15 @@ use GuzzleHttp\Exception\RequestException;
 final class Gateway extends \WC_Payment_Gateway {
 
     /**
+     * Default method descriptions to be used as fallbacks.
+     */
+    protected const DEFAULT_METHOD_INFO = [
+        'fi' => 'Checkout Finland',
+        'en' => 'Checkout Finland',
+        'sv' => 'Checkout Finland',
+    ];
+
+    /**
      * Checkout Finland merchant ID.
      *
      * @var int
@@ -66,6 +75,13 @@ final class Gateway extends \WC_Payment_Gateway {
     ];
 
     /**
+     * Dynamic method info that will be populated from an endpoint.
+     *
+     * @var array
+     */
+    public $method_info = [];
+
+    /**
      * WooCommerce logger instance
      *
      * @var \WC_Logger
@@ -86,22 +102,26 @@ final class Gateway extends \WC_Payment_Gateway {
         // Set payment gateway ID
         $this->id = Plugin::GATEWAY_ID;
 
-        // TODO: Set property 'icon'
         $this->has_fields = true;
 
+        // Get dynamic payment method info.
+        $this->method_info = $this->get_checkout_finland_method_info();
+
         // These strings will show in the backend.
-        $this->method_title       = 'Checkout Finland';
-        $this->method_description = 'TODO METHOD DESCRIPTION';
+        $this->method_title       = $this->method_info['title'];
+        $this->method_description = $this->method_info['description'];
+
+        // These strings may show in the frontend.
+        $this->title       = $this->method_info['title'];
+        $this->description = $this->method_info['description'];
+
+        $this->icon = Plugin::ICON_URL;
 
         // Set gateway admin settings fields.
         $this->set_form_fields();
 
         // Initialize gateway settings.
         $this->init_settings();
-
-        // Get options
-        $this->title       = $this->get_option( 'title' );
-        $this->description = $this->get_option( 'description' );
 
         // Whether we are in test mode or not.
         $this->testmode = 'yes' === $this->get_option( 'testmode', 'no' );
@@ -145,6 +165,60 @@ final class Gateway extends \WC_Payment_Gateway {
     }
 
     /**
+     * Returns the payment method description string.
+     *
+     * @return array
+     */
+    protected function get_checkout_finland_method_info() : array {
+        // Determine the locale to use
+        $locale = \get_locale();
+
+        $short_locale = substr( $locale, 0, 2 );
+
+        // Check from transients for the description object
+        $method_info = get_transient( 'checkout_finland_method_descriptions' );
+
+        // If we didn't have the descriptions in a transient, fetch them from the server.
+        if ( empty( $method_info ) ) {
+            // Get the external description file
+            $response = wp_remote_get( Plugin::METHOD_INFO_URL, [ 'timeout' => 3 ] );
+
+            // If the response is valid, parse it into JSON.
+            if ( ! $response instanceof \WP_Error ) {
+                $body = wp_remote_retrieve_body( $response );
+
+                $data = \json_decode( $body );
+
+                if ( ! empty( $data ) ) {
+                    $method_info = $data;
+
+                    set_transient( 'checkout_finland_method_descriptions', $method_info, WEEK_IN_SECONDS );
+                }
+            }
+        }
+
+        // Combine the current description array with the defaults.
+        $method_info = [
+            'title'       => wp_parse_args( $method_info->title ?? [], self::DEFAULT_METHOD_INFO ),
+            'description' => wp_parse_args( $method_info->description ?? [], self::DEFAULT_METHOD_INFO ),
+        ];
+
+        // Pick the right locale.
+        $method_info = array_map( function( $item ) use ( $short_locale ) {
+            // If the wanted locale exists, return it.
+            if ( isset( $item[ $short_locale ] ) ) {
+                return $item[ $short_locale ];
+            }
+            // Otherwise just use Finnish.
+            else {
+                return $item['fi'];
+            }
+        }, $method_info );
+
+        return $method_info;
+    }
+
+    /**
      * Returns admin form fields.
      *
      * @return void
@@ -173,19 +247,6 @@ final class Gateway extends \WC_Payment_Gateway {
                 'default'     => 'no',
                 // translators: %s: URL
                 'description' => sprintf( __( 'This enables logging all payment gateway events. The log will be written in %s. Recommended only for debugging purposes as this might save personal data.', 'woocommerce-payment-gateway-checkout-finland' ), '<code>' . \WC_Log_Handler_File::get_log_file_path( Plugin::GATEWAY_ID ) . '</code>' ),
-            ],
-            // Settings for front-end
-            'title'       => [
-                'title'   => __( 'Title', 'woocommerce-payment-gateway-checkout-finland' ),
-                'type'    => 'text',
-                'label'   => __( 'Title', 'woocommerce-payment-gateway-checkout-finland' ),
-                'default' => 'Checkout Finland',
-            ],
-            'description' => [
-                'title'   => __( 'Description', 'woocommerce-payment-gateway-checkout-finland' ),
-                'type'    => 'text',
-                'label'   => __( 'Description', 'woocommerce-payment-gateway-checkout-finland' ),
-                'default' => '',
             ],
             // Checkout Finland credentials
             'merchant_id' => [
@@ -466,7 +527,7 @@ final class Gateway extends \WC_Payment_Gateway {
 
         $payment->setLanguage( $locale );
 
-        // Get the items from the cart
+        // Get the items from the order
         $order_items = $order->get_items( [ 'line_item', 'fee', 'shipping' ] );
 
         // Convert items to SDK Item objects.
@@ -838,10 +899,10 @@ final class Gateway extends \WC_Payment_Gateway {
         $tax_rate = $this->get_item_tax_rate( $order_item, $order );
 
         $item->setVatPercentage( $tax_rate )
-            ->setProductCode( $this->get_item_produt_code( $order_item ) )
+            ->setProductCode( $this->get_item_product_code( $order_item ) )
             ->setDeliveryDate( apply_filters( 'checkout_finland_delivery_date', date( 'Y-m-d' ) ) )
             ->setDescription( $this->get_item_description( $order_item ) )
-            ->setStamp( $order_item->get_id() );
+            ->setStamp( (string) $order_item->get_id() );
 
         return $item;
     }
@@ -853,7 +914,7 @@ final class Gateway extends \WC_Payment_Gateway {
      *
      * @return string
      */
-    protected function get_item_produt_code( WC_Order_Item $item ) : string {
+    protected function get_item_product_code( WC_Order_Item $item ) : string {
         $product_code = '';
         switch ( get_class( $item ) ) {
             case WC_Order_Item_Product::class:
