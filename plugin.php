@@ -3,11 +3,12 @@
 Plugin Name: Checkout Finland WooCommerce Payment Gateway
 Plugin URI: https://github.com/CheckoutFinland/plugin-woocommerce
 Description: WooCommerce extension for supporting Checkout Finland payment methods
-Version: 1.0.0-beta
+Version: 1.0.1-beta
 Author: Checkout Finland
 Author URI: http://www.checkout.fi/
 Copyright: Checkout Finland
 Text Domain: woocommerce-payment-gateway-checkout-finland
+Domain Path: /languages
 */
 
 namespace CheckoutFinland\WooCommercePaymentGateway;
@@ -105,6 +106,9 @@ final class Plugin {
         $this->plugin_dir     = __DIR__;
         $this->plugin_dir_url = plugin_dir_url( __FILE__ );
         $this->plugin_info    = array_combine( $this->plugin_info, get_file_data( __FILE__, $this->plugin_info ) );
+
+        // Load the plugin textdomain.
+        load_plugin_textdomain( 'woocommerce-payment-gateway-checkout-finland', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
     }
 
     /**

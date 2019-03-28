@@ -21,6 +21,7 @@ use WC_Order_Item_Product;
 use WC_Order_Item_Fee;
 use WC_Order_Item_Shipping;
 use GuzzleHttp\Exception\RequestException;
+use CheckoutFinland\SDK\Model\Provider;
 
 /**
  * The gateway class
@@ -227,23 +228,23 @@ final class Gateway extends \WC_Payment_Gateway {
         $this->form_fields = [
             // Whether the payment gateway is enabled.
             'enabled'     => [
-                'title'   => __( 'Enable/Disable', 'woocommerce' ),
+                'title'   => __( 'Payment gateway status', 'woocommerce-payment-gateway-checkout-finland' ),
                 'type'    => 'checkbox',
                 'label'   => __( 'Enable Checkout Finland', 'woocommerce-payment-gateway-checkout-finland' ),
                 'default' => 'yes',
             ],
             // Whether test mode is enabled
             'testmode'    => [
-                'title'   => __( 'Enable/Disable', 'woocommerce' ),
+                'title'   => __( 'Test mode', 'woocommerce-payment-gateway-checkout-finland' ),
                 'type'    => 'checkbox',
                 'label'   => __( 'Enable test mode', 'woocommerce-payment-gateway-checkout-finland' ),
                 'default' => 'no',
             ],
             // Whether debug mode is enabled
             'debug'       => [
-                'title'       => __( 'Debug log', 'woocommerce' ),
+                'title'       => __( 'Debug log', 'woocommerce-payment-gateway-checkout-finland' ),
                 'type'        => 'checkbox',
-                'label'       => __( 'Enable logging', 'woocommerce' ),
+                'label'       => __( 'Enable logging', 'woocommerce-payment-gateway-checkout-finland' ),
                 'default'     => 'no',
                 // translators: %s: URL
                 'description' => sprintf( __( 'This enables logging all payment gateway events. The log will be written in %s. Recommended only for debugging purposes as this might save personal data.', 'woocommerce-payment-gateway-checkout-finland' ), '<code>' . \WC_Log_Handler_File::get_log_file_path( Plugin::GATEWAY_ID ) . '</code>' ),
@@ -340,36 +341,42 @@ final class Gateway extends \WC_Payment_Gateway {
         if ( ! empty( $orders ) ) {
             $order = $orders[0];
 
-            if ( $status === 'ok' ) {
-                $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
+            switch ( $status ) {
+                case 'ok':
+                    $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
 
-                $order_status = $order->get_status();
+                    $order_status = $order->get_status();
 
-                if ( $order_status === 'completed' || $order_status === 'processing' ) {
-                    // This order has already been processed.
-                    return;
-                }
+                    if ( $order_status === 'completed' || $order_status === 'processing' ) {
+                        // This order has already been processed.
+                        return;
+                    }
 
-                // Mark payment completed and store the transaction ID.
-                $order->payment_complete( $transaction_id );
+                    // Mark payment completed and store the transaction ID.
+                    $order->payment_complete( $transaction_id );
 
-                $order_note = sprintf(
-                    // Translators: The placeholder is a transaction ID.
-                    esc_html__(
-                        'Payment completed with transaction ID %s.',
-                        'woocommerce-payment-gateway-checkout-finland'
-                    ),
-                    $transaction_id
-                );
+                    $order_note = sprintf(
+                        // Translators: The placeholder is a transaction ID.
+                        esc_html__(
+                            'Payment completed with transaction ID %s.',
+                            'woocommerce-payment-gateway-checkout-finland'
+                        ),
+                        $transaction_id
+                    );
 
-                $order->add_order_note( $order_note );
+                    $order->add_order_note( $order_note );
 
-                // Clear the cart.
-                WC()->cart->empty_cart();
-            }
-            else {
-                $order->update_status( 'failed' );
-                $order->add_order_note( __( 'Payment failed.', 'woocommerce-payment-gateway-checkout-finland' ) );
+                    // Clear the cart.
+                    WC()->cart->empty_cart();
+                    break;
+                case 'pending':
+                    $order->update_status( 'on-hold' );
+                    $order->add_order_note( __( 'Payment pending.', 'woocommerce-payment-gateway-checkout-finland' ) );
+                    break;
+                default:
+                    $order->update_status( 'failed' );
+                    $order->add_order_note( __( 'Payment failed.', 'woocommerce-payment-gateway-checkout-finland' ) );
+                    break;
             }
         }
     }
@@ -512,8 +519,12 @@ final class Gateway extends \WC_Payment_Gateway {
             $payment->setDeliveryAddress( $shipping_address );
         }
 
+        $full_locale = get_locale();
+
+        $short_locale = substr( $full_locale, 0, 2 );
+
         // Get and assign the WordPress locale
-        switch ( get_locale() ) {
+        switch ( $short_locale ) {
             case 'sv':
                 $locale = 'SV';
                 break;
@@ -584,8 +595,9 @@ final class Gateway extends \WC_Payment_Gateway {
 
         $providers = $response->getProviders();
 
+        // Get only the wanted payment provider object
         $wanted_provider = array_reduce(
-            $providers, function( $carry, $item = null ) use ( $payment_provider ) {
+            $providers, function( $carry, $item = null ) use ( $payment_provider ) : ?Provider {
                 if ( $item && $item->getId() === $payment_provider ) {
                     return $item;
                 }
@@ -596,7 +608,14 @@ final class Gateway extends \WC_Payment_Gateway {
 
         WC()->session->set( 'payment_provider', $wanted_provider );
 
-        $order->add_order_note( __( 'Payment request created.', 'woocommerce-payment-gateway-checkout-finland' ) );
+        $message = sprintf(
+            // translators: First parameter is transaction ID, the other is the name of the payment provider.
+            __( 'Transaction %1$s created with payment provider %2$s.', 'woocommerce-payment-gateway-checkout-finland' ),
+            $response->getTransactionId(),
+            $wanted_provider->getName()
+        );
+
+        $order->add_order_note( $message );
 
         return [
             'result'   => 'success',
@@ -815,6 +834,17 @@ final class Gateway extends \WC_Payment_Gateway {
         catch ( RequestException $exception ) {
             $providers = $error_handler( $this, $exception );
         }
+
+        // Group the providers by type
+        $providers = array_reduce( $providers, function( ?array $carry, Provider $item ) : array {
+            if ( ! is_array( $carry[ $item->getGroup() ] ?? false ) ) {
+                $carry[ $item->getGroup() ] = [];
+            }
+
+            $carry[ $item->getGroup() ][] = $item;
+
+            return $carry;
+        });
 
         $provider_form_view = new View( 'ProviderForm' );
 
