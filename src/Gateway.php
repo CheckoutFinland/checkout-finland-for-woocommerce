@@ -143,7 +143,7 @@ final class Gateway extends \WC_Payment_Gateway {
             $this->secret_key,
             [
                 'cofPluginVersion' => 'woocommerce-1.0.0',
-            ],
+            ]
         );
 
         // Whether we are in debug mode or not.
