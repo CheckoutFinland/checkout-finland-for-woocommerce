@@ -369,7 +369,7 @@ final class Gateway extends \WC_Payment_Gateway {
                     // Mark payment completed and store the transaction ID.
                     $order->payment_complete( $transaction_id );
 
-                    if ( 'no' === $this->get_option( 'provider_selection', 'yes' ) ) {
+                    if ( ! $this->use_provider_selection() ) {
                         // Get the chosen payment provider and save it to the order
                         $payment_provider = filter_input( INPUT_GET, 'checkout-provider' );
                         $payment_amount   = filter_input( INPUT_GET, 'checkout-amount' );
@@ -433,6 +433,15 @@ final class Gateway extends \WC_Payment_Gateway {
                     break;
             }
         }
+    }
+
+    /**
+     * Whether we want to use in-store provider selection or not.
+     *
+     * @return boolean
+     */
+    protected function use_provider_selection() : bool {
+        return 'yes' === $this->get_option( 'provider_selection', 'yes' );
     }
 
     /**
@@ -513,7 +522,7 @@ final class Gateway extends \WC_Payment_Gateway {
      * @return void
      */
     public function payment_fields() {
-        if ( is_checkout() && 'yes' === $this->get_option( 'provider_selection', 'yes' ) ) {
+        if ( is_checkout() && $this->use_provider_selection() ) {
             $this->provider_form();
         }
     }
@@ -647,7 +656,7 @@ final class Gateway extends \WC_Payment_Gateway {
             $this->error( $exception, $message, $die_on_error );
         }
 
-        if ( 'no' !== $this->get_option( 'provider_selection', 'yes' ) ) {
+        if ( $this->use_provider_selection() ) {
             $providers = $response->getProviders();
 
             // Get only the wanted payment provider object
