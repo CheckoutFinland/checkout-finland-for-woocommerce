@@ -255,6 +255,14 @@ final class Gateway extends \WC_Payment_Gateway {
                 // translators: %s: URL
                 'description' => sprintf( __( 'This enables logging all payment gateway events. The log will be written in %s. Recommended only for debugging purposes as this might save personal data.', 'woocommerce-payment-gateway-checkout-finland' ), '<code>' . \WC_Log_Handler_File::get_log_file_path( Plugin::GATEWAY_ID ) . '</code>' ),
             ],
+            // Whether to show the payment provider wall or choose the method in the store
+            'provider_selection' => [
+                'title'       => __( 'Payment provider selection', 'woocommerce-payment-gateway-checkout-finland' ),
+                'type'        => 'checkbox',
+                'label'       => __( 'Enable payment provider selection in the checkout page', 'woocommerce-payment-gateway-checkout-finland' ),
+                'default'     => 'yes',
+                'description' => __( 'Choose whether you want the payment provider selection to happen in the checkout page or in a separate page.' ),
+            ],
             // Checkout Finland credentials
             'merchant_id' => [
                 'title'   => __( 'Merchant ID', 'woocommerce-payment-gateway-checkout-finland' ),
@@ -361,16 +369,56 @@ final class Gateway extends \WC_Payment_Gateway {
                     // Mark payment completed and store the transaction ID.
                     $order->payment_complete( $transaction_id );
 
-                    $order_note = sprintf(
-                        // Translators: The placeholder is a transaction ID.
-                        esc_html__(
-                            'Payment completed with transaction ID %s.',
-                            'woocommerce-payment-gateway-checkout-finland'
-                        ),
-                        $transaction_id
-                    );
+                    if ( ! $this->use_provider_selection() ) {
+                        // Get the chosen payment provider and save it to the order
+                        $payment_provider = filter_input( INPUT_GET, 'checkout-provider' );
+                        $payment_amount   = filter_input( INPUT_GET, 'checkout-amount' );
 
-                    $order->add_order_note( $order_note );
+                        $order->update_meta_data( '_checkout_payment_provider', $payment_provider );
+
+                        $providers = $this->get_payment_providers( $payment_amount );
+
+                        if ( ! empty( $providers['error'] ) ) {
+                            $provider_name = ucfirst( $payment_provider );
+                        }
+                        else {
+                            // Get only the wanted payment provider object
+                            $wanted_provider = array_reduce(
+                                $providers, function( $carry, $item = null ) use ( $payment_provider ) : ?Provider {
+                                    if ( $item && $item->getId() === $payment_provider ) {
+                                        return $item;
+                                    }
+
+                                    return $carry;
+                                }
+                            );
+
+                            $provider_name = $wanted_provider->getName() ?? ucfirst( $wanted_provider->getId() );
+                        }
+
+                        WC()->session->set( 'payment_provider', $wanted_provider );
+
+                        $message = sprintf(
+                            // translators: First parameter is transaction ID, the other is the name of the payment provider.
+                            __( 'Payment completed with transaction ID %1$s and payment provider %2$s.', 'woocommerce-payment-gateway-checkout-finland' ),
+                            $transaction_id,
+                            $provider_name
+                        );
+
+                        $order->add_order_note( $message );
+                    }
+                    else {
+                        $order_note = sprintf(
+                            // Translators: The placeholder is a transaction ID.
+                            esc_html__(
+                                'Payment completed with transaction ID %s.',
+                                'woocommerce-payment-gateway-checkout-finland'
+                            ),
+                            $transaction_id
+                        );
+
+                        $order->add_order_note( $order_note );
+                    }
 
                     // Clear the cart.
                     WC()->cart->empty_cart();
@@ -385,6 +433,15 @@ final class Gateway extends \WC_Payment_Gateway {
                     break;
             }
         }
+    }
+
+    /**
+     * Whether we want to use in-store provider selection or not.
+     *
+     * @return boolean
+     */
+    protected function use_provider_selection() : bool {
+        return 'yes' === $this->get_option( 'provider_selection', 'yes' );
     }
 
     /**
@@ -465,7 +522,7 @@ final class Gateway extends \WC_Payment_Gateway {
      * @return void
      */
     public function payment_fields() {
-        if ( is_checkout() ) {
+        if ( is_checkout() && $this->use_provider_selection() ) {
             $this->provider_form();
         }
     }
@@ -599,34 +656,56 @@ final class Gateway extends \WC_Payment_Gateway {
             $this->error( $exception, $message, $die_on_error );
         }
 
-        $providers = $response->getProviders();
+        if ( $this->use_provider_selection() ) {
+            $providers = $response->getProviders();
 
-        // Get only the wanted payment provider object
-        $wanted_provider = array_reduce(
-            $providers, function( $carry, $item = null ) use ( $payment_provider ) : ?Provider {
-                if ( $item && $item->getId() === $payment_provider ) {
-                    return $item;
+            // Get only the wanted payment provider object
+            $wanted_provider = array_reduce(
+                $providers, function( $carry, $item = null ) use ( $payment_provider ) : ?Provider {
+                    if ( $item && $item->getId() === $payment_provider ) {
+                        return $item;
+                    }
+
+                    return $carry;
                 }
+            );
 
-                return $carry;
-            }
-        );
+            WC()->session->set( 'payment_provider', $wanted_provider );
 
-        WC()->session->set( 'payment_provider', $wanted_provider );
+            $message = sprintf(
+                // translators: First parameter is transaction ID, the other is the name of the payment provider.
+                __(
+                    'Transaction %1$s created with payment provider %2$s.',
+                    'woocommerce-payment-gateway-checkout-finland'
+                ),
+                $response->getTransactionId(),
+                $wanted_provider->getName() ?? ucfirst( $payment_provider )
+            );
 
-        $message = sprintf(
-            // translators: First parameter is transaction ID, the other is the name of the payment provider.
-            __( 'Transaction %1$s created with payment provider %2$s.', 'woocommerce-payment-gateway-checkout-finland' ),
-            $response->getTransactionId(),
-            $wanted_provider->getName()
-        );
+            $order->add_order_note( $message );
 
-        $order->add_order_note( $message );
+            return [
+                'result'   => 'success',
+                'redirect' => $order->get_checkout_payment_url( true ),
+            ];
+        }
+        else {
+            $message = sprintf(
+                // translators: First parameter is transaction ID, the other is the name of the payment provider.
+                __(
+                    'Transaction %1$s created and user redirected to the payment provider selection page.',
+                    'woocommerce-payment-gateway-checkout-finland'
+                ),
+                $response->getTransactionId()
+            );
 
-        return [
-            'result'   => 'success',
-            'redirect' => $order->get_checkout_payment_url( true ),
-        ];
+            $order->add_order_note( $message );
+
+            return [
+                'result'   => 'success',
+                'redirect' => $response->getHref(),
+            ];
+        }
     }
 
     /**
@@ -719,7 +798,8 @@ final class Gateway extends \WC_Payment_Gateway {
                                             $refund_object->delete( true );
                                             $order->add_order_note(
                                                 __(
-                                                    'The payment provider does not support either regular or email refunds. The refund was cancelled.',
+                                                    'The payment provider does not support either regular
+                                                    or email refunds. The refund was cancelled.',
                                                     'woocommerce-payment-gateway-checkout-finland'
                                                 )
                                             );
@@ -812,34 +892,7 @@ final class Gateway extends \WC_Payment_Gateway {
     protected function provider_form() {
         $cart_total = $this->get_cart_total();
 
-        $error_handler = function( Gateway $gateway, \Exception $exception ) : array {
-
-            // Log the error message.
-            $gateway->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
-
-            $error = __(
-                'An error occurred loading the payment providers.',
-                'woocommerce-payment-gateway-checkout-finland'
-            );
-
-            // You can use this filter to modify the error message.
-            $error     = apply_filters( 'checkout_finland_provider_form_error', $error );
-            $providers = [
-                'error' => $error,
-            ];
-
-            return $providers;
-        };
-
-        try {
-            $providers = $this->client->getPaymentProviders( $cart_total );
-        }
-        catch ( HmacException $exception ) {
-            $providers = $error_handler( $this, $exception );
-        }
-        catch ( RequestException $exception ) {
-            $providers = $error_handler( $this, $exception );
-        }
+        $providers = $this->get_payment_providers( $cart_total );
 
         // Group the providers by type
         $providers = array_reduce( $providers, function( ?array $carry, Provider $item ) : array {
@@ -873,6 +926,51 @@ final class Gateway extends \WC_Payment_Gateway {
             ->setPhone( $order->get_billing_phone() ?? null );
 
         return $customer;
+    }
+
+    /**
+     * Get the list of payment providers
+     *
+     * @param integer $payment_amount Payment amount in currency minor unit, eg. cents.
+     * @return array
+     */
+    protected function get_payment_providers( int $payment_amount ) : array {
+        try {
+            $providers = $this->client->getPaymentProviders( $payment_amount );
+        }
+        catch ( HmacException $exception ) {
+            $providers = $this->get_payment_providers_error_handler( $exception );
+        }
+        catch ( RequestException $exception ) {
+            $providers = $this->get_payment_providers_error_handler( $exception );
+        }
+
+        return $providers;
+    }
+
+    /**
+     * Error handler for get_payment_providers method.
+     *
+     * @param \Exception $exception Exception to handle.
+     * @return array
+     */
+    protected function get_payment_providers_error_handler( \Exception $exception ) : array {
+
+        // Log the error message.
+        $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+
+        $error = __(
+            'An error occurred loading the payment providers.',
+            'woocommerce-payment-gateway-checkout-finland'
+        );
+
+        // You can use this filter to modify the error message.
+        $error     = apply_filters( 'checkout_finland_provider_form_error', $error );
+        $providers = [
+            'error' => $error,
+        ];
+
+        return $providers;
     }
 
     /**

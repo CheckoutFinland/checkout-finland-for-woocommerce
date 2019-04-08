@@ -20,8 +20,7 @@
         {
             "type": "vcs",
             "url": "git@github.com:CheckoutFinland/cof-api-php.git"
-          }
-
+        }
     ],
     "keywords": [
         "wordpress", "woocommerce", "payment gateway", "checkout finland"
@@ -31,7 +30,7 @@
         "psr-4": {"CheckoutFinland\\WooCommercePaymentGateway\\": "src/"}
     },
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
         "composer/installers": ">=1.0.12",
         "checkoutfinland/php-sdk": "dev-master"
     }
