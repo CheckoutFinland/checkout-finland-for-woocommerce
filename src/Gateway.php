@@ -665,9 +665,12 @@ final class Gateway extends \WC_Payment_Gateway {
 
             $message = sprintf(
                 // translators: First parameter is transaction ID, the other is the name of the payment provider.
-                __( 'Transaction %1$s created with payment provider %2$s.', 'woocommerce-payment-gateway-checkout-finland' ),
+                __(
+                    'Transaction %1$s created with payment provider %2$s.',
+                    'woocommerce-payment-gateway-checkout-finland'
+                ),
                 $response->getTransactionId(),
-                $wanted_provider->getName() ?? ucfirst( $wanted_provider->getId() )
+                $wanted_provider->getName() ?? ucfirst( $payment_provider )
             );
 
             $order->add_order_note( $message );
@@ -680,7 +683,10 @@ final class Gateway extends \WC_Payment_Gateway {
         else {
             $message = sprintf(
                 // translators: First parameter is transaction ID, the other is the name of the payment provider.
-                __( 'Transaction %1$s created and user redirected to the payment provider wall.', 'woocommerce-payment-gateway-checkout-finland' ),
+                __(
+                    'Transaction %1$s created and user redirected to the payment provider selection page.',
+                    'woocommerce-payment-gateway-checkout-finland'
+                ),
                 $response->getTransactionId()
             );
 
@@ -783,7 +789,8 @@ final class Gateway extends \WC_Payment_Gateway {
                                             $refund_object->delete( true );
                                             $order->add_order_note(
                                                 __(
-                                                    'The payment provider does not support either regular or email refunds. The refund was cancelled.',
+                                                    'The payment provider does not support either regular
+                                                    or email refunds. The refund was cancelled.',
                                                     'woocommerce-payment-gateway-checkout-finland'
                                                 )
                                             );
