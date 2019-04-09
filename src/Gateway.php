@@ -116,7 +116,8 @@ final class Gateway extends \WC_Payment_Gateway {
         $this->title       = $this->method_info['title'];
         $this->description = $this->method_info['description'];
 
-        $this->icon = Plugin::ICON_URL;
+        // Icon temporarily disabled for size issues
+        // $this->icon = Plugin::ICON_URL;
 
         // Set gateway admin settings fields.
         $this->set_form_fields();
