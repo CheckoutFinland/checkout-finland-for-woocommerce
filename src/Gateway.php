@@ -612,6 +612,31 @@ final class Gateway extends \WC_Payment_Gateway {
             }, $order_items
         );
 
+        $sub_sum = array_sum( array_map( function( Item $item ) : int {
+            return ( $item->getUnitPrice() * $item->getUnits() );
+        }, $items ) );
+
+        if ( $sub_sum !== $order_total ) {
+            $diff = absint( $sub_sum - $order_total );
+
+            if ( $diff > ( count( $items ) + 1 ) ) {
+                throw new \Exception( __(
+                    'There was too big error in rounding the prices.',
+                    'woocommerce-payment-gateway-checkout-finland'
+                ));
+            }
+
+            $rounding_item = new Item();
+            $rounding_item->setDescription( __( 'Rounding', 'woocommerce-payment-gateway-checkout-finland' ) );
+            $rounding_item->setDeliveryDate( date( 'Y-m-d' ) );
+            $rounding_item->setVatPercentage( 0 );
+            $rounding_item->setUnits( ( $order_total - $sub_sum > 0 ) ? 1 : -1 );
+            $rounding_item->setUnitPrice( $diff );
+            $rounding_item->setProductCode( 'rounding-row' );
+
+            $items[] = $rounding_item;
+        }
+
         // Assign the items to the payment request.
         $payment->setItems( array_filter( $items ) );
 
