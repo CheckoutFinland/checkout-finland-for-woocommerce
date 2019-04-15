@@ -38,8 +38,10 @@ $shadow-color: rgba(8, 19, 31, .12);
         &--img {
             float: none !important;
             padding: .2rem .6rem !important;
-            max-width: 100%;
             cursor: pointer;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            padding: 10% 15% !important;
         }
     }
 }
