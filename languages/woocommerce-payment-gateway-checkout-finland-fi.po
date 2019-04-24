@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Checkout Finland WooCommerce Payment Gateway\n"
-"POT-Creation-Date: 2019-03-26 15:34+0200\n"
-"PO-Revision-Date: 2019-03-26 15:36+0200\n"
+"POT-Creation-Date: 2019-04-15 16:32+0300\n"
+"PO-Revision-Date: 2019-04-15 16:34+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.1\n"
+"X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
@@ -21,7 +21,6 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#. translators: The placeholder contains the current PHP version.
 #: plugin.php:182
 #, php-format
 msgid ""
@@ -70,7 +69,6 @@ msgstr "Testaustilan loki"
 msgid "Enable logging"
 msgstr "Ota käyttöön testitilan lokitus"
 
-#. translators: %s: URL
 #: src/Gateway.php:250
 #, php-format
 msgid ""
@@ -81,67 +79,97 @@ msgstr ""
 "kirjoitetaan sijaintiin %s. Toimintoa suositellaan vain "
 "virheenkorjaustarkoistuksiin, sillä se voi tallentaa henkilötietoja."
 
-#: src/Gateway.php:254 src/Gateway.php:256
+#: src/Gateway.php:254
+msgid "Payment provider selection"
+msgstr "Maksupalveluntarjoajan valinta"
+
+#: src/Gateway.php:256
+msgid "Enable payment provider selection in the checkout page"
+msgstr "Ota maksupalveluntarjoajan valinta käyttöön"
+
+#: src/Gateway.php:258
+msgid ""
+"Choose whether you want the payment provider selection to happen in the "
+"checkout page or in a separate page."
+msgstr ""
+"Valitse, haluatko maksupalvelun valinnan tapahtuvan kassalla tai erillisellä "
+"sivulla."
+
+#: src/Gateway.php:262 src/Gateway.php:264
 msgid "Merchant ID"
 msgstr "Kauppiastunnus"
 
-#: src/Gateway.php:260 src/Gateway.php:262
+#: src/Gateway.php:268 src/Gateway.php:270
 msgid "Secret key"
 msgstr "Salainen avain"
 
-#: src/Gateway.php:361
+#: src/Gateway.php:401
+#, php-format
+msgid "Payment completed with transaction ID %1$s and payment provider %2$s."
+msgstr ""
+"Maksu suoritettiin tapahtuman tunnuksella %1$s ja maksupalveluntarjoajalla "
+"%2$s."
+
+#: src/Gateway.php:412
 #, php-format
 msgid "Payment completed with transaction ID %s."
 msgstr "Maksu on suoritettu tapahtumatunnuksella %s."
 
-#: src/Gateway.php:374
+#: src/Gateway.php:426
 msgid "Payment pending."
 msgstr "Maksua odotetaan."
 
-#: src/Gateway.php:378
+#: src/Gateway.php:430
 msgid "Payment failed."
 msgstr "Maksu epäonnistui."
 
-#: src/Gateway.php:416
+#: src/Gateway.php:468
 msgid "Refund cannot be found."
 msgstr "Palautusta ei löydy."
 
-#: src/Gateway.php:434
+#: src/Gateway.php:486
 msgid "Refund process completed."
 msgstr "Palautusprosessi on valmis."
 
-#: src/Gateway.php:443
+#: src/Gateway.php:495
 msgid "Refund was cancelled by the payment provider."
 msgstr "Maksupalveluntarjoaja peruutti palautuksen."
 
-#: src/Gateway.php:578
+#: src/Gateway.php:634
 msgid "An error occurred validating the payment."
 msgstr "Maksun vahvistamisessa tapahtui virhe."
 
-#: src/Gateway.php:589
+#: src/Gateway.php:645
 msgid "An error occurred performing the payment request."
 msgstr "Maksun suorittamisessa tapahtui virhe."
 
-#. translators: First parameter is transaction ID, the other is the name of the payment provider.
-#: src/Gateway.php:613
+#: src/Gateway.php:670
 #, php-format
 msgid "Transaction %1$s created with payment provider %2$s."
-msgstr "Maksu %1$s luotu maksupalveluntarjoajalla %2$s."
+msgstr "Maksu ID:llä %1$s luotu maksupalveluntarjoajalla %2$s."
 
-#: src/Gateway.php:655
+#: src/Gateway.php:685
+#, php-format
+msgid ""
+"Transaction %1$s created and user redirected to the payment provider wall."
+msgstr ""
+"Luotu maksutapahtuma ID:llä %1$s ja käyttäjä ohjattu maksutavan "
+"valintasivulle."
+
+#: src/Gateway.php:727
 msgid "The refund amount must be larger than 0."
 msgstr "Maksun palautuksen arvon on oltava suurempi kuin 0."
 
-#: src/Gateway.php:677
+#: src/Gateway.php:749
 #, php-format
 msgid "Refunding process started.%s"
 msgstr "Palautusprosessi on aloitettu.%s"
 
-#: src/Gateway.php:678
+#: src/Gateway.php:750
 msgid " Reason: "
 msgstr " Syy: "
 
-#: src/Gateway.php:716
+#: src/Gateway.php:788
 msgid ""
 "The payment provider does not support either regular or email refunds. The "
 "refund was cancelled."
@@ -149,27 +177,27 @@ msgstr ""
 "Maksupalveluntarjoaja ei tue tavallisia tai sähköpostipalautuksia. "
 "Palautustoiminto peruttiin."
 
-#: src/Gateway.php:726
+#: src/Gateway.php:798
 msgid "Something went wrong with the email refund and it was cancelled."
 msgstr "Sähköpostipalautuksessa tapahtui virhe ja se peruutettiin."
 
-#: src/Gateway.php:739
+#: src/Gateway.php:811
 msgid "Something went wrong with the refund and it was cancelled."
 msgstr "Palautuksessa tapahtui virhe ja se peruutettiin."
 
-#: src/Gateway.php:815
+#: src/Gateway.php:930
 msgid "An error occurred loading the payment providers."
 msgstr "Maksupalveluntarjoajien lataamisessa tapahtui virhe."
 
-#: src/Gateway.php:954
+#: src/Gateway.php:1038
 msgid "fee"
 msgstr "maksu"
 
-#: src/Gateway.php:958
+#: src/Gateway.php:1042
 msgid "shipping"
 msgstr "toimitus"
 
-#: src/Gateway.php:1150
+#: src/Gateway.php:1234
 msgid "An error occurred validating the signature."
 msgstr "Allekirjoituksen vahvistamisessa tapahtui virhe."
 
