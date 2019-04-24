@@ -3,7 +3,7 @@
 Plugin Name: Checkout Finland WooCommerce Payment Gateway
 Plugin URI: https://github.com/CheckoutFinland/plugin-woocommerce
 Description: WooCommerce extension for supporting Checkout Finland payment methods
-Version: 1.0.7-beta
+Version: 1.0.9-beta
 Author: Checkout Finland
 Author URI: http://www.checkout.fi/
 Copyright: Checkout Finland
@@ -154,14 +154,18 @@ final class Plugin {
      * @return bool
      */
     protected function initialization_checks() {
-        $this->check_php_version();
-        $this->check_woocommerce_active_status();
-        $this->check_woocommerce_version();
+        $errors = [];
 
-        if ( ! empty( $this->errors ) ) {
-            add_action( 'admin_notices', function() {
+        $errors[] = self::check_php_version();
+        $errors[] = self::check_woocommerce_active_status();
+        $errors[] = self::check_woocommerce_version();
+
+        $errors = array_filter( $errors );
+
+        if ( ! empty( $errors ) ) {
+            add_action( 'admin_notices', function() use ( $errors ) {
                 echo '<div class="notice notice-error">';
-                array_walk( $this->errors, 'esc_html_e' );
+                array_walk( $errors, 'esc_html_e' );
                 echo '</div>';
             });
 
@@ -173,43 +177,70 @@ final class Plugin {
     }
 
     /**
-     * Ensure that the PHP version is at least 7.0.0.
+     * Checks to run on plugin activation
      *
      * @return void
      */
-    protected function check_php_version() {
+    public static function activation_check() {
+        $checks = [
+            'check_php_version',
+            'check_woocommerce_active_status',
+            'check_woocommerce_version',
+        ];
+
+        array_walk( $checks, function( $check ) {
+            $error = call_user_func( __CLASS__ . '::' . $check );
+
+            if ( $error ) {
+                wp_die( esc_html( $error ) );
+            }
+        });
+    }
+
+    /**
+     * Ensure that the PHP version is at least 7.0.0.
+     *
+     * @return string|null
+     */
+    public static function check_php_version() : ?string {
         if ( ! version_compare( PHP_VERSION, '7.0.0', '>=' ) ) {
-            $this->errors[] = sprintf(
+            return sprintf(
                 // translators: The placeholder contains the current PHP version.
                 esc_html__( 'Checkout Finland payment gateway plugin requires a PHP version of at least 7.0. You are currently running version %1$s.', 'woocommerce-payment-gateway-checkout-finland' ),
                 esc_html( PHP_VERSION )
             );
         }
+
+        return null;
     }
 
     /**
      * Ensure that the WooCommerce plugin is active.
      *
-     * @return void
+     * @return string|null
      */
-    protected function check_woocommerce_active_status() {
+    public static function check_woocommerce_active_status() : ?string {
         if ( ! class_exists( '\WC_Payment_Gateway' ) ) {
-            $this->errors[] = esc_html__( 'Checkout Finland payment gateway plugin requires WooCommerce to be activated.', 'woocommerce-payment-gateway-checkout-finland' );
+            return esc_html__( 'Checkout Finland payment gateway plugin requires WooCommerce to be activated.', 'woocommerce-payment-gateway-checkout-finland' );
         }
+
+        return null;
     }
 
     /**
      * Ensure that we have at least version 3.5 of the WooCommerce plugin.
      *
-     * @return void
+     * @return string|null
      */
-    protected function check_woocommerce_version() {
+    public static function check_woocommerce_version() : ?string {
         if (
             defined( 'WOO_COMMERCE_VERSION' ) &&
             version_compare( WOO_COMMERCE_VERSION, '3.5' ) === -1
         ) {
-            $this->errors[] = esc_html__( 'Checkout Finland payment gateway plugin requires WooCommerce version of 3.5 or greater.', 'woocommerce-payment-gateway-checkout-finland' );
+            return esc_html__( 'Checkout Finland payment gateway plugin requires WooCommerce version of 3.5 or greater.', 'woocommerce-payment-gateway-checkout-finland' );
         }
+
+        return null;
     }
 
     /**
@@ -243,3 +274,6 @@ final class Plugin {
 add_action( 'plugins_loaded', function() {
     Plugin::instance();
 });
+
+
+register_activation_hook( __FILE__, __NAMESPACE__ . '\\Plugin::activation_check' );

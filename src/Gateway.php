@@ -616,10 +616,14 @@ final class Gateway extends \WC_Payment_Gateway {
             return ( $item->getUnitPrice() * $item->getUnits() );
         }, $items ) );
 
+        $qty_sum = array_sum( array_map( function( Item $item ) : int {
+            return $item->getUnits();
+        }, $items ) );
+
         if ( $sub_sum !== $order_total ) {
             $diff = absint( $sub_sum - $order_total );
 
-            if ( $diff > ( count( $items ) + 1 ) ) {
+            if ( $diff > $qty_sum ) {
                 throw new \Exception( __(
                     'There was too big error in rounding the prices.',
                     'woocommerce-payment-gateway-checkout-finland'
