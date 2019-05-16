@@ -1111,6 +1111,10 @@ final class Gateway extends \WC_Payment_Gateway {
                 $description = $item->get_name();
                 break;
         }
+
+        // Ensure the description is maximum of 1000 characters long.
+        $description = substr( $description, 0, 1000 );
+
         return apply_filters( 'checkout_finland_item_description', $description, $item );
     }
 
