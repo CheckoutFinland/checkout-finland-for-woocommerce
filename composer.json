@@ -32,6 +32,6 @@
     "require": {
         "php": ">=7.1",
         "composer/installers": ">=1.0.12",
-        "checkoutfinland/php-sdk": "dev-master"
+        "checkoutfinland/sdk": "dev-master"
     }
 }
