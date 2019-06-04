@@ -4,11 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f508dd07186e810c9f8a8a37ff7b1c1b",
+    "content-hash": "f347c32c1a6a509694f1e78c8f4fe71f",
     "packages": [
         {
             "name": "checkoutfinland/sdk",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CheckoutFinland/php-sdk.git",
@@ -578,9 +578,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "checkoutfinland/sdk": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
