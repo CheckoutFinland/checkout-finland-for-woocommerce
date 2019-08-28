@@ -1144,7 +1144,7 @@ final class Gateway extends \WC_Payment_Gateway {
     protected function create_redirect_url( \WC_Order $order ) : CallbackUrl {
         $callback = new CallbackUrl();
 
-        $callback->setSuccess( $this->get_return_url() );
+        $callback->setSuccess( $this->get_return_url( $order ) );
         $callback->setCancel( $order->get_cancel_order_url_raw() );
 
         return $callback;
