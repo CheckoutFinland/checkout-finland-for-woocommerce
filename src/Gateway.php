@@ -1130,6 +1130,11 @@ final class Gateway extends \WC_Payment_Gateway {
         $total     = $order->get_line_total( $item, false );
         $tax_total = $order->get_line_tax( $item );
 
+        // Not taxes set.
+        if ( $tax_total === 0.0 ) {
+            return 0;
+        }
+
         $tax_rate = round( ( $tax_total / $total ) * 100 );
 
         return (int) $tax_rate;

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2019-09-24
+
+### Fixed
+
+- Order items without taxes no longer cause 500 error on checkout. [Fixes: #9](https://github.com/CheckoutFinland/woocommerce-checkout-finland-gateway/issues/9).
+
 ## [1.1.5] - 2019-08-28
 
 ### Removed
