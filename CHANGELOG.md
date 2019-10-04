@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+- A bug where an error message from the provider list API would throw a fatal error to user.
+- Better PHP version checking for plugin activation.
+- Better error handling for when payment provider is not selected.
+
 ## [1.1.6] - 2019-09-24
 
 ### Fixed

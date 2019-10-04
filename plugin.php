@@ -203,10 +203,10 @@ final class Plugin {
      * @return string|null
      */
     public static function check_php_version() : ?string {
-        if ( ! version_compare( PHP_VERSION, '7.0.0', '>=' ) ) {
+        if ( ! version_compare( PHP_VERSION, '7.1.0', '>=' ) ) {
             return sprintf(
                 // translators: The placeholder contains the current PHP version.
-                esc_html__( 'Checkout Finland payment gateway plugin requires a PHP version of at least 7.0. You are currently running version %1$s.', 'woocommerce-payment-gateway-checkout-finland' ),
+                esc_html__( 'Checkout Finland payment gateway plugin requires a PHP version of at least 7.1. You are currently running version %1$s.', 'woocommerce-payment-gateway-checkout-finland' ),
                 esc_html( PHP_VERSION )
             );
         }
