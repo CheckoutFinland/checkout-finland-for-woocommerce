@@ -538,6 +538,16 @@ final class Gateway extends \WC_Payment_Gateway {
     public function process_payment( $order_id ) {
         $order = wc_get_order( $order_id );
 
+        // Get the wanted payment provider and check that it exists
+        $payment_provider = filter_input( INPUT_POST, 'payment_provider' );
+
+        if ( ! $payment_provider ) {
+            throw new \Exception( __(
+                'The payment provider was not chosen.',
+                'woocommerce-payment-gateway-checkout-finland'
+            ));
+        }
+
         $payment = new PaymentRequest();
 
         // Set the order ID as the stamp to the payment request
@@ -647,9 +657,7 @@ final class Gateway extends \WC_Payment_Gateway {
         // Create and assign the return urls
         $payment->setRedirectUrls( $this->create_redirect_url( $order ) );
 
-        // Get the wanted payment provider and save it to the order
-        $payment_provider = filter_input( INPUT_POST, 'payment_provider' );
-
+        // Save the wanted payment provider to the order
         $order->update_meta_data( '_checkout_payment_provider', $payment_provider );
 
         // Define if the process should die if an error occurs.
@@ -923,6 +931,12 @@ final class Gateway extends \WC_Payment_Gateway {
         $cart_total = $this->get_cart_total();
 
         $providers = $this->get_payment_providers( $cart_total );
+
+        // If there was an error getting the payment providers, show it
+        if ( ! empty( $providers['error'] ) ) {
+            echo '<p>' . esc_html( $providers['error'] ) . '</p>';
+            return;
+        }
 
         // Group the providers by type
         $providers = array_reduce( $providers, function( ?array $carry, Provider $item ) : array {
