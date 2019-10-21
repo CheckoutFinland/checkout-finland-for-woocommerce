@@ -3,7 +3,7 @@
  * A very simple templating class
  */
 
-namespace CheckoutFinland\WooCommercePaymentGateway;
+namespace OpMerchantServices\WooCommercePaymentGateway;
 
 /**
  * View

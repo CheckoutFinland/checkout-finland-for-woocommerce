@@ -24,18 +24,12 @@ use GuzzleHttp\Exception\RequestException;
 use CheckoutFinland\SDK\Model\Provider;
 
 /**
- * The gateway class
+ * Class Gateway
+ * The Gateway class
+ * @package OpMerchantServices\WooCommercePaymentGateway
  */
-final class Gateway extends \WC_Payment_Gateway {
-
-    /**
-     * Default method descriptions to be used as fallbacks.
-     */
-    protected const DEFAULT_METHOD_INFO = [
-        'fi' => 'OP Payment Service for WooCommerce',
-        'en' => 'OP Payment Service for WooCommerce',
-        'sv' => 'OP Payment Service for WooCommerce',
-    ];
+final class Gateway extends \WC_Payment_Gateway
+{
 
     /**
      * Checkout Finland merchant ID.
