@@ -20,10 +20,10 @@ if ( ! empty( $data['error'] ) ) {
 }
 
 $group_titles = [
-    'mobile'     => __( 'Mobile payment methods', 'woocommerce-payment-gateway-checkout-finland' ),
-    'bank'       => __( 'Bank payment methods', 'woocommerce-payment-gateway-checkout-finland' ),
-    'creditcard' => __( 'Card payment methods', 'woocommerce-payment-gateway-checkout-finland' ),
-    'credit'     => __( 'Invoice and instalment payment methods', 'woocommerce-payment-gateway-checkout-finland' ),
+    'mobile'     => __( 'Mobile payment methods', 'op-payment-service-woocommerce' ),
+    'bank'       => __( 'Bank payment methods', 'op-payment-service-woocommerce' ),
+    'creditcard' => __( 'Card payment methods', 'op-payment-service-woocommerce' ),
+    'credit'     => __( 'Invoice and instalment payment methods', 'op-payment-service-woocommerce' ),
 ];
 
 array_walk( $data, function( $provider_group, $title ) use ( $group_titles ) {

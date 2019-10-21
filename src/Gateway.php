@@ -179,8 +179,8 @@ final class Gateway extends \WC_Payment_Gateway {
      */
     protected function get_method_info() : array {
         $method_info = [
-            'title' => __('OP Payment Service for WooCommerce', 'woocommerce-payment-gateway-checkout-finland'),
-            'description' => __('OP Payment Service for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract', 'woocommerce-payment-gateway-checkout-finland'),
+            'title' => __('OP Payment Service for WooCommerce', 'op-payment-service-woocommerce'),
+            'description' => __('OP Payment Service for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract', 'op-payment-service-woocommerce'),
         ];
         return $method_info;
     }
@@ -194,46 +194,46 @@ final class Gateway extends \WC_Payment_Gateway {
         $this->form_fields = [
             // Whether the payment gateway is enabled.
             'enabled'     => [
-                'title'   => __( 'Payment gateway status', 'woocommerce-payment-gateway-checkout-finland' ),
+                'title'   => __( 'Payment gateway status', 'op-payment-service-woocommerce' ),
                 'type'    => 'checkbox',
-                'label'   => __( 'Enable OP Payment Service for WooCommerce', 'woocommerce-payment-gateway-checkout-finland' ),
+                'label'   => __( 'Enable OP Payment Service for WooCommerce', 'op-payment-service-woocommerce' ),
                 'default' => 'yes',
             ],
             // Whether test mode is enabled
             'testmode'    => [
-                'title'   => __( 'Test mode', 'woocommerce-payment-gateway-checkout-finland' ),
+                'title'   => __( 'Test mode', 'op-payment-service-woocommerce' ),
                 'type'    => 'checkbox',
-                'label'   => __( 'Enable test mode', 'woocommerce-payment-gateway-checkout-finland' ),
+                'label'   => __( 'Enable test mode', 'op-payment-service-woocommerce' ),
                 'default' => 'no',
             ],
             // Whether debug mode is enabled
             'debug'       => [
-                'title'       => __( 'Debug log', 'woocommerce-payment-gateway-checkout-finland' ),
+                'title'       => __( 'Debug log', 'op-payment-service-woocommerce' ),
                 'type'        => 'checkbox',
-                'label'       => __( 'Enable logging', 'woocommerce-payment-gateway-checkout-finland' ),
+                'label'       => __( 'Enable logging', 'op-payment-service-woocommerce' ),
                 'default'     => 'no',
                 // translators: %s: URL
-                'description' => sprintf( __( 'This enables logging all payment gateway events. The log will be written in %s. Recommended only for debugging purposes as this might save personal data.', 'woocommerce-payment-gateway-checkout-finland' ), '<code>' . \WC_Log_Handler_File::get_log_file_path( Plugin::GATEWAY_ID ) . '</code>' ),
+                'description' => sprintf( __( 'This enables logging all payment gateway events. The log will be written in %s. Recommended only for debugging purposes as this might save personal data.', 'op-payment-service-woocommerce' ), '<code>' . \WC_Log_Handler_File::get_log_file_path( Plugin::GATEWAY_ID ) . '</code>' ),
             ],
             // Whether to show the payment provider wall or choose the method in the store
             'provider_selection' => [
-                'title'       => __( 'Payment provider selection', 'woocommerce-payment-gateway-checkout-finland' ),
+                'title'       => __( 'Payment provider selection', 'op-payment-service-woocommerce' ),
                 'type'        => 'checkbox',
-                'label'       => __( 'Enable payment provider selection in the checkout page', 'woocommerce-payment-gateway-checkout-finland' ),
+                'label'       => __( 'Enable payment provider selection in the checkout page', 'op-payment-service-woocommerce' ),
                 'default'     => 'yes',
                 'description' => __( 'Choose whether you want the payment provider selection to happen in the checkout page or in a separate page.' ),
             ],
             // Checkout Finland credentials
             'merchant_id' => [
-                'title'   => __( 'Merchant ID', 'woocommerce-payment-gateway-checkout-finland' ),
+                'title'   => __( 'Merchant ID', 'op-payment-service-woocommerce' ),
                 'type'    => 'text',
-                'label'   => __( 'Merchant ID', 'woocommerce-payment-gateway-checkout-finland' ),
+                'label'   => __( 'Merchant ID', 'op-payment-service-woocommerce' ),
                 'default' => '',
             ],
             'secret_key'  => [
-                'title'   => __( 'Secret key', 'woocommerce-payment-gateway-checkout-finland' ),
+                'title'   => __( 'Secret key', 'op-payment-service-woocommerce' ),
                 'type'    => 'password',
-                'label'   => __( 'Secret key', 'woocommerce-payment-gateway-checkout-finland' ),
+                'label'   => __( 'Secret key', 'op-payment-service-woocommerce' ),
                 'default' => '',
             ],
         ];
@@ -360,7 +360,7 @@ final class Gateway extends \WC_Payment_Gateway {
 
                         $message = sprintf(
                             // translators: First parameter is transaction ID, the other is the name of the payment provider.
-                            __( 'Payment completed with transaction ID %1$s and payment provider %2$s.', 'woocommerce-payment-gateway-checkout-finland' ),
+                            __( 'Payment completed with transaction ID %1$s and payment provider %2$s.', 'op-payment-service-woocommerce' ),
                             $transaction_id,
                             $provider_name
                         );
@@ -372,7 +372,7 @@ final class Gateway extends \WC_Payment_Gateway {
                             // Translators: The placeholder is a transaction ID.
                             esc_html__(
                                 'Payment completed with transaction ID %s.',
-                                'woocommerce-payment-gateway-checkout-finland'
+                                'op-payment-service-woocommerce'
                             ),
                             $transaction_id
                         );
@@ -385,11 +385,11 @@ final class Gateway extends \WC_Payment_Gateway {
                     break;
                 case 'pending':
                     $order->update_status( 'on-hold' );
-                    $order->add_order_note( __( 'Payment pending.', 'woocommerce-payment-gateway-checkout-finland' ) );
+                    $order->add_order_note( __( 'Payment pending.', 'op-payment-service-woocommerce' ) );
                     break;
                 default:
                     $order->update_status( 'failed' );
-                    $order->add_order_note( __( 'Payment failed.', 'woocommerce-payment-gateway-checkout-finland' ) );
+                    $order->add_order_note( __( 'Payment failed.', 'op-payment-service-woocommerce' ) );
                     break;
             }
         }
@@ -436,7 +436,7 @@ final class Gateway extends \WC_Payment_Gateway {
         );
 
         if ( empty( $refunds ) ) {
-            wp_die( esc_html__( 'Refund cannot be found.', 'woocommerce-payment-gateway-checkout-finland' ), '', 404 );
+            wp_die( esc_html__( 'Refund cannot be found.', 'op-payment-service-woocommerce' ), '', 404 );
         }
         else {
             $refund = $refunds[0];
@@ -454,7 +454,7 @@ final class Gateway extends \WC_Payment_Gateway {
                 $order = \wc_get_order( $order_id );
 
                 $order->add_order_note(
-                    __( 'Refund process completed.', 'woocommerce-payment-gateway-checkout-finland' )
+                    __( 'Refund process completed.', 'op-payment-service-woocommerce' )
                 );
 
                 update_post_meta( $refund->get_id(), '_checkout_refund_processing', false );
@@ -464,7 +464,7 @@ final class Gateway extends \WC_Payment_Gateway {
 
                 $order_note = __(
                     'Refund was cancelled by the payment provider.',
-                    'woocommerce-payment-gateway-checkout-finland'
+                    'op-payment-service-woocommerce'
                 );
 
                 $order = \wc_get_order( $order_id );
@@ -504,7 +504,7 @@ final class Gateway extends \WC_Payment_Gateway {
         if ( ! $payment_provider ) {
             throw new \Exception( __(
                 'The payment provider was not chosen.',
-                'woocommerce-payment-gateway-checkout-finland'
+                'op-payment-service-woocommerce'
             ));
         }
 
@@ -596,12 +596,12 @@ final class Gateway extends \WC_Payment_Gateway {
             if ( $diff > $qty_sum ) {
                 throw new \Exception( __(
                     'There was too big error in rounding the prices.',
-                    'woocommerce-payment-gateway-checkout-finland'
+                    'op-payment-service-woocommerce'
                 ));
             }
 
             $rounding_item = new Item();
-            $rounding_item->setDescription( __( 'Rounding', 'woocommerce-payment-gateway-checkout-finland' ) );
+            $rounding_item->setDescription( __( 'Rounding', 'op-payment-service-woocommerce' ) );
             $rounding_item->setDeliveryDate( date( 'Y-m-d' ) );
             $rounding_item->setVatPercentage( 0 );
             $rounding_item->setUnits( ( $order_total - $sub_sum > 0 ) ? 1 : -1 );
@@ -637,7 +637,7 @@ final class Gateway extends \WC_Payment_Gateway {
         catch ( ValidationException $exception ) {
             $message = __(
                 'An error occurred validating the payment.',
-                'woocommerce-payment-gateway-checkout-finland'
+                'op-payment-service-woocommerce'
             );
 
             $this->error( $exception, $message, $die_on_error );
@@ -648,7 +648,7 @@ final class Gateway extends \WC_Payment_Gateway {
         catch ( RequestException $exception ) {
             $message = __(
                 'An error occurred performing the payment request.',
-                'woocommerce-payment-gateway-checkout-finland'
+                'op-payment-service-woocommerce'
             );
 
             $this->error( $exception, $message, $die_on_error );
@@ -674,7 +674,7 @@ final class Gateway extends \WC_Payment_Gateway {
                 // translators: First parameter is transaction ID, the other is the name of the payment provider.
                 __(
                     'Transaction %1$s created with payment provider %2$s.',
-                    'woocommerce-payment-gateway-checkout-finland'
+                    'op-payment-service-woocommerce'
                 ),
                 $response->getTransactionId(),
                 $wanted_provider->getName() ?? ucfirst( $payment_provider )
@@ -692,7 +692,7 @@ final class Gateway extends \WC_Payment_Gateway {
                 // translators: First parameter is transaction ID, the other is the name of the payment provider.
                 __(
                     'Transaction %1$s created and user redirected to the payment provider selection page.',
-                    'woocommerce-payment-gateway-checkout-finland'
+                    'op-payment-service-woocommerce'
                 ),
                 $response->getTransactionId()
             );
@@ -736,7 +736,7 @@ final class Gateway extends \WC_Payment_Gateway {
                     '400',
                     __(
                         'The refund amount must be larger than 0.',
-                        'woocommerce-payment-gateway-checkout-finland'
+                        'op-payment-service-woocommerce'
                     )
                 );
             }
@@ -757,8 +757,8 @@ final class Gateway extends \WC_Payment_Gateway {
             $order->add_order_note(
                 sprintf(
                     // Translators: placeholder is the optional reason for the refund.
-                    __( 'Refunding process started.%s', 'woocommerce-payment-gateway-checkout-finland' ),
-                    $reason ? esc_html__( ' Reason: ', 'woocommerce-payment-gateway-checkout-finland' ) . esc_html( $reason ) : ''
+                    __( 'Refunding process started.%s', 'op-payment-service-woocommerce' ),
+                    $reason ? esc_html__( ' Reason: ', 'op-payment-service-woocommerce' ) . esc_html( $reason ) : ''
                 )
             );
 
@@ -798,7 +798,7 @@ final class Gateway extends \WC_Payment_Gateway {
                                                 __(
                                                     'The payment provider does not support either regular
                                                     or email refunds. The refund was cancelled.',
-                                                    'woocommerce-payment-gateway-checkout-finland'
+                                                    'op-payment-service-woocommerce'
                                                 )
                                             );
                                             return false; // Return when an error occurred.
@@ -808,7 +808,7 @@ final class Gateway extends \WC_Payment_Gateway {
                                             $order->add_order_note(
                                                 __(
                                                     'Something went wrong with the email refund and it was cancelled.',
-                                                    'woocommerce-payment-gateway-checkout-finland'
+                                                    'op-payment-service-woocommerce'
                                                 )
                                             );
                                             return false; // Return when an error occurred.
@@ -821,7 +821,7 @@ final class Gateway extends \WC_Payment_Gateway {
                                 $order->add_order_note(
                                     __(
                                         'Something went wrong with the refund and it was cancelled.',
-                                        'woocommerce-payment-gateway-checkout-finland'
+                                        'op-payment-service-woocommerce'
                                     )
                                 );
                                 return false; // Return when an error occurred.
@@ -965,7 +965,7 @@ final class Gateway extends \WC_Payment_Gateway {
 
         $error = __(
             'An error occurred loading the payment providers.',
-            'woocommerce-payment-gateway-checkout-finland'
+            'op-payment-service-woocommerce'
         );
 
         // You can use this filter to modify the error message.
@@ -1059,11 +1059,11 @@ final class Gateway extends \WC_Payment_Gateway {
                 $product_code = $item->get_product()->get_sku() ?: $item->get_product()->get_id();
                 break;
             case WC_Order_Item_Fee::class:
-                $product_code = __( 'fee', 'woocommerce-payment-gateway-checkout-finland' );
+                $product_code = __( 'fee', 'op-payment-service-woocommerce' );
                 $item->get_type();
                 break;
             case WC_Order_Item_Shipping::class:
-                $product_code = __( 'shipping', 'woocommerce-payment-gateway-checkout-finland' );
+                $product_code = __( 'shipping', 'op-payment-service-woocommerce' );
                 break;
         }
         return apply_filters( 'checkout_finland_item_product_code', $product_code, $item );
@@ -1265,7 +1265,7 @@ final class Gateway extends \WC_Payment_Gateway {
     protected function signature_error( HmacException $exception, bool $die = true ) {
         $message = __(
             'An error occurred validating the signature.',
-            'woocommerce-payment-gateway-checkout-finland'
+            'op-payment-service-woocommerce'
         );
 
         // You can use this filter to modify the error message.
