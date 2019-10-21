@@ -8,7 +8,7 @@
  * Requires PHP: 7.1
  * Author: OP Merchant Services
  * Author URI: https://www.op-kauppiaspalvelut.fi
- * Text Domain: op-payment-service-for-woocommerce
+ * Text Domain: op-payment-service-woocommerce
  * Domain Path: /languages
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
