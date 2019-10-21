@@ -19,15 +19,15 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@github.com:CheckoutFinland/cof-api-php.git"
+            "url": "git@github.com:OPMerchantServices/op-payment-service-php-sdk.git"
         }
     ],
     "keywords": [
-        "wordpress", "woocommerce", "payment gateway", "checkout finland"
+        "wordpress", "woocommerce", "payment gateway", "op payment service finland"
     ],
     "license": "MIT",
     "autoload": {
-        "psr-4": {"CheckoutFinland\\WooCommercePaymentGateway\\": "src/"}
+        "psr-4": {"OpMerchantServices\\WooCommercePaymentGateway\\": "src/"}
     },
     "require": {
         "php": ">=7.1",

@@ -1,9 +1,9 @@
 <?php
 /**
- * Checkout Finland WooCommerce payment gateway class
+ * OP Payment Service WooCommerce payment gateway class
  */
 
-namespace CheckoutFinland\WooCommercePaymentGateway;
+namespace OpMerchantServices\WooCommercePaymentGateway;
 
 use CheckoutFinland\SDK\Exception\ValidationException;
 use CheckoutFinland\SDK\Request\PaymentRequest;
@@ -32,9 +32,9 @@ final class Gateway extends \WC_Payment_Gateway {
      * Default method descriptions to be used as fallbacks.
      */
     protected const DEFAULT_METHOD_INFO = [
-        'fi' => 'Checkout Finland',
-        'en' => 'Checkout Finland',
-        'sv' => 'Checkout Finland',
+        'fi' => 'OP Payment Service for WooCommerce',
+        'en' => 'OP Payment Service for WooCommerce',
+        'sv' => 'OP Payment Service for WooCommerce',
     ];
 
     /**
@@ -106,7 +106,7 @@ final class Gateway extends \WC_Payment_Gateway {
         $this->has_fields = true;
 
         // Get dynamic payment method info.
-        $this->method_info = $this->get_checkout_finland_method_info();
+        $this->method_info = $this->get_method_info();
 
         // These strings will show in the backend.
         $this->method_title       = $this->method_info['title'];
@@ -143,7 +143,7 @@ final class Gateway extends \WC_Payment_Gateway {
             $this->merchant_id,
             $this->secret_key,
             [
-                'cofPluginVersion' => 'woocommerce-' . \CheckoutFinland\WooCommercePaymentGateway\Plugin::$version,
+                'cofPluginVersion' => 'woocommerce-' . \OpMerchantServices\WooCommercePaymentGateway\Plugin::$version,
             ]
         );
 
@@ -177,52 +177,11 @@ final class Gateway extends \WC_Payment_Gateway {
      *
      * @return array
      */
-    protected function get_checkout_finland_method_info() : array {
-        // Determine the locale to use
-        $locale = \get_locale();
-
-        $short_locale = substr( $locale, 0, 2 );
-
-        // Check from transients for the description object
-        $method_info = get_transient( 'checkout_finland_method_descriptions' );
-
-        // If we didn't have the descriptions in a transient, fetch them from the server.
-        if ( empty( $method_info ) ) {
-            // Get the external description file
-            $response = wp_remote_get( Plugin::METHOD_INFO_URL, [ 'timeout' => 3 ] );
-
-            // If the response is valid, parse it into JSON.
-            if ( ! $response instanceof \WP_Error ) {
-                $body = wp_remote_retrieve_body( $response );
-
-                $data = \json_decode( $body );
-
-                if ( ! empty( $data ) ) {
-                    $method_info = $data;
-
-                    set_transient( 'checkout_finland_method_descriptions', $method_info, WEEK_IN_SECONDS );
-                }
-            }
-        }
-
-        // Combine the current description array with the defaults.
+    protected function get_method_info() : array {
         $method_info = [
-            'title'       => wp_parse_args( $method_info->title ?? [], self::DEFAULT_METHOD_INFO ),
-            'description' => wp_parse_args( $method_info->description ?? [], self::DEFAULT_METHOD_INFO ),
+            'title' => __('OP Payment Service for WooCommerce', 'woocommerce-payment-gateway-checkout-finland'),
+            'description' => __('OP Payment Service for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract', 'woocommerce-payment-gateway-checkout-finland'),
         ];
-
-        // Pick the right locale.
-        $method_info = array_map( function( $item ) use ( $short_locale ) {
-            // If the wanted locale exists, return it.
-            if ( isset( $item[ $short_locale ] ) ) {
-                return $item[ $short_locale ];
-            }
-            // Otherwise just use Finnish.
-            else {
-                return $item['fi'];
-            }
-        }, $method_info );
-
         return $method_info;
     }
 
@@ -237,7 +196,7 @@ final class Gateway extends \WC_Payment_Gateway {
             'enabled'     => [
                 'title'   => __( 'Payment gateway status', 'woocommerce-payment-gateway-checkout-finland' ),
                 'type'    => 'checkbox',
-                'label'   => __( 'Enable Checkout Finland', 'woocommerce-payment-gateway-checkout-finland' ),
+                'label'   => __( 'Enable OP Payment Service for WooCommerce', 'woocommerce-payment-gateway-checkout-finland' ),
                 'default' => 'yes',
             ],
             // Whether test mode is enabled
@@ -508,6 +467,7 @@ final class Gateway extends \WC_Payment_Gateway {
                     'woocommerce-payment-gateway-checkout-finland'
                 );
 
+                $order = \wc_get_order( $order_id );
                 $order->add_order_note( $order_note );
 
                 do_action( 'woocommerce_refund_delete', $refund->get_id(), $order_id );
@@ -1240,7 +1200,7 @@ final class Gateway extends \WC_Payment_Gateway {
         $plugin_version = $plugin_instance->get_plugin_info()['Version'];
 
         wp_register_style(
-            'woocommerce-gateway-checkout-finland-payment-fields',
+            'op-payment-service-woocommerce-payment-fields',
             $plugin_dir_url . 'assets/dist/main.css',
             [],
             $plugin_version
