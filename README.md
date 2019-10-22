@@ -1,4 +1,4 @@
-# OP Payment Service Payment Gateway plugin for WooCommerce 
+# OP Payment Service for WooCommerce
 
 **Contributors:** [Nomafin](https://github.com/nomafin) and [villesiltala](https://github.com/villesiltala)
 
