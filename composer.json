@@ -1,7 +1,7 @@
 {
-    "name": "checkoutfinland/woocommerce-gateway-checkout-finland",
+    "name": "op-merchant-services/op-payment-service-for-woocommerce",
     "type": "wordpress-plugin",
-    "description": "WooCommerce extension for supporting Checkout Finland payment methods",
+    "description": "OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.",
     "authors": [
         {
             "name": "Miika Arponen",
@@ -14,6 +14,18 @@
             "email": "ville.siltala@geniem.com",
             "homepage": "http://github.com/villesiltala",
             "role": "Developer"
+        },
+        {
+            "name": "Henryk Helsky",
+            "email": "henryk.helsky@geniem.com",
+            "homepage": "https://github.com/traone",
+            "role": "Developer"
+        },
+        {
+            "name": "Joonas Loueranta",
+            "email": "joonas.loueranta@op.fi",
+            "homepage": "https://github.com/loueranta",
+            "role": "Manager"
         }
     ],
     "repositories": [
@@ -23,7 +35,7 @@
         }
     ],
     "keywords": [
-        "wordpress", "woocommerce", "payment gateway", "op payment service finland"
+        "wordpress", "woocommerce", "payment gateway", "op payment service", "checkout finland"
     ],
     "license": "MIT",
     "autoload": {
