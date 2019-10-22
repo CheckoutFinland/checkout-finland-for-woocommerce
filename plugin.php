@@ -1,17 +1,21 @@
 <?php
-/*
-Plugin Name: Checkout Finland WooCommerce Payment Gateway
-Plugin URI: https://github.com/CheckoutFinland/plugin-woocommerce
-Description: WooCommerce extension for supporting Checkout Finland payment methods
-Version: 1.1.7
-Author: Checkout Finland
-Author URI: http://www.checkout.fi/
-Copyright: Checkout Finland
-Text Domain: woocommerce-payment-gateway-checkout-finland
-Domain Path: /languages
-*/
+/**
+ * Plugin Name: OP Payment Service for WooCommerce
+ * Plugin URI: https://github.com/OPMerchantServices/op-payment-service-for-woocommerce
+ * Description: OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
+ * Version: 1.2
+ * Requires at least: 4.9
+ * Requires PHP: 7.1
+ * Author: OP Merchant Services
+ * Author URI: https://www.op-kauppiaspalvelut.fi
+ * Text Domain: op-payment-service-woocommerce
+ * Domain Path: /languages
+ * License: MIT
+ * License URI: https://opensource.org/licenses/MIT
+ * Copyright: OP Merchant Services
+ */
 
-namespace CheckoutFinland\WooCommercePaymentGateway;
+namespace OpMerchantServices\WooCommercePaymentGateway;
 
 // Ensure that the file is being run within the WordPress context.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -110,7 +114,7 @@ final class Plugin {
         self::$version = $this->plugin_info['Version'];
 
         // Load the plugin textdomain.
-        load_plugin_textdomain( 'woocommerce-payment-gateway-checkout-finland', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+        load_plugin_textdomain( 'op-payment-service-woocommerce', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
     }
 
     /**
@@ -206,7 +210,7 @@ final class Plugin {
         if ( ! version_compare( PHP_VERSION, '7.1.0', '>=' ) ) {
             return sprintf(
                 // translators: The placeholder contains the current PHP version.
-                esc_html__( 'Checkout Finland payment gateway plugin requires a PHP version of at least 7.1. You are currently running version %1$s.', 'woocommerce-payment-gateway-checkout-finland' ),
+                esc_html__( 'OP Payment Service gateway plugin requires a PHP version of at least 7.1. You are currently running version %1$s.', 'op-payment-service-woocommerce' ),
                 esc_html( PHP_VERSION )
             );
         }
@@ -221,7 +225,7 @@ final class Plugin {
      */
     public static function check_woocommerce_active_status() : ?string {
         if ( ! class_exists( '\WC_Payment_Gateway' ) ) {
-            return esc_html__( 'Checkout Finland payment gateway plugin requires WooCommerce to be activated.', 'woocommerce-payment-gateway-checkout-finland' );
+            return esc_html__( 'OP Payment Service gateway plugin requires WooCommerce to be activated.', 'op-payment-service-woocommerce' );
         }
 
         return null;
@@ -237,7 +241,7 @@ final class Plugin {
             defined( 'WOO_COMMERCE_VERSION' ) &&
             version_compare( WOO_COMMERCE_VERSION, '3.5' ) === -1
         ) {
-            return esc_html__( 'Checkout Finland payment gateway plugin requires WooCommerce version of 3.5 or greater.', 'woocommerce-payment-gateway-checkout-finland' );
+            return esc_html__( 'OP Payment Service gateway plugin requires WooCommerce version of 3.5 or greater.', 'op-payment-service-woocommerce' );
         }
 
         return null;

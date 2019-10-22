@@ -21,10 +21,10 @@ if ( ! defined( 'ABSPATH' ) ) {
             );
         });
 
-        esc_html_e( 'Redirecting... If nothing happens in a few seconds, click the button below.', 'woocommerce-payment-gateway-checkout-finland' );
+        esc_html_e( 'Redirecting... If nothing happens in a few seconds, click the button below.', 'op-payment-service-woocommerce' );
     ?>
 
-    <p><input type="submit" value="<?php esc_html_e( 'Submit', 'woocommerce-payment-gateway-checkout-finland' ); ?>" /></p>
+    <p><input type="submit" value="<?php esc_html_e( 'Submit', 'op-payment-service-woocommerce' ); ?>" /></p>
 </form>
 
 <script>
