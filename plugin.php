@@ -7,7 +7,7 @@
  * Requires at least: 4.9
  * Requires PHP: 7.1
  * Author: OP Merchant Services
- * Author URI: https://www.op-kauppiaspalvelut.fi
+ * Author URI: https://www.checkout.fi/
  * Text Domain: op-payment-service-woocommerce
  * Domain Path: /languages
  * License: MIT
