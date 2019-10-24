@@ -6,7 +6,7 @@
 
 **Required PHP version:** 7.1
 
-[OP Payment Service](https://www.checkout.fi) (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
+**[OP Payment Service](https://www.checkout.fi) (previously known as Checkout Finland)** is a payment gateway that offers 20+ payment methods for Finnish customers.
 
 The payment gateway provides all the popular payment methods with one simple integration. The provided payment methods include but are not limited to credit cards, online banking and mobile payments. 
 
@@ -27,12 +27,12 @@ After installation go to WooCommerce -> Settings -> Payments and select "Manage"
 ### Via Composer
 
 1. If you have Composer installed:
-    - You can use the command line to install the plugin
+- You can use the command line to install the plugin:
 
 ```
 $ composer require op-merchant-services/op-payment-service-for-woocommerce
 ```
-    - Or you can add the following json to your `composer.json` file:
+- Or you can add the following json to your `composer.json` file:
 
 ```json
 {
@@ -48,7 +48,7 @@ $ composer require op-merchant-services/op-payment-service-for-woocommerce
 
 ## Configuration
 
-There are several settings you can configure via the payment gateway options page.
+There are several settings you can configure via the options page.
 
 ### Test mode
 
