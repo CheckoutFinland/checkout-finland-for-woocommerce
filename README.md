@@ -24,11 +24,6 @@ Open WordPress Admin panel and go to Plugins -> Add New. Search for [OP Payment 
 
 After installation go to WooCommerce -> Settings -> Payments and select "Manage" next to OP Payment Service for WooCommerce to review settings.
 
-### Manually
-
-Go to the [Releases](https://github.com/OPMerchantServices/op-payment-service-for-woocommerce/releases) page and download 
-the ready to install version numbered zip-file from the Assets-section. 
-
 ### Via Composer
 
 1. If you have Composer installed:
