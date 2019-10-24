@@ -318,19 +318,20 @@
         },
         {
             "name": "op-merchant-services/op-payment-service-php-sdk",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/OPMerchantServices/op-payment-service-php-sdk.git",
-                "reference": "bdbbe1fe443c894b655ea43173ac12e45b92fec3"
+                "reference": "0013d9b28f662df7507b2a8d89d518d3d726dfe2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/OPMerchantServices/op-payment-service-php-sdk/zipball/bdbbe1fe443c894b655ea43173ac12e45b92fec3",
-                "reference": "bdbbe1fe443c894b655ea43173ac12e45b92fec3",
+                "url": "https://api.github.com/repos/OPMerchantServices/op-payment-service-php-sdk/zipball/0013d9b28f662df7507b2a8d89d518d3d726dfe2",
+                "reference": "0013d9b28f662df7507b2a8d89d518d3d726dfe2",
                 "shasum": ""
             },
             "require": {
+                "ext-json": "*",
                 "guzzlehttp/guzzle": "^6.3.3",
                 "php": "^7.1",
                 "respect/validation": "^1.1.29"
@@ -338,7 +339,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "CheckoutFinland\\SDK\\": "src/"
+                    "OpMerchantServices\\SDK\\": "src/"
                 }
             },
             "license": [
@@ -356,18 +357,31 @@
                     "email": "ville.siltala@geniem.com",
                     "homepage": "http://github.com/villesiltala",
                     "role": "Developer"
+                },
+                {
+                    "name": "Henryk Helsky",
+                    "email": "henryk.helsky@geniem.com",
+                    "homepage": "https://github.com/traone",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joonas Loueranta",
+                    "email": "joonas.loueranta@op.fi",
+                    "homepage": "https://github.com/loueranta",
+                    "role": "Manager"
                 }
             ],
-            "description": "PHP SDK for using Checkout Finland's PSP API",
+            "description": "PHP SDK for using OP Payment Service (formerly Checkout Finland)",
             "keywords": [
                 "checkout finland",
+                "op payment service",
                 "payment service provider"
             ],
             "support": {
-                "source": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/tree/1.0.0",
+                "source": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/tree/1.0.1",
                 "issues": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/issues"
             },
-            "time": "2019-06-04T11:13:05+00:00"
+            "time": "2019-10-24T10:03:21+00:00"
         },
         {
             "name": "psr/http-message",

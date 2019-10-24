@@ -5,23 +5,23 @@
 
 namespace OpMerchantServices\WooCommercePaymentGateway;
 
-use CheckoutFinland\SDK\Exception\ValidationException;
-use CheckoutFinland\SDK\Request\PaymentRequest;
-use CheckoutFinland\SDK\Model\Customer;
-use CheckoutFinland\SDK\Model\Address;
-use CheckoutFinland\SDK\Model\Item;
-use CheckoutFinland\SDK\Model\CallbackUrl;
-use CheckoutFinland\SDK\Exception\HmacException;
-use CheckoutFinland\SDK\Request\RefundRequest;
-use CheckoutFinland\SDK\Client;
-use CheckoutFinland\SDK\Request\EmailRefundRequest;
+use OpMerchantServices\SDK\Exception\ValidationException;
+use OpMerchantServices\SDK\Request\PaymentRequest;
+use OpMerchantServices\SDK\Model\Customer;
+use OpMerchantServices\SDK\Model\Address;
+use OpMerchantServices\SDK\Model\Item;
+use OpMerchantServices\SDK\Model\CallbackUrl;
+use OpMerchantServices\SDK\Exception\HmacException;
+use OpMerchantServices\SDK\Request\RefundRequest;
+use OpMerchantServices\SDK\Client;
+use OpMerchantServices\SDK\Request\EmailRefundRequest;
+use OpMerchantServices\SDK\Model\Provider;
 use WC_Order;
 use WC_Order_Item;
 use WC_Order_Item_Product;
 use WC_Order_Item_Fee;
 use WC_Order_Item_Shipping;
 use GuzzleHttp\Exception\RequestException;
-use CheckoutFinland\SDK\Model\Provider;
 
 /**
  * Class Gateway
