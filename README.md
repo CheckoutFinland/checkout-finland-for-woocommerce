@@ -8,7 +8,7 @@
 
 [OP Payment Service](https://www.checkout.fi) (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
 
-The payment gateway provides 20+ popular payment methods for Finnish customers with one simple integration. The provided payment methods include but are not limited to credit cards, online banking and mobile payments. 
+The payment gateway provides all the popular payment methods with one simple integration. The provided payment methods include but are not limited to credit cards, online banking and mobile payments. 
 
 To use this extension, you need to sign up for a OP Payment Service account. Transaction fees will be charged for every transaction. Transaction cost may vary from merchant to merchant, based on what is agreed upon with OP Merchant Services when negotiating your contract. For more information and to register, please visit [our website](https://www.checkout.fi)  (in Finnish only) or contact [asiakaspalvelu@checkout.fi](mailto:asiakaspalvelu@checkout.fi) directly.
 
