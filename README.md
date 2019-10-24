@@ -1,6 +1,6 @@
 # OP Payment Service for WooCommerce
 
-**Contributors:** [Nomafin](https://github.com/nomafin) and [villesiltala](https://github.com/villesiltala)
+**Contributors:** [Nomafin](https://github.com/nomafin), [villesiltala](https://github.com/villesiltala), [tommireinikainen](https://github.com/tommireinikainen), [onnimonni](https://github.com/onnimonni), [traone](https://github.com/traone) & [loueranta](https://github.com/loueranta)
 
 **Required WordPress version:** 4.9
 
@@ -9,6 +9,12 @@
 A WooCommerce extension to add support for OP Payment Service (formerly Checkout Finland) payment methods. 
 
 ## Installation
+
+### From WordPress plugin directory
+
+Open WordPress Admin panel and go to Plugins -> Add New. Search for [OP Payment Service for WooCommerce](https://wordpress.org/plugins/op-payment-service-for-woocommerce/), click install and then activate. 
+
+After installation go to WooCommerce -> Settings -> Payments and select "Manage" next to OP Payment Service for WooCommerce to review settings.
 
 ### Manually
 
@@ -19,16 +25,16 @@ the ready to install version numbered zip-file from the Assets-section.
 
 1. If you have Composer installed:
     - You can use the command line to install the plugin
-    - Or you can add the following json to your `composer.json` file:
 
 ```
-$ composer require checkoutfinland/woocommerce-gateway-checkout-finland
+$ composer require op-merchant-services/op-payment-service-for-woocommerce
 ```
+    - Or you can add the following json to your `composer.json` file:
 
 ```json
 {
   "require": {
-    "checkoutfinland/woocommerce-gateway-checkout-finland": "*"
+    "op-merchant-services/op-payment-service-for-woocommerce": "*"
   }
 }
 ```
