@@ -11,6 +11,10 @@ License URI: https://opensource.org/licenses/MIT
 
 [OP Payment Service](https://www.checkout.fi) (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
 
+== Description ==
+
+[OP Payment Service](https://www.checkout.fi) (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
+
 The payment gateway provides 20+ popular payment methods for Finnish customers with one simple integration. The provided payment methods include but are not limited to credit cards, online banking and mobile payments. 
 
 To use this extension, you need to sign up for a OP Payment Service account. Transaction fees will be charged for every transaction. Transaction cost may vary from merchant to merchant, based on what is agreed upon with OP Merchant Services when negotiating your contract. For more information and to register, please visit [our website](https://www.checkout.fi)  (in Finnish only) or contact [asiakaspalvelu@checkout.fi](mailto:asiakaspalvelu@checkout.fi) directly.
@@ -18,8 +22,6 @@ To use this extension, you need to sign up for a OP Payment Service account. Tra
 We employ the industry's best security practices and tools to maintain bank-level security for merchants and end customers. OP Payment Service is PCI DSS Level I and GDPR compliant. 
 
 Upon checkout, customers are redirected to the OP Payment Service website. The customer enters his or her payment information directly into our secure environment so that the web shop never comes into contact with the customers payment data. Once the payment process is complete, customers will redirected back to your store. Tokenization is used to run transactions with stored payment information. No confidential card data is ever stored on your server.
-
-== Description ==
 
 Supported payment methods include:
 
