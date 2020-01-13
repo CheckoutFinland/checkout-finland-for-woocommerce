@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated to the latest PHP-SDK version
 
-## Added
+### Added
 - Custom title and description to be used on the Payment provider section.
 
 ## [1.2.1] - 2019-10-24

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b30031111fbe772a4e2d2f19cea87424",
+    "content-hash": "a215992045977d7bbb8db3c4a96dca88",
     "packages": [
         {
             "name": "composer/installers",
@@ -319,16 +319,16 @@
         },
         {
             "name": "op-merchant-services/op-payment-service-php-sdk",
-            "version": "dev-remove-validator-lib",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/OPMerchantServices/op-payment-service-php-sdk.git",
-                "reference": "1354ca4347b334120cfb5c9e457a65537ac0b3f2"
+                "reference": "523c65a3e10575bcf6d622552c77472b4ae93c16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/OPMerchantServices/op-payment-service-php-sdk/zipball/1354ca4347b334120cfb5c9e457a65537ac0b3f2",
-                "reference": "1354ca4347b334120cfb5c9e457a65537ac0b3f2",
+                "url": "https://api.github.com/repos/OPMerchantServices/op-payment-service-php-sdk/zipball/523c65a3e10575bcf6d622552c77472b4ae93c16",
+                "reference": "523c65a3e10575bcf6d622552c77472b4ae93c16",
                 "shasum": ""
             },
             "require": {
@@ -381,10 +381,10 @@
                 "payment service provider"
             ],
             "support": {
-                "source": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/tree/remove-validator-lib",
+                "source": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/tree/v1.0.2",
                 "issues": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/issues"
             },
-            "time": "2020-01-07T13:57:43+00:00"
+            "time": "2020-01-13T10:35:16+00:00"
         },
         {
             "name": "psr/http-message",
@@ -480,9 +480,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "op-merchant-services/op-payment-service-php-sdk": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
