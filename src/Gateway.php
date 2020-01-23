@@ -107,8 +107,8 @@ final class Gateway extends \WC_Payment_Gateway
         $this->method_description = $this->method_info['description'];
 
         // These strings may show in the frontend.
-        $this->title       = $this->method_info['title'];
-        $this->description = $this->method_info['description'];
+        $this->title       = $this->get_option('custom_provider_name') ?? $this->method_info['title'];
+        $this->description = $this->get_option('custom_provider_description') ?? $this->method_info['description'];
 
         // Icon temporarily disabled for size issues
         // $this->icon = Plugin::ICON_URL;
@@ -132,13 +132,13 @@ final class Gateway extends \WC_Payment_Gateway
             $this->secret_key  = $this->get_option( 'secret_key' );
         }
 
+        $cofPluginVersion = 'woocommerce-' . \OpMerchantServices\WooCommercePaymentGateway\Plugin::$version;
+
         // Create SDK client instance
         $this->client = new Client(
             $this->merchant_id,
             $this->secret_key,
-            [
-                'cofPluginVersion' => 'woocommerce-' . \OpMerchantServices\WooCommercePaymentGateway\Plugin::$version,
-            ]
+            $cofPluginVersion
         );
 
         // Whether we are in debug mode or not.
@@ -208,6 +208,21 @@ final class Gateway extends \WC_Payment_Gateway
                 'default'     => 'no',
                 // translators: %s: URL
                 'description' => sprintf( __( 'This enables logging all payment gateway events. The log will be written in %s. Recommended only for debugging purposes as this might save personal data.', 'op-payment-service-woocommerce' ), '<code>' . \WC_Log_Handler_File::get_log_file_path( Plugin::GATEWAY_ID ) . '</code>' ),
+            ],
+            // Alternative text + description to show on the Checkout page
+            'custom_provider_name' => [
+                'title'       => __( 'Payment provider title', 'op-payment-service-woocommerce' ),
+                'type'        => 'text',
+                'label'       => __( 'Used on the Checkout page title', 'op-payment-service-woocommerce' ),
+                'default'     => 'OP Merchant Service for WooCommerce',
+                'description' => __( 'This title is displayed on the Checkout page before the payment provider images.', 'op-payment-service-woocommerce' )
+            ],
+            'custom_provider_description' => [
+                'title'       => __( 'Payment provider description', 'op-payment-service-woocommerce' ),
+                'type'        => 'text',
+                'label'       => __( 'Used on the Checkout page title', 'op-payment-service-woocommerce' ),
+                'default'     => 'OP Merchant Service for WooCommerce',
+                'description' => __( 'Depending on your theme, this description might be displayed on the Checkout page before the payment provider images.', 'op-payment-service-woocommerce' )
             ],
             // Whether to show the payment provider wall or choose the method in the store
             'provider_selection' => [
