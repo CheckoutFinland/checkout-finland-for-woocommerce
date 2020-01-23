@@ -3,7 +3,7 @@ Contributors: loueranta
 Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
-Tested up to: 5.3.1
+Tested up to: 5.3.2
 Stable tag: 1.2
 Requires PHP: 7.1
 License: MIT
@@ -45,7 +45,7 @@ Supported payment methods include:
 * Pivo
 * Siirto
 * Apple Pay*
-* Google Pay**
+* Google Pay*
 * AinaPay
 
 = International Credit Cards =
@@ -62,8 +62,7 @@ Supported payment methods include:
 * Jousto
 * AfterPay
 
-*) Coming in 2019
-**) Coming in 2020
+*) Coming in 2020
 
 
 == Installation ==
@@ -83,6 +82,9 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 
 == Changelog ==
+
+= 1.2 =
+* First version published at WordPress.org
 
 = 1.2 =
 * First version published at WordPress.org
