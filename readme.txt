@@ -1,5 +1,5 @@
 === OP Payment Service for WooCommerce ===
-Contributors: loueranta
+Contributors: loueranta, henrykhelskgeniem
 Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
