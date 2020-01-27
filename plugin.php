@@ -5,7 +5,10 @@
  * Description: OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
  * Version: 1.2.6
  * Requires at least: 4.9
+ * Tested up to: 5.3
  * Requires PHP: 7.1
+ * WC requires at least: 3.0
+ * WC tested up to: 3.9
  * Author: OP Merchant Services
  * Author URI: https://www.checkout.fi/
  * Text Domain: op-payment-service-woocommerce
