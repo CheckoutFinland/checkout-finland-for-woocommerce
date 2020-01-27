@@ -83,8 +83,16 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
-= 1.2 =
-* First version published at WordPress.org
+= 1.2.6 =
+* Minor tweaks to readme
 
-= 1.2 =
+= 1.2.5 =
+* PHP-SDK updated to latest version (1.0.2)
+
+= 1.2.4 =
+* Updated description and installation instructions
+* Added Github Action to auto deploy new releases to WordPress.org
+
+= 1.2.0 =
+* Rebranding changes from Checkout Finland to OP Merchant Service for WooCommerce
 * First version published at WordPress.org
