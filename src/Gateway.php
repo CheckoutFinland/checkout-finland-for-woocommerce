@@ -1245,12 +1245,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     protected function error( \Exception $exception, string $message, bool $die = true ) {
         $glue = PHP_EOL . '- ';
-        if ( method_exists( $exception, 'getMessages' ) ) {
-            $log_message = $message . $glue . implode( $glue, $exception->getMessages() ) . $glue;
-        }
-        else {
-            $log_message = $message . $glue;
-        }
+
+        $log_message = $message . $glue;
 
         $this->log( $log_message . PHP_EOL . $exception->getTraceAsString(), 'error' );
 
