@@ -82,6 +82,11 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.2.7 =
+* Simplified error handling
+* Strict comparison to some validations
+* Use mb_substr() to truncate the description
+
 = 1.2.6 =
 * Minor tweaks to readme
 

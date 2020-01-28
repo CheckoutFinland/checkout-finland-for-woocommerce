@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.7] - 2020-01-28
+### Changed
+- Simplified error handling
+- Strict comparison to some validations
+- Use mb_substr() to truncate the description
+
 ## [1.2.6] - 2020-01-08
 ### Changed
 - Updated to the latest PHP-SDK version
