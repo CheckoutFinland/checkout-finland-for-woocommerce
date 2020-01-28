@@ -1,5 +1,5 @@
 === OP Payment Service for WooCommerce ===
-Contributors: loueranta, henrykhelskgeniem
+Contributors: loueranta, henrykhelskygeniem
 Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
@@ -58,7 +58,6 @@ Supported payment methods include:
 
 * OP Osta laskulla
 * Collector Bank
-* Mash
 * Jousto
 * AfterPay
 
