@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a215992045977d7bbb8db3c4a96dca88",
+    "content-hash": "df98d68ea6feec7c01cb999831802c84",
     "packages": [
         {
             "name": "composer/installers",
@@ -319,16 +319,16 @@
         },
         {
             "name": "op-merchant-services/op-payment-service-php-sdk",
-            "version": "v1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/OPMerchantServices/op-payment-service-php-sdk.git",
-                "reference": "523c65a3e10575bcf6d622552c77472b4ae93c16"
+                "reference": "add95db6d10cabe68cc9185b2f23705ae0361e77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/OPMerchantServices/op-payment-service-php-sdk/zipball/523c65a3e10575bcf6d622552c77472b4ae93c16",
-                "reference": "523c65a3e10575bcf6d622552c77472b4ae93c16",
+                "url": "https://api.github.com/repos/OPMerchantServices/op-payment-service-php-sdk/zipball/add95db6d10cabe68cc9185b2f23705ae0361e77",
+                "reference": "add95db6d10cabe68cc9185b2f23705ae0361e77",
                 "shasum": ""
             },
             "require": {
@@ -381,10 +381,10 @@
                 "payment service provider"
             ],
             "support": {
-                "source": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/tree/v1.0.2",
+                "source": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/tree/1.0.3",
                 "issues": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/issues"
             },
-            "time": "2020-01-13T10:35:16+00:00"
+            "time": "2020-01-27T15:16:42+00:00"
         },
         {
             "name": "psr/http-message",
@@ -484,7 +484,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.1"
+        "php": ">=7.1",
+        "ext-mbstring": "*"
     },
     "platform-dev": []
 }
