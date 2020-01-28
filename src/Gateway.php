@@ -214,14 +214,14 @@ final class Gateway extends \WC_Payment_Gateway
                 'title'       => __( 'Payment provider title', 'op-payment-service-woocommerce' ),
                 'type'        => 'text',
                 'label'       => __( 'Used on the Checkout page title', 'op-payment-service-woocommerce' ),
-                'default'     => 'OP Merchant Service for WooCommerce',
+                'default'     => 'OP Payment Service for WooCommerce',
                 'description' => __( 'This title is displayed on the Checkout page before the payment provider images.', 'op-payment-service-woocommerce' )
             ],
             'custom_provider_description' => [
                 'title'       => __( 'Payment provider description', 'op-payment-service-woocommerce' ),
                 'type'        => 'text',
                 'label'       => __( 'Used on the Checkout page title', 'op-payment-service-woocommerce' ),
-                'default'     => 'OP Merchant Service for WooCommerce',
+                'default'     => 'OP Payment Service for WooCommerce',
                 'description' => __( 'Depending on your theme, this description might be displayed on the Checkout page before the payment provider images.', 'op-payment-service-woocommerce' )
             ],
             // Whether to show the payment provider wall or choose the method in the store
@@ -1096,7 +1096,7 @@ final class Gateway extends \WC_Payment_Gateway
         }
 
         // Ensure the description is maximum of 1000 characters long.
-        $description = substr( $description, 0, 1000 );
+        $description = mb_substr( $description, 0, 1000 );
 
         return apply_filters( 'checkout_finland_item_description', $description, $item );
     }
@@ -1245,12 +1245,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     protected function error( \Exception $exception, string $message, bool $die = true ) {
         $glue = PHP_EOL . '- ';
-        if ( method_exists( $exception, 'getMessages' ) ) {
-            $log_message = $message . $glue . implode( $glue, $exception->getMessages() ) . $glue;
-        }
-        else {
-            $log_message = $message . $glue;
-        }
+
+        $log_message = $message . $glue;
 
         $this->log( $log_message . PHP_EOL . $exception->getTraceAsString(), 'error' );
 
