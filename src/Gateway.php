@@ -1133,7 +1133,7 @@ final class Gateway extends \WC_Payment_Gateway
         $callback = new CallbackUrl();
 
         $callback->setSuccess( $this->get_return_url( $order ) );
-        $callback->setCancel( $order->get_cancel_order_url_raw() );
+        $callback->setCancel( wc_get_checkout_url() );
 
         return $callback;
     }
