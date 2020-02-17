@@ -28,9 +28,19 @@ $group_titles = [
 
 array_walk( $data, function( $provider_group, $title ) use ( $group_titles ) {
 
-    echo '<h4>' . esc_html( $group_titles[ $title ] ?? $title ) . '</h4>';
+    $providers_list = [];
 
-    echo '<ul class="op-payment-service-woocommerce-payment-fields">';
+    foreach ( $provider_group as $provider ) {
+        $providers_list[] = $provider->getName();
+    }
+
+    $provider_group_html = '<div class="provider-group"><h4 class="provider-group-title ' . $title . '">' . esc_html( $group_titles[ $title ] ?? $title ) .
+        '</h4><div class="provider-list">' .
+        implode( ', ', $providers_list ) . '</div></div>';
+
+    echo $provider_group_html;
+
+    echo '<ul class="op-payment-service-woocommerce-payment-fields hidden">';
     array_walk( $provider_group, function( $provider ) {
         printf(
             '<li class="op-payment-service-woocommerce-payment-fields--list-item">
@@ -51,3 +61,15 @@ array_walk( $data, function( $provider_group, $title ) use ( $group_titles ) {
     echo '</ul>';
 });
 
+// @todo move this where it is more suitable
+echo "
+<script>
+
+jQuery('.provider-group').on('click', function() {
+    jQuery('.provider-group').removeClass('selected');
+    jQuery('.op-payment-service-woocommerce-payment-fields').addClass('hidden');
+    jQuery(this).addClass('selected').next().removeClass('hidden');
+});
+
+</script>
+";

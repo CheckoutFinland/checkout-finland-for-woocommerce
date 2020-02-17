@@ -1,15 +1,84 @@
-$shadow-color: rgba(8, 19, 31, .12);
+
+.provider-group {
+    background: #ebebeb;
+    padding: 8px 12px;
+    margin: 10px 0;
+    cursor: pointer;
+
+    &-title {
+        display: flex;
+        padding-left: 42px;
+        margin-top: 6px;
+
+        &.bank {
+            background: url("../img/icon_bank.svg") no-repeat;
+        }
+
+        &.credit {
+            background: url("../img/icon_credit.svg") no-repeat;
+        }
+
+        &.creditcard {
+            background: url("../img/icon_creditcard.svg") no-repeat;
+        }
+
+        &.mobile {
+            background: url("../img/icon_mobile.svg") no-repeat;
+        }
+
+        .icon {
+            float: none;
+            margin-right: 8px;
+        }
+    }
+
+
+    &.selected {
+        background: #33798d;
+        color: #ffffff;
+
+        .provider-group-title {
+            color: #ffffff;
+
+            &.bank {
+                background: url("../img/icon_bank_active.svg") no-repeat;
+            }
+
+            &.credit {
+                background: url("../img/icon_credit_active.svg") no-repeat;
+            }
+
+            &.creditcard {
+                background: url("../img/icon_creditcard_active.svg") no-repeat;
+            }
+
+            &.mobile {
+                background: url("../img/icon_mobile_active.svg") no-repeat;
+            }
+        }
+    }
+}
 
 .op-payment-service-woocommerce-payment-fields {
 
     margin: 0;
+    display: flex;
+    justify-content: space-between;
+    flex-flow: wrap;
+
+    &.hidden {
+        display: none;
+    }
 
     &--list-item {
         position: relative;
         display: inline-block;
-        width: 33%;
+        width: 48%;
         padding-bottom: 17% !important;
         list-style-type: none !important;
+        border: 2px solid #ebebeb;
+        border-bottom: 2px solid #ebebeb !important;
+        margin-bottom: 20px;
 
         &--wrapper {
             position: absolute;
@@ -31,17 +100,23 @@ $shadow-color: rgba(8, 19, 31, .12);
 
         &:hover,
         &--input:checked + &--wrapper {
-            box-shadow: 0 0 .625rem 0 $shadow-color;
-            transition: box-shadow .3s ease-in-out;
+            border: 2px solid #33798d;
+            border-bottom: 2px solid #33798d !important;
         }
 
         &--img {
             float: none !important;
-            padding: .2rem .6rem !important;
+            //padding: .2rem .6rem !important;
             cursor: pointer;
             max-width: 100% !important;
-            max-height: 100% !important;
-            padding: 10% 15% !important;
+            max-height: 4em !important;
+            padding: 5% 10% !important;
         }
+
+        label {
+            border: 1px solid red;
+
+        }
+
     }
 }
