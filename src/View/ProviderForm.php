@@ -26,6 +26,9 @@ $group_titles = [
     'credit'     => __( 'Invoice and instalment payment methods', 'op-payment-service-woocommerce' ),
 ];
 
+$terms_link = 'Maksamalla tilauksen hyväksyt <a href="https://www.checkout.fi/ehdot-ja-sopimukset/maksuehdot" target="_blank">maksupalvelun ehdot</a>.';
+echo '<div class="checkout-terms-link">' . $terms_link . '</div>';
+
 array_walk( $data, function( $provider_group, $title ) use ( $group_titles ) {
 
     $providers_list = [];
@@ -62,6 +65,7 @@ array_walk( $data, function( $provider_group, $title ) use ( $group_titles ) {
 });
 
 // @todo move this where it is more suitable
+// toggle payment method group sections' visibility
 echo "
 <script>
 
