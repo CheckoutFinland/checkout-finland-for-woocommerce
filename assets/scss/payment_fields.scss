@@ -4,9 +4,10 @@
     padding: 8px 12px;
     margin: 10px 0;
     cursor: pointer;
+    display: flex;
+    flex-flow: column;
 
     &-title {
-        display: flex;
         padding-left: 42px;
         margin-top: 6px;
         line-height: 1.45em;
