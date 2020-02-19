@@ -26,6 +26,8 @@ $group_titles = [
     'credit'     => __( 'Invoice and instalment payment methods', 'op-payment-service-woocommerce' ),
 ];
 
+// Currently terms are only in FI, SV and EN are coming soon
+// in the future, this link / text will be served via Checkout API response
 $terms_link = 'Maksamalla tilauksen hyväksyt <a href="https://www.checkout.fi/ehdot-ja-sopimukset/maksuehdot" target="_blank">maksupalvelun ehdot</a>.';
 echo '<div class="checkout-terms-link">' . $terms_link . '</div>';
 
