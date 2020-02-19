@@ -9,6 +9,8 @@
         display: flex;
         padding-left: 42px;
         margin-top: 6px;
+        line-height: 1.45em;
+        font-size: 1.5em;
 
         &.bank {
             background: url("../img/icon_bank.svg") no-repeat;
@@ -62,6 +64,7 @@
 .op-payment-service-woocommerce-payment-fields {
 
     margin: 0;
+    padding: 0;
     display: flex;
     justify-content: space-between;
     flex-flow: wrap;
@@ -74,10 +77,8 @@
         position: relative;
         display: inline-block;
         width: 48%;
-        padding-bottom: 17% !important;
+        padding-bottom: 17%;
         list-style-type: none !important;
-        border: 2px solid #ebebeb;
-        border-bottom: 2px solid #ebebeb !important;
         margin-bottom: 20px;
 
         &--wrapper {
@@ -89,6 +90,7 @@
             align-items: center;
             width: 100%;
             height: 100%;
+            overflow: hidden;
         }
 
         &--input {
@@ -101,7 +103,6 @@
         &:hover,
         &--input:checked + &--wrapper {
             border: 2px solid #33798d;
-            border-bottom: 2px solid #33798d !important;
         }
 
         &--img {
@@ -109,8 +110,22 @@
             //padding: .2rem .6rem !important;
             cursor: pointer;
             max-width: 100% !important;
-            max-height: 4em !important;
+            max-height: 6em !important;
             padding: 5% 10% !important;
         }
     }
 }
+
+// Overrides for different themes
+.woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item {
+    margin-bottom: 20px;
+    border: 2px solid #ebebeb;
+}
+.woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item--wrapper {
+}
+
+.woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item:hover,
+.woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--input:checked + .op-payment-service-woocommerce-payment-fields--list-item--wrapper {
+    border: 2px solid #33798d;
+}
+
