@@ -68,14 +68,23 @@ array_walk( $data, function( $provider_group, $title ) use ( $group_titles ) {
 
 // @todo move this where it is more suitable
 // toggle payment method group sections' visibility
+// add class to handle different theme layouts 2 or 5 items per row
 echo "
 <script>
+    jQuery('.provider-group').on('click', function() {
+        jQuery('.provider-group').removeClass('selected');
+        jQuery('.op-payment-service-woocommerce-payment-fields').addClass('hidden');
+        jQuery(this).addClass('selected').next().removeClass('hidden');
+    });
 
-jQuery('.provider-group').on('click', function() {
-    jQuery('.provider-group').removeClass('selected');
-    jQuery('.op-payment-service-woocommerce-payment-fields').addClass('hidden');
-    jQuery(this).addClass('selected').next().removeClass('hidden');
-});
+    let handleSize = function(elem, size) {
+        (size < 500) ? elem.classList.add('col-narrow') : elem.classList.add('col-wide');
+    };
+    
+    const container = document.getElementById('payment');
+    let checkoutContainer = document.getElementsByClassName('payment_method_checkout_finland');
+    let containerWidth = Math.round(container.offsetWidth);
+    handleSize(checkoutContainer[0], containerWidth);
 
 </script>
 ";

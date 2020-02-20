@@ -131,3 +131,10 @@
     border: 2px solid #33798d;
 }
 
+.col-wide .op-payment-service-woocommerce-payment-fields--list-item {
+    width: 19%;
+}
+
+.col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
+    width: 48%;
+}
