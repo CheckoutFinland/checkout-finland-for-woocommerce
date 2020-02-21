@@ -78,13 +78,41 @@ echo "
     });
 
     let handleSize = function(elem, size) {
-        (size < 500) ? elem.classList.add('col-narrow') : elem.classList.add('col-wide');
+        if(size < 600) {
+            elem.classList.remove('col-wide');
+            elem.classList.add('col-narrow');
+        } else {
+            elem.classList.remove('col-narrow');
+            elem.classList.add('col-wide');
+        }
     };
-    
+
     const container = document.getElementById('payment');
     let checkoutContainer = document.getElementsByClassName('payment_method_checkout_finland');
     let containerWidth = Math.round(container.offsetWidth);
     handleSize(checkoutContainer[0], containerWidth);
+    
+    let timeout = false;
+    let delta = 300;
+    let startTime;
+    let handleResize = function() {
+        if (new Date() - startTime < delta) {
+            setTimeout(handleResize, delta)
+        } else {
+            timeout = false;
+            console.log('xxx');
+            handleSize(checkoutContainer[0], Math.round(container.offsetWidth));
+        }
+    };
+    
+    window.addEventListener('resize', function() {
+        startTime = new Date();
+        console.log('123');
+        if (timeout === false) {
+            timeout = true;
+            setTimeout(handleResize, delta);
+        }
+    });
 
 </script>
 ";
