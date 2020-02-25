@@ -71,14 +71,30 @@ array_walk( $data, function( $provider_group, $title ) use ( $group_titles ) {
 // add class to handle different theme layouts 2 or 5 items per row
 echo "
 <script>
-    jQuery('.provider-group').on('click', function() {
-        jQuery('.provider-group').removeClass('selected');
-        jQuery('.op-payment-service-woocommerce-payment-fields').addClass('hidden');
-        jQuery(this).addClass('selected').next().removeClass('hidden');
-    });
+
+    const providerGroups = document.getElementsByClassName('provider-group');
+    
+    for (let i = 0; i < providerGroups.length; i++) {
+        providerGroups[i].addEventListener('click', function(e) {
+            e.preventDefault();
+            // Clear active state
+            const active = document.getElementsByClassName('provider-group selected');
+            if (active.length !== 0) {
+                active[0].classList.remove('selected');
+            }
+            // Hide payment fields
+            const fields = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields');
+            for (let ii = 0; ii < fields.length; ii++) {
+                fields[ii].classList.add('hidden');
+            }
+            // Show current group            
+            this.classList.add('selected');
+            this.nextSibling.classList.remove('hidden');
+        });
+    }
 
     let handleSize = function(elem, size) {
-        if(size < 600) {
+        if (size < 600) {
             elem.classList.remove('col-wide');
             elem.classList.add('col-narrow');
         } else {
@@ -86,12 +102,15 @@ echo "
             elem.classList.add('col-wide');
         }
     };
-
-    const container = document.getElementById('payment');
-    let checkoutContainer = document.getElementsByClassName('payment_method_checkout_finland');
-    let containerWidth = Math.round(container.offsetWidth);
-    handleSize(checkoutContainer[0], containerWidth);
     
+    // Payment gateways container
+    const container = document.getElementById('payment');
+    // Checkout container
+    const checkoutContainer = document.getElementsByClassName('payment_method_checkout_finland');
+    // Add some css class to help out with different width columns
+    handleSize(checkoutContainer[0], Math.round(container.offsetWidth));
+
+    // handleSize for resize event
     let timeout = false;
     let delta = 300;
     let startTime;
@@ -100,14 +119,12 @@ echo "
             setTimeout(handleResize, delta)
         } else {
             timeout = false;
-            console.log('xxx');
             handleSize(checkoutContainer[0], Math.round(container.offsetWidth));
         }
     };
     
     window.addEventListener('resize', function() {
         startTime = new Date();
-        console.log('123');
         if (timeout === false) {
             timeout = true;
             setTimeout(handleResize, delta);
