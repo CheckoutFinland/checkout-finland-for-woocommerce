@@ -898,17 +898,20 @@ final class Gateway extends \WC_Payment_Gateway
      */
     protected function provider_form() {
         $cart_total = $this->get_cart_total();
+        $res = [];
 
-        $providers = $this->get_payment_providers( $cart_total );
+        //$providers = $this->get_payment_providers( $cart_total );
+        $providers = $this->get_grouped_payment_providers( $cart_total );
 
         // If there was an error getting the payment providers, show it
         if ( ! empty( $providers['error'] ) ) {
             echo '<p>' . esc_html( $providers['error'] ) . '</p>';
             return;
         }
-
+        $res['terms'] = $providers['terms'] ?? '';
+error_log(print_r($providers, true));
         // Group the providers by type
-        $providers = array_reduce( $providers, function( ?array $carry, Provider $item ) : array {
+        $providers = array_reduce( $providers['providers'], function( ?array $carry, Provider $item ) : array {
             if ( ! is_array( $carry[ $item->getGroup() ] ?? false ) ) {
                 $carry[ $item->getGroup() ] = [];
             }
@@ -917,10 +920,11 @@ final class Gateway extends \WC_Payment_Gateway
 
             return $carry;
         });
-
+        $res['providers'] = $providers;
         $provider_form_view = new View( 'ProviderForm' );
 
-        $provider_form_view->render( $providers );
+        //$provider_form_view->render( $providers );
+        $provider_form_view->render( $res );
     }
 
     /**
@@ -950,6 +954,26 @@ final class Gateway extends \WC_Payment_Gateway
     protected function get_payment_providers( int $payment_amount ) : array {
         try {
             $providers = $this->client->getPaymentProviders( $payment_amount );
+        }
+        catch ( HmacException $exception ) {
+            $providers = $this->get_payment_providers_error_handler( $exception );
+        }
+        catch ( RequestException $exception ) {
+            $providers = $this->get_payment_providers_error_handler( $exception );
+        }
+
+        return $providers;
+    }
+
+    /**
+     * Get the groupd list of payment providers
+     *
+     * @param integer $payment_amount Payment amount in currency minor unit, eg. cents.
+     * @return array
+     */
+    protected function get_grouped_payment_providers( int $payment_amount ) : array {
+        try {
+            $providers = $this->client->getGroupedPaymentProviders( $payment_amount );
         }
         catch ( HmacException $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );
