@@ -139,5 +139,12 @@
 }
 
 .col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
+    padding-bottom: 19%;
     width: 48%;
+}
+.col-narrow .provider-list {
+    display: none;
+}
+.col-narrow .provider-group-title {
+    margin-bottom: 4px;
 }
