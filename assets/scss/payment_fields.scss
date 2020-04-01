@@ -90,6 +90,7 @@
     /*justify-content: space-between;*/
     justify-content: space-around;
     flex-flow: wrap;
+    min-height: 90px;
 
     &.hidden {
         display: none;
@@ -102,7 +103,7 @@
         padding-bottom: 12%;
         list-style-type: none !important;
         margin-bottom: 20px;
-        min-height: 70px;
+        /*min-height: 70px;*/
 
         &--wrapper {
             position: absolute;
