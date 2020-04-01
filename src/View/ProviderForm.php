@@ -38,9 +38,11 @@ array_walk( $data['providers'], function( $provider_group, $title ) use ( $group
         $providers_list[] = $provider->getName();
     }
 
-    $provider_group_html = '<div class="provider-group"><h4 class="provider-group-title ' . $title . '">' . esc_html( $group_titles[ $title ] ?? $title ) .
-        '</h4><div class="provider-list">' .
-        implode( ', ', $providers_list ) . '</div></div>';
+    $provider_group_html = '<div class="provider-group">' .
+        '<div class="provider-group-title ' . $title . '">' . esc_html( $group_titles[ $title ] ?? $title ) . '</div>' .
+        '<div class="provider-list">' . implode( ', ', $providers_list ) . '</div>' .
+        '<div style="clear: both;"></div>' .
+        '</div>';
 
     echo $provider_group_html;
 

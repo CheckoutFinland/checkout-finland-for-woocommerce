@@ -5,34 +5,50 @@
     margin: 10px 0;
     cursor: pointer;
     display: flex;
-    flex-flow: column;
+    flex-flow: row;
+    align-items: center;
 
     &-title {
         padding-left: 42px;
-        margin-top: 6px;
-        line-height: 1.45em;
-        font-size: 1.5em;
+        margin-top: 2px;
+        line-height: 1.8em;
+        font-size: 1.2em;
+        width: 100%;
+        padding-top: 8px;
+        padding-bottom: 8px;
 
         &.bank {
             background: url("../img/icon_bank.svg") no-repeat;
+            background-position-y: center;
         }
 
         &.credit {
             background: url("../img/icon_credit.svg") no-repeat;
+            background-position-y: center;
         }
 
         &.creditcard {
             background: url("../img/icon_creditcard.svg") no-repeat;
+            background-position-y: center;
         }
 
         &.mobile {
             background: url("../img/icon_mobile.svg") no-repeat;
+            background-position-y: center;
         }
 
         .icon {
             float: none;
             margin-right: 8px;
         }
+    }
+
+    .provider-list {
+        text-align: right;
+        float: right;
+        font-style: italic;
+        margin-left: 2em;
+        width: 100%;
     }
 
 
@@ -45,18 +61,22 @@
 
             &.bank {
                 background: url("../img/icon_bank_active.svg") no-repeat;
+                background-position-y: center;
             }
 
             &.credit {
                 background: url("../img/icon_credit_active.svg") no-repeat;
+                background-position-y: center;
             }
 
             &.creditcard {
                 background: url("../img/icon_creditcard_active.svg") no-repeat;
+                background-position-y: center;
             }
 
             &.mobile {
                 background: url("../img/icon_mobile_active.svg") no-repeat;
+                background-position-y: center;
             }
         }
     }
@@ -67,7 +87,8 @@
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: space-between;
+    /*justify-content: space-between;*/
+    justify-content: space-around;
     flex-flow: wrap;
 
     &.hidden {
@@ -78,9 +99,10 @@
         position: relative;
         display: inline-block;
         width: 48%;
-        padding-bottom: 11%;
+        padding-bottom: 12%;
         list-style-type: none !important;
         margin-bottom: 20px;
+        min-height: 70px;
 
         &--wrapper {
             position: absolute;
@@ -110,10 +132,11 @@
             float: none !important;
             //padding: .2rem .6rem !important;
             cursor: pointer;
-            max-width: 100% !important;
+            max-width: 90% !important;
             min-height: 5em !important;
             max-height: 9em !important;
             padding: 5% 4% !important;
+            margin-left: 0 !important;
         }
     }
 }
@@ -123,7 +146,7 @@
     text-align: right;
 }
 .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item {
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     border: 2px solid #ebebeb;
 }
 .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item--wrapper {
