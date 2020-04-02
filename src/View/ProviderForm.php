@@ -80,6 +80,11 @@ echo "
     for (let i = 0; i < providerGroups.length; i++) {
         providerGroups[i].addEventListener('click', function(e) {
             e.preventDefault();
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                this.nextSibling.classList.add('hidden');
+                return;
+            }
             // Clear active state
             const active = document.getElementsByClassName('provider-group selected');
             if (active.length !== 0) {
