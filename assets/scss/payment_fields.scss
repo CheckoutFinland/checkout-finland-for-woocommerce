@@ -18,25 +18,21 @@
         padding-bottom: 8px;
 
         &.bank {
-            background: url("../img/icon_bank.svg") no-repeat;
             background-position-y: center;
             background-size: 28px 28px;
         }
 
         &.credit {
-            background: url("../img/icon_credit.svg") no-repeat;
             background-position-y: center;
             background-size: 28px 28px;
         }
 
         &.creditcard {
-            background: url("../img/icon_creditcard.svg") no-repeat;
             background-position-y: center;
             background-size: 28px 28px;
         }
 
         &.mobile {
-            background: url("../img/icon_mobile.svg") no-repeat;
             background-position-y: center;
             background-size: 28px 28px;
         }
@@ -63,27 +59,24 @@
 
         .provider-group-title {
             color: #ffffff;
+            filter: brightness(5);
 
             &.bank {
-                background: url("../img/icon_bank_active.svg") no-repeat;
                 background-position-y: center;
                 background-size: 28px 28px;
             }
 
             &.credit {
-                background: url("../img/icon_credit_active.svg") no-repeat;
                 background-position-y: center;
                 background-size: 28px 28px;
             }
 
             &.creditcard {
-                background: url("../img/icon_creditcard_active.svg") no-repeat;
                 background-position-y: center;
                 background-size: 28px 28px;
             }
 
             &.mobile {
-                background: url("../img/icon_mobile_active.svg") no-repeat;
                 background-position-y: center;
                 background-size: 28px 28px;
             }
@@ -95,10 +88,11 @@
 
     margin: 0;
     padding: 0;
+    /*
     display: flex;
-    /*justify-content: space-between;*/
     justify-content: space-around;
     flex-flow: wrap;
+    */
     min-height: 90px;
 
     &.hidden {
@@ -109,18 +103,19 @@
         position: relative;
         display: inline-block;
         width: 48%;
-        padding-bottom: 12%;
+        /*padding-bottom: 12%;*/
         list-style-type: none !important;
         margin-bottom: 20px;
-        /*min-height: 70px;*/
+
+        /*min-height: 80px;*/
 
         &--wrapper {
-            position: absolute;
+            /*position: absolute;
             top: 0;
-            left: 0;
-            display: flex;
+            left: 0;*/
+            /*display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: center;*/
             width: 100%;
             height: 100%;
             overflow: hidden;
@@ -142,7 +137,7 @@
             float: none !important;
             //padding: .2rem .6rem !important;
             cursor: pointer;
-            max-width: 90% !important;
+            max-width: 100% !important;
             min-height: 5em !important;
             max-height: 9em !important;
             padding: 5% 4% !important;
@@ -156,8 +151,13 @@
     font-size: 75%;
 }
 .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+    margin-left: 4px;
+    margin-right: 4px;
     border: 2px solid #ebebeb;
+}
+.woocommerce-checkout #payment ul.payment_methods .col-narrow li.op-payment-service-woocommerce-payment-fields--list-item {
+    margin-left: 3px;
 }
 .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item--wrapper {
 }
@@ -168,11 +168,11 @@
 }
 
 .col-wide .op-payment-service-woocommerce-payment-fields--list-item {
-    width: 19%;
+    width: 18%;
 }
 
 .col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
-    padding-bottom: 19%;
+    /*padding-bottom: 19%;*/
     width: 48%;
 }
 .col-narrow .provider-list {

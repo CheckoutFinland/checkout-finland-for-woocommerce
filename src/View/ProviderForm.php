@@ -19,51 +19,53 @@ if ( ! empty( $data['error'] ) ) {
     return;
 }
 
-$group_titles = [
-    'mobile'     => __( 'Mobile payment methods', 'op-payment-service-woocommerce' ),
-    'bank'       => __( 'Bank payment methods', 'op-payment-service-woocommerce' ),
-    'creditcard' => __( 'Card payment methods', 'op-payment-service-woocommerce' ),
-    'credit'     => __( 'Invoice and instalment payment methods', 'op-payment-service-woocommerce' ),
-];
-
 // Terms
 $terms_link = $data['terms'];
 echo '<div class="checkout-terms-link">' . $terms_link . '</div>';
-//var_dump($data);
-array_walk( $data['providers'], function( $provider_group, $title ) use ( $group_titles ) {
 
+array_walk( $data['groups'], function( $group ) {
+    echo '<div class="provider-group">';
     $providers_list = [];
-
-    foreach ( $provider_group as $provider ) {
+    echo '<style type="text/css">';
+    foreach( $group['providers'] as $provider ) {
+        // Create simple list of provider names only
         $providers_list[] = $provider->getName();
+        // Styles for group icons
+        $group_id =  $group['id'];
+        $group_icon = $group['icon'];
+        echo <<<EOL
+.payment_method_checkout_finland .provider-group-title.$group_id {
+    background: url($group_icon) no-repeat;
+    background-size: 28px 28px;
+    background-position-y: center;
+}
+.payment_method_checkout_finland .provider-group.selected .provider-group-title.$group_id {
+    background: url($group_icon) no-repeat;
+    background-size: 28px 28px;
+    background-position-y: center;
+}
+EOL;
+        
     }
-
-    $provider_group_html = '<div class="provider-group">' .
-        '<div class="provider-group-title ' . $title . '">' . esc_html( $group_titles[ $title ] ?? $title ) . '</div>' .
-        '<div class="provider-list">' . implode( ', ', $providers_list ) . '</div>' .
-        '<div style="clear: both;"></div>' .
-        '</div>';
-
-    echo $provider_group_html;
-
+    echo '</style>';
+    echo '<div class="provider-group-title ' . $group['id']  . '">';
+    echo esc_html( $group['name'] );
+    echo '</div>';
+    echo '<div class="provider-list">';
+    echo implode( ', ', $providers_list );
+    echo '</div>';
+    echo '</div>';
     echo '<ul class="op-payment-service-woocommerce-payment-fields hidden">';
-    array_walk( $provider_group, function( $provider ) {
-        printf(
-            '<li class="op-payment-service-woocommerce-payment-fields--list-item">
-                <label>
-                    <input
-                        class="op-payment-service-woocommerce-payment-fields--list-item--input"
-                        type="radio" name="payment_provider" value="%s">
-                    <div class="op-payment-service-woocommerce-payment-fields--list-item--wrapper">
-                        <img class="op-payment-service-woocommerce-payment-fields--list-item--img" src="%s">
-                    </div>
-                </label>
-            </li>',
-            esc_html( $provider->getId() ),
-            esc_html( $provider->getSvg() )
-        );
+    array_walk( $group['providers'], function ($provider) {
+        echo '<li class="op-payment-service-woocommerce-payment-fields--list-item">';
+        echo '<label>';
+        echo '<input class="op-payment-service-woocommerce-payment-fields--list-item--input" type="radio" name="payment_provider" value="' . $provider->getId() . '">';
+        echo '<div class="op-payment-service-woocommerce-payment-fields--list-item--wrapper">';
+        echo '<img class="op-payment-service-woocommerce-payment-fields--list-item--img" src="' . $provider->getSvg() . '">';
+        echo '</div>';
+        echo '</label>';
+        echo '</li>';
     });
-
     echo '</ul>';
 });
 

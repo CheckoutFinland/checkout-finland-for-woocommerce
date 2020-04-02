@@ -900,7 +900,6 @@ final class Gateway extends \WC_Payment_Gateway
         $cart_total = $this->get_cart_total();
         $res = [];
 
-        //$providers = $this->get_payment_providers( $cart_total );
         $providers = $this->get_grouped_payment_providers( $cart_total );
 
         // If there was an error getting the payment providers, show it
@@ -909,21 +908,10 @@ final class Gateway extends \WC_Payment_Gateway
             return;
         }
         $res['terms'] = $providers['terms'] ?? '';
-error_log(print_r($providers, true));
-        // Group the providers by type
-        $providers = array_reduce( $providers['providers'], function( ?array $carry, Provider $item ) : array {
-            if ( ! is_array( $carry[ $item->getGroup() ] ?? false ) ) {
-                $carry[ $item->getGroup() ] = [];
-            }
+        $res['groups'] = $providers['groups'];
 
-            $carry[ $item->getGroup() ][] = $item;
-
-            return $carry;
-        });
-        $res['providers'] = $providers;
         $provider_form_view = new View( 'ProviderForm' );
 
-        //$provider_form_view->render( $providers );
         $provider_form_view->render( $res );
     }
 
