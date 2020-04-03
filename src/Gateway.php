@@ -900,7 +900,24 @@ final class Gateway extends \WC_Payment_Gateway
         $cart_total = $this->get_cart_total();
         $res = [];
 
-        $providers = $this->get_grouped_payment_providers( $cart_total );
+        $full_locale = get_locale();
+
+        $short_locale = substr( $full_locale, 0, 2 );
+
+        // Get and assign the WordPress locale
+        switch ( $short_locale ) {
+            case 'sv':
+                $locale = 'SV';
+                break;
+            case 'fi':
+                $locale = 'FI';
+                break;
+            default:
+                $locale = 'EN';
+                break;
+        }
+
+        $providers = $this->get_grouped_payment_providers( $cart_total, $locale );
 
         // If there was an error getting the payment providers, show it
         if ( ! empty( $providers['error'] ) ) {
@@ -959,9 +976,9 @@ final class Gateway extends \WC_Payment_Gateway
      * @param integer $payment_amount Payment amount in currency minor unit, eg. cents.
      * @return array
      */
-    protected function get_grouped_payment_providers( int $payment_amount ) : array {
+    protected function get_grouped_payment_providers( int $payment_amount, string $locale ) : array {
         try {
-            $providers = $this->client->getGroupedPaymentProviders( $payment_amount );
+            $providers = $this->client->getGroupedPaymentProviders( $payment_amount, $locale );
         }
         catch ( HmacException $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );
