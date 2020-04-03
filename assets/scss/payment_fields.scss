@@ -1,6 +1,5 @@
 .provider-group {
     background: #ebebeb;
-    border: 1px solid #ebebeb;
     padding: 8px 12px;
     margin: 10px 0;
     cursor: pointer;
@@ -55,7 +54,6 @@
 
     &.selected {
         background: #33798d;
-        border: 1px solid #33798d;
         color: #ffffff;
 
         .provider-group-title {
@@ -85,7 +83,10 @@
     }
 }
 .provider-group:hover {
-    border: 1px solid #666 !important;
+    background-color: #d0d0d0;
+}
+.provider-group.selected:hover {
+    background-color: #33798d;
 }
 
 .op-payment-service-woocommerce-payment-fields {
@@ -108,7 +109,8 @@
         
         &--wrapper {
             text-align: center;
-            width: 100%;
+            /*width: 100%;*/
+            max-width: 100%;
             height: 100%;
             overflow: hidden;
             padding: 4px;
