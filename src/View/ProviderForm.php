@@ -113,6 +113,8 @@ echo "
             for (let ii = 0; ii < methods.length; ii++) {
                 methods[ii].classList.remove('selected');
             }
+            let radio = this.childNodes[0].childNodes[0];
+            radio.checked = true;
             this.classList.add('selected');
         });
     }
