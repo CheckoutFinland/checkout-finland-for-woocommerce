@@ -139,6 +139,9 @@ final class Plugin {
                     background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#33798d'); ?> !important;
                     color: <?php echo get_theme_mod('op_group_highlighted_text', '#ffffff'); ?> !important;
                 }
+                .provider-group.selected div {
+                    color: <?php echo get_theme_mod('op_group_highlighted_text', '#ffffff'); ?> !important;
+                }
                 .provider-group:hover {
                     background-color: <?php echo get_theme_mod('op_group_hover_background', '#d0d0d0'); ?> !important;
                     color: <?php echo get_theme_mod('op_group_hover_text', '#515151'); ?> !important;
