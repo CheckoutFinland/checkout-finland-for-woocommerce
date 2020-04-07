@@ -147,11 +147,8 @@ final class Plugin {
                     background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#33798d'); ?> !important;
                     color: <?php echo get_theme_mod('op_group_highlighted_text', '#ffffff'); ?> !important;
                 }
-                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--input:checked+.op-payment-service-woocommerce-payment-fields--list-item--wrapper {
+                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--input:checked {
                     border: 2px solid <?php echo get_theme_mod('op_method_highlighted', '#33798d'); ?> !important;
-                }
-                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item:hover {
-                    border: 2px solid <?php echo get_theme_mod('op_method_hover', '#33798d'); ?> !important;
                 }
             </style>
         <?php

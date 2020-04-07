@@ -8,7 +8,6 @@
     align-items: center;
 
     &-title {
-        /* padding-left: 42px; */
         margin-top: 2px;
         line-height: 1.2em;
         font-size: 100%;
@@ -125,7 +124,6 @@
 
         &--wrapper {
             text-align: center;
-            /*width: 100%;*/
             max-width: 100%;
             height: 100%;
             overflow: hidden;
@@ -139,7 +137,11 @@
             opacity: 0;
         }
 
-        &:hover,
+        &--input + &--wrapper {
+            border: 2px solid #ebebeb;
+        }
+
+        &:hover .op-payment-service-woocommerce-payment-fields--list-item--wrapper,
         &--input:checked + &--wrapper {
             border: 2px solid #33798d;
         }
@@ -166,20 +168,12 @@
     margin-bottom: 5px;
     margin-left: 4px;
     margin-right: 4px;
-    border: 2px solid #ebebeb;
+    /*border: 2px solid #ebebeb;*/
 }
 .woocommerce-checkout #payment ul.payment_methods .col-narrow li.op-payment-service-woocommerce-payment-fields--list-item {
     margin-left: 3px;
     margin-right: 3px;
 }
-.woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item--wrapper {
-}
-
-.woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item:hover,
-.woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--input:checked + .op-payment-service-woocommerce-payment-fields--list-item--wrapper {
-    border: 2px solid #33798d;
-}
-
 .theme-generatepress .op-payment-service-woocommerce-payment-fields .op-payment-service-woocommerce-payment-fields--list-item--img {
     margin-left: -4px !important;
     max-width: 90% !important;
