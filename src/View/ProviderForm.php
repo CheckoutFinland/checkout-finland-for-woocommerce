@@ -81,6 +81,7 @@ echo "
 <script>
 
     const providerGroups = document.getElementsByClassName('provider-group');
+    const methods = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields--list-item');
     
     for (let i = 0; i < providerGroups.length; i++) {
         providerGroups[i].addEventListener('click', function(e) {
@@ -103,6 +104,16 @@ echo "
             // Show current group            
             this.classList.add('selected');
             this.nextSibling.classList.remove('hidden');
+        });
+    }
+    for (let i = 0; i < methods.length; i++) {
+        
+        methods[i].addEventListener('click', function(e) {
+            e.preventDefault();
+            for (let ii = 0; ii < methods.length; ii++) {
+                methods[ii].classList.remove('selected');
+            }
+            this.classList.add('selected');
         });
     }
 

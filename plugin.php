@@ -147,8 +147,11 @@ final class Plugin {
                     background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#33798d'); ?> !important;
                     color: <?php echo get_theme_mod('op_group_highlighted_text', '#ffffff'); ?> !important;
                 }
-                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--input:checked {
+                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item.selected .op-payment-service-woocommerce-payment-fields--list-item--wrapper {
                     border: 2px solid <?php echo get_theme_mod('op_method_highlighted', '#33798d'); ?> !important;
+                }
+                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--wrapper:hover {
+                    border: 2px solid <?php echo get_theme_mod('op_method_hover', '#5399ad'); ?> !important;
                 }
             </style>
         <?php
@@ -188,7 +191,7 @@ final class Plugin {
             'transport' => 'refresh',
         ) );
         $wp_customize->add_setting( 'op_method_hover' , array(
-            'default'   => '#33798d',
+            'default'   => '#5399ad',
             'transport' => 'refresh',
         ) );
         // Section
