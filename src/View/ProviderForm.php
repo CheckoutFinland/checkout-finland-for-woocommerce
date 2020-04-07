@@ -26,25 +26,29 @@ echo '<div class="checkout-terms-link">' . $terms_link . '</div>';
 array_walk( $data['groups'], function( $group ) {
     echo '<div class="provider-group">';
     $providers_list = [];
+    //var_dump($group['providers']);
     echo '<style type="text/css">';
-    foreach( $group['providers'] as $provider ) {
+    foreach( $group['providers'] as $key => $provider ) {
         // Create simple list of provider names only
         $providers_list[] = $provider->getName();
         // Styles for group icons
         $group_id =  $group['id'];
         $group_icon = $group['icon'];
-        echo <<<EOL
-.payment_method_checkout_finland .provider-group-title.$group_id i {
-    background: url($group_icon) no-repeat;
-    background-size: 28px 28px;
-    background-position-y: center;
-}
-.payment_method_checkout_finland .provider-group.selected .provider-group-title.$group_id i {
-    background: url($group_icon) no-repeat;
-    background-size: 28px 28px;
-    background-position-y: center;
-}
+        if ($key === 0) {
+
+            echo <<<EOL
+            .payment_method_checkout_finland .provider-group-title.$group_id i {
+                background: url($group_icon) no-repeat;
+                background-size: 28px 28px;
+                background-position-y: center;
+            }
+            .payment_method_checkout_finland .provider-group.selected .provider-group-title.$group_id i {
+                background: url($group_icon) no-repeat;
+                background-size: 28px 28px;
+                background-position-y: center;
+            }
 EOL;
+        }
         
     }
     echo '</style>';

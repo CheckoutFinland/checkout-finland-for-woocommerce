@@ -135,8 +135,7 @@ final class Plugin {
                     background-color: <?php echo get_theme_mod('op_group_background', '#ebebeb'); ?> !important;
                     color: <?php echo get_theme_mod('op_group_text', '#515151'); ?> !important;
                 }
-                .provider-group.selected,
-                .provider-group.selected .provider-group-title {
+                .provider-group.selected {
                     background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#33798d'); ?> !important;
                     color: <?php echo get_theme_mod('op_group_highlighted_text', '#ffffff'); ?> !important;
                 }
