@@ -1,5 +1,5 @@
 .provider-group {
-    background: #ebebeb;
+    background-color: #ebebeb;
     padding: 8px 12px;
     margin: 10px 0;
     cursor: pointer;
@@ -63,7 +63,7 @@
 
 
     &.selected {
-        background: #33798d;
+        background-color: #33798d;
         color: #ffffff;
 
         .provider-group-title {
