@@ -898,29 +898,38 @@ final class Gateway extends \WC_Payment_Gateway
      */
     protected function provider_form() {
         $cart_total = $this->get_cart_total();
+        $res = [];
 
-        $providers = $this->get_payment_providers( $cart_total );
+        $full_locale = get_locale();
+
+        $short_locale = substr( $full_locale, 0, 2 );
+
+        // Get and assign the WordPress locale
+        switch ( $short_locale ) {
+            case 'sv':
+                $locale = 'SV';
+                break;
+            case 'fi':
+                $locale = 'FI';
+                break;
+            default:
+                $locale = 'EN';
+                break;
+        }
+
+        $providers = $this->get_grouped_payment_providers( $cart_total, $locale );
 
         // If there was an error getting the payment providers, show it
         if ( ! empty( $providers['error'] ) ) {
             echo '<p>' . esc_html( $providers['error'] ) . '</p>';
             return;
         }
-
-        // Group the providers by type
-        $providers = array_reduce( $providers, function( ?array $carry, Provider $item ) : array {
-            if ( ! is_array( $carry[ $item->getGroup() ] ?? false ) ) {
-                $carry[ $item->getGroup() ] = [];
-            }
-
-            $carry[ $item->getGroup() ][] = $item;
-
-            return $carry;
-        });
+        $res['terms'] = $providers['terms'] ?? '';
+        $res['groups'] = $providers['groups'];
 
         $provider_form_view = new View( 'ProviderForm' );
 
-        $provider_form_view->render( $providers );
+        $provider_form_view->render( $res );
     }
 
     /**
@@ -950,6 +959,26 @@ final class Gateway extends \WC_Payment_Gateway
     protected function get_payment_providers( int $payment_amount ) : array {
         try {
             $providers = $this->client->getPaymentProviders( $payment_amount );
+        }
+        catch ( HmacException $exception ) {
+            $providers = $this->get_payment_providers_error_handler( $exception );
+        }
+        catch ( RequestException $exception ) {
+            $providers = $this->get_payment_providers_error_handler( $exception );
+        }
+
+        return $providers;
+    }
+
+    /**
+     * Get the groupd list of payment providers
+     *
+     * @param integer $payment_amount Payment amount in currency minor unit, eg. cents.
+     * @return array
+     */
+    protected function get_grouped_payment_providers( int $payment_amount, string $locale ) : array {
+        try {
+            $providers = $this->client->getGroupedPaymentProviders( $payment_amount, $locale );
         }
         catch ( HmacException $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );
@@ -1133,7 +1162,7 @@ final class Gateway extends \WC_Payment_Gateway
         $callback = new CallbackUrl();
 
         $callback->setSuccess( $this->get_return_url( $order ) );
-        $callback->setCancel( $order->get_cancel_order_url_raw() );
+        $callback->setCancel( wc_get_checkout_url() );
 
         return $callback;
     }

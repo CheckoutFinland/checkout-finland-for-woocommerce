@@ -1,6 +1,6 @@
 # OP Payment Service for WooCommerce
 
-**Contributors:** [Nomafin](https://github.com/nomafin), [villesiltala](https://github.com/villesiltala), [tommireinikainen](https://github.com/tommireinikainen), [onnimonni](https://github.com/onnimonni), [traone](https://github.com/traone) & [loueranta](https://github.com/loueranta)
+**Contributors:** [Nomafin](https://github.com/nomafin), [villesiltala](https://github.com/villesiltala), [tommireinikainen](https://github.com/tommireinikainen), [onnimonni](https://github.com/onnimonni), [traone](https://github.com/traone), [villepietarinen](https://github.com/villepietarinen) & [loueranta](https://github.com/loueranta)
 
 **Required WordPress version:** 4.9
 

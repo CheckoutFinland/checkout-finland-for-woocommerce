@@ -19,35 +19,141 @@ if ( ! empty( $data['error'] ) ) {
     return;
 }
 
-$group_titles = [
-    'mobile'     => __( 'Mobile payment methods', 'op-payment-service-woocommerce' ),
-    'bank'       => __( 'Bank payment methods', 'op-payment-service-woocommerce' ),
-    'creditcard' => __( 'Card payment methods', 'op-payment-service-woocommerce' ),
-    'credit'     => __( 'Invoice and instalment payment methods', 'op-payment-service-woocommerce' ),
-];
+// Terms
+$terms_link = $data['terms'];
+echo '<div class="checkout-terms-link">' . $terms_link . '</div>';
 
-array_walk( $data, function( $provider_group, $title ) use ( $group_titles ) {
+array_walk( $data['groups'], function( $group ) {
+    echo '<div class="provider-group">';
+    $providers_list = [];
+    //var_dump($group['providers']);
+    echo '<style type="text/css">';
+    foreach( $group['providers'] as $key => $provider ) {
+        // Create simple list of provider names only
+        $providers_list[] = $provider->getName();
+        // Styles for group icons
+        $group_id =  $group['id'];
+        $group_icon = $group['icon'];
+        if ($key === 0) {
 
-    echo '<h4>' . esc_html( $group_titles[ $title ] ?? $title ) . '</h4>';
-
-    echo '<ul class="op-payment-service-woocommerce-payment-fields">';
-    array_walk( $provider_group, function( $provider ) {
-        printf(
-            '<li class="op-payment-service-woocommerce-payment-fields--list-item">
-                <label>
-                    <input
-                        class="op-payment-service-woocommerce-payment-fields--list-item--input"
-                        type="radio" name="payment_provider" value="%s">
-                    <div class="op-payment-service-woocommerce-payment-fields--list-item--wrapper">
-                        <img class="op-payment-service-woocommerce-payment-fields--list-item--img" src="%s">
-                    </div>
-                </label>
-            </li>',
-            esc_html( $provider->getId() ),
-            esc_html( $provider->getSvg() )
-        );
+            echo <<<EOL
+            .payment_method_checkout_finland .provider-group-title.$group_id i {
+                background: url($group_icon) no-repeat;
+                background-size: 28px 28px;
+                background-position-y: center;
+            }
+            .payment_method_checkout_finland .provider-group.selected .provider-group-title.$group_id i {
+                background: url($group_icon) no-repeat;
+                background-size: 28px 28px;
+                background-position-y: center;
+            }
+EOL;
+        }
+        
+    }
+    echo '</style>';
+    echo '<div class="provider-group-title ' . $group['id']  . '">';
+    echo '<i></i>';
+    echo esc_html( $group['name'] );
+    echo '</div>';
+    echo '<div class="provider-list">';
+    echo implode( ', ', $providers_list );
+    echo '</div>';
+    echo '</div>';
+    echo '<ul class="op-payment-service-woocommerce-payment-fields hidden">';
+    array_walk( $group['providers'], function ($provider) {
+        echo '<li class="op-payment-service-woocommerce-payment-fields--list-item">';
+        echo '<label>';
+        echo '<input class="op-payment-service-woocommerce-payment-fields--list-item--input" type="radio" name="payment_provider" value="' . $provider->getId() . '">';
+        echo '<div class="op-payment-service-woocommerce-payment-fields--list-item--wrapper">';
+        echo '<img class="op-payment-service-woocommerce-payment-fields--list-item--img" src="' . $provider->getSvg() . '">';
+        echo '</div>';
+        echo '</label>';
+        echo '</li>';
     });
-
     echo '</ul>';
 });
 
+// @todo move this where it is more suitable
+// toggle payment method group sections' visibility
+// add class to handle different theme layouts 2 or 5 items per row
+echo "
+<script>
+
+    const providerGroups = document.getElementsByClassName('provider-group');
+    const methods = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields--list-item');
+    
+    for (let i = 0; i < providerGroups.length; i++) {
+        providerGroups[i].addEventListener('click', function(e) {
+            e.preventDefault();
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                this.nextSibling.classList.add('hidden');
+                return;
+            }
+            // Clear active state
+            const active = document.getElementsByClassName('provider-group selected');
+            if (active.length !== 0) {
+                active[0].classList.remove('selected');
+            }
+            // Hide payment fields
+            const fields = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields');
+            for (let ii = 0; ii < fields.length; ii++) {
+                fields[ii].classList.add('hidden');
+            }
+            // Show current group            
+            this.classList.add('selected');
+            this.nextSibling.classList.remove('hidden');
+        });
+    }
+    for (let i = 0; i < methods.length; i++) {
+        
+        methods[i].addEventListener('click', function(e) {
+            e.preventDefault();
+            for (let ii = 0; ii < methods.length; ii++) {
+                methods[ii].classList.remove('selected');
+            }
+            this.classList.add('selected');
+        });
+    }
+
+    let handleSize = function(elem, size) {
+        if (size < 600) {
+            elem.classList.remove('col-wide');
+            elem.classList.add('col-narrow');
+        } else {
+            elem.classList.remove('col-narrow');
+            elem.classList.add('col-wide');
+        }
+    };
+    
+    // Payment gateways container
+    const container = document.getElementById('payment');
+    // Checkout container
+    const checkoutContainer = document.getElementsByClassName('payment_method_checkout_finland');
+    // Add some css class to help out with different width columns
+    handleSize(checkoutContainer[0], Math.round(container.offsetWidth));
+
+    // handleSize for resize event
+    let timeout = false;
+    let delta = 300;
+    let startTime;
+    let handleResize = function() {
+        if (new Date() - startTime < delta) {
+            setTimeout(handleResize, delta)
+        } else {
+            timeout = false;
+            handleSize(checkoutContainer[0], Math.round(container.offsetWidth));
+        }
+    };
+    
+    window.addEventListener('resize', function() {
+        startTime = new Date();
+        if (timeout === false) {
+            timeout = true;
+            setTimeout(handleResize, delta);
+        }
+    });
+
+</script>
+";
