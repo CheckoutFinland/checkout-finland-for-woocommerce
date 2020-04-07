@@ -8,7 +8,7 @@
     align-items: center;
 
     &-title {
-        padding-left: 42px;
+        /* padding-left: 42px; */
         margin-top: 2px;
         line-height: 1.2em;
         font-size: 100%;
@@ -16,22 +16,32 @@
         padding-top: 8px;
         padding-bottom: 8px;
 
-        &.bank {
+        display: flex;
+        align-items: center;
+
+        i {
+            width: 28px;
+            height: 28px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        &.bank i {
             background-position-y: center;
             background-size: 28px 28px;
         }
 
-        &.credit {
+        &.credit i {
             background-position-y: center;
             background-size: 28px 28px;
         }
 
-        &.creditcard {
+        &.creditcard i {
             background-position-y: center;
             background-size: 28px 28px;
         }
 
-        &.mobile {
+        &.mobile i {
             background-position-y: center;
             background-size: 28px 28px;
         }
@@ -58,7 +68,10 @@
 
         .provider-group-title {
             color: #ffffff;
-            filter: brightness(5);
+
+            i {
+                filter: brightness(5);
+            }
 
             &.bank {
                 background-position-y: center;

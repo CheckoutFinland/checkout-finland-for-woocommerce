@@ -118,6 +118,129 @@ final class Plugin {
 
         // Load the plugin textdomain.
         load_plugin_textdomain( 'op-payment-service-woocommerce', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
+        // Register customizations
+        add_action( 'customize_register', [ $this, 'checkout_customizations' ] );
+        // Add custom styles
+        add_action( 'wp_head', [ $this, 'op_checkout_customize_css' ] );
+    }
+
+    /**
+     * Print custom styles
+     */
+    public function op_checkout_customize_css() {
+        ?>
+            <style type="text/css">
+                .provider-group {
+                    background-color: <?php echo get_theme_mod('op_group_background', '#ebebeb'); ?> !important;
+                    color: <?php echo get_theme_mod('op_group_text', '#515151'); ?> !important;
+                }
+                .provider-group.selected,
+                .provider-group.selected .provider-group-title {
+                    background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#33798d'); ?> !important;
+                    color: <?php echo get_theme_mod('op_group_highlighted_text', '#ffffff'); ?> !important;
+                }
+                .provider-group:hover {
+                    background-color: <?php echo get_theme_mod('op_group_hover_background', '#d0d0d0'); ?> !important;
+                    color: <?php echo get_theme_mod('op_group_hover_text', '#ffffff'); ?> !important;
+                }
+                .provider-group.selected:hover {
+                    background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#d0d0d0'); ?> !important;
+                    color: <?php echo get_theme_mod('op_group_highlighted_text', '#33798d'); ?> !important;
+                }
+                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--input:checked+.op-payment-service-woocommerce-payment-fields--list-item--wrapper {
+                    border: 2px solid <?php echo get_theme_mod('op_method_highlighted', '#33798d'); ?> !important;
+                }
+                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item:hover {
+                    border: 2px solid <?php echo get_theme_mod('op_method_hover', '#33798d'); ?> !important;
+                }
+            </style>
+        <?php
+    }
+
+    /**
+     * Customizer options
+     */
+    public function checkout_customizations( $wp_customize ) {
+        // Settings
+        $wp_customize->add_setting( 'op_group_background' , array(
+            'default'   => '#ebebeb',
+            'transport' => 'refresh',
+        ) );
+        $wp_customize->add_setting( 'op_group_text' , array(
+            'default'   => '#515151',
+            'transport' => 'refresh',
+        ) );
+        $wp_customize->add_setting( 'op_group_highlighted_background' , array(
+            'default'   => '#33798d',
+            'transport' => 'refresh',
+        ) );
+        $wp_customize->add_setting( 'op_group_highlighted_text' , array(
+            'default'   => '#ffffff',
+            'transport' => 'refresh',
+        ) );
+        $wp_customize->add_setting( 'op_group_hover_background' , array(
+            'default'   => '#d0d0d0',
+            'transport' => 'refresh',
+        ) );
+        $wp_customize->add_setting( 'op_group_hover_text' , array(
+            'default'   => '#313131',
+            'transport' => 'refresh',
+        ) );
+        $wp_customize->add_setting( 'op_method_highlighted' , array(
+            'default'   => '#33798d',
+            'transport' => 'refresh',
+        ) );
+        $wp_customize->add_setting( 'op_method_hover' , array(
+            'default'   => '#33798d',
+            'transport' => 'refresh',
+        ) );
+        // Section
+        $wp_customize->add_section( 'op_checkout_customize_section' , array(
+            'title'      => __( 'Payment page personalization', 'op-payment-service-woocommerce' ),
+            'priority'   => 30,
+        ) );
+        // Controls
+        $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bgcolor', array(
+            'label'      => __( 'Payment group background', 'op-payment-service-woocommerce' ),
+            'section'    => 'op_checkout_customize_section',
+            'settings'   => 'op_group_background',
+        ) ) );
+        $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_fgcolor', array(
+            'label'      => __( 'Payment group text', 'op-payment-service-woocommerce' ),
+            'section'    => 'op_checkout_customize_section',
+            'settings'   => 'op_group_text',
+        ) ) );
+        $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bgcolor_selected', array(
+            'label'      => __( 'Highlighted payment group background', 'op-payment-service-woocommerce' ),
+            'section'    => 'op_checkout_customize_section',
+            'settings'   => 'op_group_highlighted_background',
+        ) ) );
+        $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_fgcolor_selected', array(
+            'label'      => __( 'Highlighted payment group text', 'op-payment-service-woocommerce' ),
+            'section'    => 'op_checkout_customize_section',
+            'settings'   => 'op_group_highlighted_text',
+        ) ) );
+        $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bgcolor_hover', array(
+            'label'      => __( 'Payment group background hover', 'op-payment-service-woocommerce' ),
+            'section'    => 'op_checkout_customize_section',
+            'settings'   => 'op_group_hover_background',
+        ) ) );
+        $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_fgcolor_hover', array(
+            'label'      => __( 'Payment group text hover', 'op hover-payment-service-woocommerce' ),
+            'section'    => 'op_checkout_customize_section',
+            'settings'   => 'op_group_hover_text',
+        ) ) );
+        $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bordercolor_selected', array(
+            'label'      => __( 'Highlighted payment method', 'op-payment-service-woocommerce' ),
+            'section'    => 'op_checkout_customize_section',
+            'settings'   => 'op_method_highlighted',
+        ) ) );
+        $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bordercolor_hover', array(
+            'label'      => __( 'Payment method hover', 'op-payment-service-woocommerce' ),
+            'section'    => 'op_checkout_customize_section',
+            'settings'   => 'op_method_hover',
+        ) ) );
     }
 
     /**

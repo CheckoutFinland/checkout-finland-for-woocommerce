@@ -34,12 +34,12 @@ array_walk( $data['groups'], function( $group ) {
         $group_id =  $group['id'];
         $group_icon = $group['icon'];
         echo <<<EOL
-.payment_method_checkout_finland .provider-group-title.$group_id {
+.payment_method_checkout_finland .provider-group-title.$group_id i {
     background: url($group_icon) no-repeat;
     background-size: 28px 28px;
     background-position-y: center;
 }
-.payment_method_checkout_finland .provider-group.selected .provider-group-title.$group_id {
+.payment_method_checkout_finland .provider-group.selected .provider-group-title.$group_id i {
     background: url($group_icon) no-repeat;
     background-size: 28px 28px;
     background-position-y: center;
@@ -49,6 +49,7 @@ EOL;
     }
     echo '</style>';
     echo '<div class="provider-group-title ' . $group['id']  . '">';
+    echo '<i></i>';
     echo esc_html( $group['name'] );
     echo '</div>';
     echo '<div class="provider-list">';
