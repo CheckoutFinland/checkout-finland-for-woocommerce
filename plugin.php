@@ -141,10 +141,10 @@ final class Plugin {
                 }
                 .provider-group:hover {
                     background-color: <?php echo get_theme_mod('op_group_hover_background', '#d0d0d0'); ?> !important;
-                    color: <?php echo get_theme_mod('op_group_hover_text', '#ffffff'); ?> !important;
+                    color: <?php echo get_theme_mod('op_group_hover_text', '#515151'); ?> !important;
                 }
                 .provider-group.selected:hover {
-                    background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#d0d0d0'); ?> !important;
+                    background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#33798d'); ?> !important;
                     color: <?php echo get_theme_mod('op_group_highlighted_text', '#33798d'); ?> !important;
                 }
                 .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--input:checked+.op-payment-service-woocommerce-payment-fields--list-item--wrapper {
