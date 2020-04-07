@@ -16,9 +16,21 @@
             "role": "Developer"
         },
         {
+            "name": "Onni Hakala",
+            "email": "onni.hakala@op.fi",
+            "homepage": "https://github.com/onnimonni",
+            "role": "Developer"
+        },
+        {
             "name": "Henryk Helsky",
             "email": "henryk.helsky@geniem.com",
             "homepage": "https://github.com/traone",
+            "role": "Developer"
+        },
+        {
+            "name": "Ville Pietarinen",
+            "email": "ville.pietarinen@geniem.com",
+            "homepage": "https://github.com/villepietarinen",
             "role": "Developer"
         },
         {
@@ -28,6 +40,11 @@
             "role": "Manager"
         }
     ],
+    "support": {
+        "email": "asiakaspalvelu@checkout.fi",
+        "issues": "https://github.com/OPMerchantServices/op-payment-service-for-woocommerce/issues",
+        "source": "https://github.com/OPMerchantServices/op-payment-service-for-woocommerce"
+    },
     "repositories": [
         {
             "type": "vcs",
