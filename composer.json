@@ -44,7 +44,7 @@
     "require": {
         "php": ">=7.1",
         "composer/installers": ">=1.0.12",
-        "op-merchant-services/op-payment-service-php-sdk": ">=1.0.0",
+        "op-merchant-services/op-payment-service-php-sdk": ">=1.1.0",
         "ext-mbstring": "*"
     }
 }
