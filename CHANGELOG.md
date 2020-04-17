@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.1] - 2020-04-15
 ### Fixed
-- Fix for hosted payment method selection
+- Fixed the hosted payment method selection
 
 ## [1.3.0] - 2020-04-03
 ### Changed
