@@ -82,6 +82,10 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.3.1 =
+
+* Fixed the hosted payment method selection
+
 = 1.3.0 =
 * New layout for the payment method selection
 
