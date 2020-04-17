@@ -505,10 +505,15 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws \Exception If the processing fails, this error is handled by WooCommerce.
      */
     public function process_payment( $order_id ) {
+
         $order = wc_get_order( $order_id );
 
         // Get the wanted payment provider and check that it exists
-        $payment_provider = filter_input( INPUT_POST, 'payment_provider' );
+        if ($this->use_provider_selection()) {
+            $payment_provider = filter_input( INPUT_POST, 'payment_provider' );
+        } else {
+            $payment_provider = filter_input( INPUT_POST, 'payment_method' );
+        }
 
         if ( ! $payment_provider ) {
             throw new \Exception( __(
@@ -1162,7 +1167,7 @@ final class Gateway extends \WC_Payment_Gateway
         $callback = new CallbackUrl();
 
         $callback->setSuccess( $this->get_return_url( $order ) );
-        $callback->setCancel( wc_get_checkout_url() );
+        $callback->setCancel( $order->get_cancel_order_url_raw() );
 
         return $callback;
     }
