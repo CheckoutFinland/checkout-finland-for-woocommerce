@@ -71,6 +71,9 @@ EOL;
         echo '</label>';
         echo '</li>';
     });
+    if (is_user_logged_in() && $group['id'] == 'creditcard') {
+        (new \OpMerchantServices\WooCommercePaymentGateway\Gateway)->render_saved_payment_methods();
+    }
     echo '</ul>';
 });
 
@@ -114,8 +117,10 @@ echo "
                 methods[ii].classList.remove('selected');
             }
             let radio = this.childNodes[0].childNodes[0];
-            radio.checked = true;
-            this.classList.add('selected');
+            if (typeof radio !== 'undefined') {
+                radio.checked = true;
+                this.classList.add('selected');
+            }
         });
     }
 

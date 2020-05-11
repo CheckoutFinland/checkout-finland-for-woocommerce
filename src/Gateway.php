@@ -6,6 +6,9 @@
 namespace OpMerchantServices\WooCommercePaymentGateway;
 
 use OpMerchantServices\SDK\Exception\ValidationException;
+use OpMerchantServices\SDK\Request\AddCardFormRequest;
+use OpMerchantServices\SDK\Request\CitPaymentRequest;
+use OpMerchantServices\SDK\Request\GetTokenRequest;
 use OpMerchantServices\SDK\Request\PaymentRequest;
 use OpMerchantServices\SDK\Model\Customer;
 use OpMerchantServices\SDK\Model\Address;
@@ -16,12 +19,14 @@ use OpMerchantServices\SDK\Request\RefundRequest;
 use OpMerchantServices\SDK\Client;
 use OpMerchantServices\SDK\Request\EmailRefundRequest;
 use OpMerchantServices\SDK\Model\Provider;
+use OpMerchantServices\SDK\Response\GetTokenResponse;
 use WC_Order;
 use WC_Order_Item;
 use WC_Order_Item_Product;
 use WC_Order_Item_Fee;
 use WC_Order_Item_Shipping;
 use GuzzleHttp\Exception\RequestException;
+use WC_Payment_Token_CC;
 
 /**
  * Class Gateway
@@ -67,6 +72,7 @@ final class Gateway extends \WC_Payment_Gateway
     public $supports = [
         'products',
         'refunds',
+        'tokenization'
     ];
 
     /**
@@ -164,6 +170,7 @@ final class Gateway extends \WC_Payment_Gateway
         add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
         add_filter( 'woocommerce_admin_order_items_after_refunds', [ $this, 'refund_items' ], 10, 1 );
         add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_custom_searches' ], 10, 2 );
+        add_filter('woocommerce_payment_gateway_get_saved_payment_method_option_html', [ $this, 'get_token_payment_option_html' ], 10, 2);
     }
 
     /**
@@ -281,6 +288,140 @@ final class Gateway extends \WC_Payment_Gateway
         $view->render( $provider );
     }
 
+    public function render_saved_payment_methods() {
+        $view = new View( 'SavedPaymentMethods' );
+        $view->render();
+    }
+
+    /**
+     * @throws HmacException
+     * @throws ValidationException
+     */
+    public function add_card_form($context = Plugin::ADD_CARD_CONTEXT_CHECKOUT) {
+        $datetime = new \DateTime();
+        $checkout_nonce = sha1(uniqid(true));
+
+        $full_locale = get_locale();
+        $short_locale = substr($full_locale, 0, 2);
+
+        // Get and assign the WordPress locale
+        switch ($short_locale) {
+            case 'sv':
+                $locale = 'SV';
+                break;
+            case 'fi':
+                $locale = 'FI';
+                break;
+            default:
+                $locale = 'EN';
+                break;
+        }
+
+        $success_url = home_url() . '/' . Plugin::BASE_URL . Plugin::ADD_CARD_REDIRECT_SUCCESS_URL;
+        $cancel_url = home_url() . '/' . Plugin::BASE_URL . Plugin::ADD_CARD_REDIRECT_CANCEL_URL;
+
+        if ($context == Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT) {
+            $success_url .= '/' . Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT;
+            $cancel_url .= '/' . Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT;
+        } else {
+            $success_url .= '/' . Plugin::ADD_CARD_CONTEXT_CHECKOUT;
+            $cancel_url .= '/' . Plugin::ADD_CARD_CONTEXT_CHECKOUT;
+        }
+
+        $add_card_form_request = new AddCardFormRequest();
+        $add_card_form_request->setCheckoutAccount($this->merchant_id);
+        $add_card_form_request->setCheckoutAlgorithm('sha256');
+        $add_card_form_request->setCheckoutMethod('POST');
+        $add_card_form_request->setCheckoutTimestamp($datetime->format('Y-m-d\TH:i:s.u\Z'));
+        $add_card_form_request->setCheckoutNonce($checkout_nonce);
+        $add_card_form_request->setCheckoutRedirectSuccessUrl($success_url);
+        $add_card_form_request->setCheckoutRedirectCancelUrl($cancel_url);
+        $add_card_form_request->setLanguage($locale);
+
+        // Create a addCardFormRequest via Checkout SDK
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        $response = $this->client->createAddCardFormRequest($add_card_form_request);
+
+        if ($location = $response->getHeader('Location')) {
+            wp_redirect($location[0]);
+            exit;
+        }
+    }
+
+    /**
+     * @return bool
+     * @throws HmacException
+     * @throws ValidationException
+     */
+    public function process_card_token() {
+        $getTokenRequest = new GetTokenRequest();
+        $getTokenRequest->setCheckoutTokenizationId(filter_input( INPUT_GET, 'checkout-tokenization-id' ));
+
+        $response = $this->client->createGetTokenRequest($getTokenRequest);
+
+        return (bool)$this->save_card_token($response);
+    }
+
+    /**
+     * @param GetTokenResponse $card_token
+     */
+    private function save_card_token(GetTokenResponse $card_token) {
+        $token = new WC_Payment_Token_CC();
+        $token->set_card_type($card_token->getCard()->getType());
+        $token->set_expiry_month($card_token->getCard()->getExpireMonth());
+        $token->set_expiry_year($card_token->getCard()->getExpireYear());
+        $token->set_last4($card_token->getCard()->getPartialPan());
+        $token->set_token($card_token->getToken());
+        $token->set_user_id(get_current_user_id());
+        $token->set_gateway_id(Plugin::GATEWAY_ID);
+
+        return $token->save();
+    }
+
+    /**
+     * @return array
+     * @throws HmacException
+     * @throws ValidationException
+     */
+    public function add_payment_method() {
+        $this->add_card_form(Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
+
+        return array(
+            'result' => 'success',
+            'redirect' => wc_get_endpoint_url('payment-methods'),
+        );
+    }
+
+    /**
+     * Grab and display users saved card payment methods.
+     */
+    public function saved_payment_methods() {
+        $html = '<ul class="woocommerce-SavedPaymentMethods wc-saved-payment-methods" data-count="' . esc_attr(count($this->get_tokens())) . '">';
+        foreach ($this->get_tokens() as $token) {
+            $html .= $this->get_saved_payment_method_option_html($token);
+        }
+
+        $html .= '</ul>';
+
+        echo apply_filters('wc_payment_gateway_form_saved_payment_methods_html', $html, $this); // @codingStandardsIgnoreLine
+    }
+
+    public function get_token_payment_option_html($html, $token) {
+        $html = sprintf(
+            '<li class="woocommerce-SavedPaymentMethods-token op-payment-service-woocommerce-tokenized-payment-method">
+				<label for="wc-%1$s-payment-token-%2$s">
+				<input id="wc-%1$s-payment-token-%2$s" type="radio" name="wc-%1$s-payment-token" value="%2$s" class="op-payment-service-woocommerce-tokenized-payment-method-input" />
+				<div class="op-payment-service-woocommerce-tokenized-payment-method-title">%3$s</div>
+				</label>
+			</li>',
+            esc_attr( $this->id ),
+            esc_attr( $token->get_id() ),
+            esc_html( $token->get_display_name() )
+        );
+
+        return $html;
+    }
+
     /**
      * Thank you page
      *
@@ -352,15 +493,7 @@ final class Gateway extends \WC_Payment_Gateway
                         }
                         else {
                             // Get only the wanted payment provider object
-                            $wanted_provider = array_reduce(
-                                $providers, function( $carry, $item = null ) use ( $payment_provider ) : ?Provider {
-                                    if ( $item && $item->getId() === $payment_provider ) {
-                                        return $item;
-                                    }
-
-                                    return $carry;
-                                }
-                            );
+                            $wanted_provider = $this->get_wanted_provider($providers, $payment_provider);
 
                             $provider_name = $wanted_provider->getName() ?? ucfirst( $wanted_provider->getId() );
                         }
@@ -505,8 +638,11 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws \Exception If the processing fails, this error is handled by WooCommerce.
      */
     public function process_payment( $order_id ) {
-
         $order = wc_get_order( $order_id );
+        $token_id = filter_input(INPUT_POST,'wc-checkout_finland-payment-token');
+
+        // Define if the process should die if an error occurs.
+        $die_on_error = filter_input( INPUT_POST, 'woocommerce_pay') ? true : false;
 
         // Get the wanted payment provider and check that it exists
         if ($this->use_provider_selection()) {
@@ -515,29 +651,176 @@ final class Gateway extends \WC_Payment_Gateway
             $payment_provider = filter_input( INPUT_POST, 'payment_method' );
         }
 
-        if ( ! $payment_provider ) {
+        $is_token_payment = !empty($token_id);
+
+        if ( ! $payment_provider && ! $is_token_payment ) {
             throw new \Exception( __(
                 'The payment provider was not chosen.',
                 'op-payment-service-woocommerce'
             ));
+        } elseif ($is_token_payment) {
+            $payment_provider = 'creditcard';
         }
 
-        $payment = new PaymentRequest();
+        if ($is_token_payment) {
+            $token = \WC_Payment_Tokens::get($token_id);
+            $payment = new CitPaymentRequest();
 
+            $payment->setToken($token->get_token());
+        } else {
+            $payment = new PaymentRequest();
+        }
+
+        $this->set_base_payment_data($payment, $order);
+
+        // Save the reference for possible later use.
+        update_post_meta( $order->get_id(), '_checkout_reference', $payment->getReference() );
+
+        // Save it also as a key for fast indexed searches.
+        update_post_meta( $order->get_id(), '_checkout_reference_' . $payment->getReference(), true );
+
+        // Save the wanted payment provider to the order
+        $order->update_meta_data( '_checkout_payment_provider', $payment_provider );
+
+        // Create a payment via Checkout SDK
+        try {
+            if ($is_token_payment) {
+                return $this->create_cit_payment($payment, $order);
+            } else {
+                return $this->create_normal_payment($payment, $order, $payment_provider);
+            }
+        }
+        catch ( ValidationException $exception ) {
+            $message = __(
+                'An error occurred validating the payment.',
+                'op-payment-service-woocommerce'
+            );
+
+            $this->error( $exception, $message, $die_on_error );
+        }
+        catch ( HmacException $exception ) {
+            $this->signature_error( $exception, $die_on_error );
+        }
+        catch ( RequestException $exception ) {
+            $message = __(
+                'An error occurred performing the payment request.',
+                'op-payment-service-woocommerce'
+            );
+
+            $this->error( $exception, $message, $die_on_error );
+        }
+
+        return [
+            'result'   => 'failure'
+        ];
+    }
+
+    /**
+     * @param PaymentRequest|CitPaymentRequest $payment
+     * @param WC_Order $order
+     * @return array
+     * @throws HmacException
+     * @throws ValidationException
+     * @throws \Exception
+     */
+    private function create_normal_payment($payment, $order, $payment_provider) {
+        $response = $this->client->createPayment( $payment );
+
+        if ( $this->use_provider_selection() ) {
+            $providers = $response->getProviders();
+
+            // Get only the wanted payment provider object
+            $wanted_provider = $this->get_wanted_provider($providers, $payment_provider);
+
+            WC()->session->set( 'payment_provider', $wanted_provider );
+
+            $message = sprintf(
+            // translators: First parameter is transaction ID, the other is the name of the payment provider.
+                __(
+                    'Transaction %1$s created with payment provider %2$s.',
+                    'op-payment-service-woocommerce'
+                ),
+                $response->getTransactionId(),
+                $wanted_provider->getName() ?? ucfirst( $payment_provider )
+            );
+
+            $order->add_order_note( $message );
+
+            return [
+                'result'   => 'success',
+                'redirect' => $order->get_checkout_payment_url( true ),
+            ];
+        }
+        else {
+            $message = sprintf(
+            // translators: First parameter is transaction ID, the other is the name of the payment provider.
+                __(
+                    'Transaction %1$s created and user redirected to the payment provider selection page.',
+                    'op-payment-service-woocommerce'
+                ),
+                $response->getTransactionId()
+            );
+
+            $order->add_order_note( $message );
+
+            return [
+                'result'   => 'success',
+                'redirect' => $response->getHref(),
+            ];
+        }
+    }
+
+    /**
+     * @param CitPaymentRequest $payment
+     * @param WC_Order $order
+     * @throws HmacException
+     * @throws ValidationException
+     */
+    private function create_cit_payment($payment, $order) {
+        $response = $this->client->createCitPaymentCharge($payment);
+        $requires_threeds = $response->getThreeDSecureUrl() !== null;
+
+        if ($response->getTransactionId() === null && $requires_threeds) {
+            throw new \Exception('Transcaction Id not found');
+        }
+
+        $message = sprintf(
+        // translators: First parameter is transaction ID, the other is the name of the payment provider.
+            __(
+                'Transaction %1$s created by token payment using card. Requires 3DS: %2$s',
+                'op-payment-service-woocommerce'
+            ),
+            $response->getTransactionId(),
+            $requires_threeds ? 'yes' : 'no'
+        );
+
+        $order->add_order_note( $message );
+
+        $order->payment_complete( $response->getTransactionId() );
+
+        $redirect_url = $response->getThreeDSecureUrl() ?? $this->get_return_url($order);
+
+        return [
+            'result'   => 'success',
+            'redirect' => $redirect_url
+        ];
+    }
+
+    /**
+     * @param PaymentRequest|CitPaymentRequest $payment
+     * @param WC_Order $order
+     * @return mixed
+     * @throws \Exception
+     */
+    private function set_base_payment_data($payment, $order) {
         // Set the order ID as the stamp to the payment request
-        $payment->setStamp( get_current_blog_id() . '-' . $order_id . '-' . time() );
+        $payment->setStamp( get_current_blog_id() . '-' . $order->get_id() . '-' . time() );
 
         // Create a random reference for the order
         $reference = sha1( uniqid( true ) );
 
         // Create a unique hash to be used as the request reference
         $payment->setReference( $reference );
-
-        // Save the reference for possible later use.
-        update_post_meta( $order->get_id(), '_checkout_reference', $reference );
-
-        // Save it also as a key for fast indexed searches.
-        update_post_meta( $order->get_id(), '_checkout_reference_' . $reference, true );
 
         // Fetch current currency and the cart total
         $currency    = get_woocommerce_currency();
@@ -587,7 +870,26 @@ final class Gateway extends \WC_Payment_Gateway
         $payment->setLanguage( $locale );
 
         // Get the items from the order
+        $items = $this->get_order_items($order);
+
+        // Assign the items to the payment request.
+        $payment->setItems( array_filter( $items ) );
+
+        // Create and assign the return urls
+        $payment->setRedirectUrls( $this->create_redirect_url( $order ) );
+
+        return $payment;
+    }
+
+    /**
+     * @param WC_Order $order
+     * @return array
+     * @throws \Exception
+     */
+    private function get_order_items($order) {
+        // Get the items from the order
         $order_items = $order->get_items( [ 'line_item', 'fee', 'shipping' ] );
+        $order_total = $this->handle_currency( $order->get_total() );
 
         // Convert items to SDK Item objects.
         $items = array_map(
@@ -625,99 +927,20 @@ final class Gateway extends \WC_Payment_Gateway
             $items[] = $rounding_item;
         }
 
-        // Assign the items to the payment request.
-        $payment->setItems( array_filter( $items ) );
+        return $items;
+    }
 
-        // Create and assign the return urls
-        $payment->setRedirectUrls( $this->create_redirect_url( $order ) );
-
-        // Save the wanted payment provider to the order
-        $order->update_meta_data( '_checkout_payment_provider', $payment_provider );
-
-        // Define if the process should die if an error occurs.
-        if ( filter_input( INPUT_POST, 'woocommerce_pay' ) ) {
-            // Die on a payment page.
-            $die_on_error = true;
-        }
-        else {
-            // Do not die on a checkout page.
-            $die_on_error = false;
-        }
-
-        // Create a payment via Checkout SDK
-        try {
-            $response = $this->client->createPayment( $payment );
-        }
-        catch ( ValidationException $exception ) {
-            $message = __(
-                'An error occurred validating the payment.',
-                'op-payment-service-woocommerce'
-            );
-
-            $this->error( $exception, $message, $die_on_error );
-        }
-        catch ( HmacException $exception ) {
-            $this->signature_error( $exception, $die_on_error );
-        }
-        catch ( RequestException $exception ) {
-            $message = __(
-                'An error occurred performing the payment request.',
-                'op-payment-service-woocommerce'
-            );
-
-            $this->error( $exception, $message, $die_on_error );
-        }
-
-        if ( $this->use_provider_selection() ) {
-            $providers = $response->getProviders();
-
-            // Get only the wanted payment provider object
-            $wanted_provider = array_reduce(
+    private function get_wanted_provider($providers, $payment_provider) {
+        // Get only the wanted payment provider object
+        return
+            array_reduce(
                 $providers, function( $carry, $item = null ) use ( $payment_provider ) : ?Provider {
                     if ( $item && $item->getId() === $payment_provider ) {
                         return $item;
                     }
-
                     return $carry;
                 }
             );
-
-            WC()->session->set( 'payment_provider', $wanted_provider );
-
-            $message = sprintf(
-                // translators: First parameter is transaction ID, the other is the name of the payment provider.
-                __(
-                    'Transaction %1$s created with payment provider %2$s.',
-                    'op-payment-service-woocommerce'
-                ),
-                $response->getTransactionId(),
-                $wanted_provider->getName() ?? ucfirst( $payment_provider )
-            );
-
-            $order->add_order_note( $message );
-
-            return [
-                'result'   => 'success',
-                'redirect' => $order->get_checkout_payment_url( true ),
-            ];
-        }
-        else {
-            $message = sprintf(
-                // translators: First parameter is transaction ID, the other is the name of the payment provider.
-                __(
-                    'Transaction %1$s created and user redirected to the payment provider selection page.',
-                    'op-payment-service-woocommerce'
-                ),
-                $response->getTransactionId()
-            );
-
-            $order->add_order_note( $message );
-
-            return [
-                'result'   => 'success',
-                'redirect' => $response->getHref(),
-            ];
-        }
     }
 
     /**

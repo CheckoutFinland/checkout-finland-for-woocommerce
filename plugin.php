@@ -55,6 +55,18 @@ final class Plugin {
      */
     public const ICON_URL = 'https://cdn2.hubspot.net/hubfs/2610868/ext-media/op-psp-master-logo.svg';
 
+    public const BASE_URL = 'op-payment-service/';
+
+    public const ADD_CARD_FORM_URL = 'add-card-form';
+
+    public const ADD_CARD_REDIRECT_SUCCESS_URL = 'card-success';
+
+    public const ADD_CARD_REDIRECT_CANCEL_URL = 'card-cancel';
+
+    public const ADD_CARD_CONTEXT_MY_ACCOUNT = 'my_account';
+
+    public const ADD_CARD_CONTEXT_CHECKOUT= 'checkout';
+
     /**
      * Singleton instance.
      *
@@ -266,6 +278,9 @@ final class Plugin {
             if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
                 require_once __DIR__ . '/vendor/autoload.php';
             }
+
+            // Create new instance of Router class
+            new Router();
 
             // Add the gateway class to WooCommerce.
             add_filter( 'woocommerce_payment_gateways', function( $gateways ) {

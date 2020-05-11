@@ -173,6 +173,29 @@
     margin-left: 3px;
     margin-right: 3px;
 }
+.woocommerce-checkout .op-payment-service-woocommerce-tokenized-payment-method {
+    width: 25%;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-left: 4px;
+
+    &-title {
+        border: 2px solid #ebebeb;
+        padding: 8px;
+
+        &:hover {
+            border: 2px solid #33798d;
+        }
+    }
+    &-input {
+        display: none;
+    }
+    &-input:checked + div {
+        border: 2px solid #33798d;
+    }
+}
+
 .theme-generatepress .op-payment-service-woocommerce-payment-fields .op-payment-service-woocommerce-payment-fields--list-item--img {
     margin-left: -4px !important;
     max-width: 90% !important;
