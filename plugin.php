@@ -67,6 +67,8 @@ final class Plugin {
 
     public const ADD_CARD_CONTEXT_CHECKOUT= 'checkout';
 
+    public const CARD_ENDPOINT = 'card';
+
     /**
      * Singleton instance.
      *

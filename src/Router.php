@@ -6,6 +6,7 @@
 namespace OpMerchantServices\WooCommercePaymentGateway;
 
 use OpMerchantServices\WooCommercePaymentGateway\Controllers\AddCardForm;
+use OpMerchantServices\WooCommercePaymentGateway\Controllers\Card;
 use OpMerchantServices\WooCommercePaymentGateway\Controllers\CardCancel;
 use OpMerchantServices\WooCommercePaymentGateway\Controllers\CardSuccess;
 
@@ -56,6 +57,9 @@ class Router
                 break;
             case Plugin::ADD_CARD_REDIRECT_CANCEL_URL:
                 $controller = new CardCancel();
+                break;
+            case Plugin::CARD_ENDPOINT:
+                $controller = new Card();
                 break;
             default:
                 echo 'Route did not match';
