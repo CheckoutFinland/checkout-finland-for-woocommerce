@@ -174,11 +174,9 @@
     margin-right: 3px;
 }
 .woocommerce-checkout .op-payment-service-woocommerce-tokenized-payment-method {
-    width: 25%;
+    width: 47%;
     position: relative;
     display: inline-block;
-    margin-bottom: 20px;
-    margin-left: 4px;
 
     &-title {
         border: 2px solid #ebebeb;
@@ -195,6 +193,30 @@
         border: 2px solid #33798d;
     }
 }
+.op-payment-service-woocommerce-tokenized-payment-methods-saved-payment-methods-title {
+    font-weight: bold;
+}
+.woocommerce-checkout .op-payment-service-woocommerce-tokenized-payment-method-links {
+    display: inline-block !important;
+    font-size: 80%;
+    max-width: 50%;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    margin-right: 5px !important;
+    text-align: center;
+}
+.woocommerce-checkout #payment .payment_methods li .payment_box .woocommerce-SavedPaymentMethods {
+    padding-top: 0;
+    padding-bottom: 5px;
+}
+.woocommerce-checkout #payment .payment_methods li .payment_box .woocommerce-SavedPaymentMethods li {
+    margin-top: 5px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+.woocommerce-checkout #payment .payment_methods li .payment_box .woocommerce-SavedPaymentMethods label {
+    cursor: pointer;
+}
 
 .theme-generatepress .op-payment-service-woocommerce-payment-fields .op-payment-service-woocommerce-payment-fields--list-item--img {
     margin-left: -4px !important;
@@ -203,19 +225,30 @@
 .col-wide .op-payment-service-woocommerce-payment-fields--list-item {
     width: 18%;
 }
+.col-wide .op-payment-service-woocommerce-tokenized-payment-method {
+    width: 30%;
+}
 
-.col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
+.col-narrow .op-payment-service-woocommerce-payment-fields--list-item,
+.col-narrow .op-payment-service-woocommerce-tokenized-payment-method {
     width: 47%;
 }
 @media only screen and (max-width: 1000px) {
-    .col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
+    .col-narrow .op-payment-service-woocommerce-payment-fields--list-item,
+    .col-narrow .op-payment-service-woocommerce-tokenized-payment-method {
         width: 31%;
-    }    
+    }
 }
 @media only screen and (max-width: 600px) {
-    .col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
+    .col-narrow .op-payment-service-woocommerce-payment-fields--list-item,
+    .col-narrow .op-payment-service-woocommerce-tokenized-payment-method {
         width: 47%;
-    }    
+    }
+}
+@media only screen and (max-width: 360px) {
+    .woocommerce-checkout .op-payment-service-woocommerce-tokenized-payment-method-links {
+        max-width: 80%;
+    }
 }
 .col-narrow .provider-list {
     display: none;
