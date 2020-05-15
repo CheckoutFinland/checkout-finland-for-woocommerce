@@ -16,10 +16,12 @@ class CardSuccess extends AbstractController
         $gateway = new Gateway();
         try {
             $gateway->process_card_token();
+            wc_add_notice(__('Card was added successfully', 'op-payment-service-woocommerce'), 'success');
         } catch (HmacException $e) {
+            wc_add_notice(__('Could not add card details', 'op-payment-service-woocommerce'), 'error');
         } catch (ValidationException $e) {
+            wc_add_notice(__('Could not add card details', 'op-payment-service-woocommerce'), 'error');
         }
-        wc_add_notice(__('Card was added successfully', 'op-payment-service-woocommerce'), 'success');
         wp_safe_redirect(wc_get_checkout_url());
         exit;
     }
@@ -29,10 +31,12 @@ class CardSuccess extends AbstractController
         $gateway = new Gateway();
         try {
             $gateway->process_card_token();
+            wc_add_notice(__('Card was added successfully', 'op-payment-service-woocommerce'), 'success');
         } catch (HmacException $e) {
+            wc_add_notice(__('Could not add card details', 'op-payment-service-woocommerce'), 'error');
         } catch (ValidationException $e) {
+            wc_add_notice(__('Could not add card details', 'op-payment-service-woocommerce'), 'error');
         }
-        wc_add_notice(__('Card was added successfully', 'op-payment-service-woocommerce'), 'success');
         wp_safe_redirect(wc_get_account_endpoint_url('payment-methods'));
         exit;
     }

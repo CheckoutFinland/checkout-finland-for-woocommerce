@@ -794,7 +794,7 @@ final class Gateway extends \WC_Payment_Gateway
         }
 
         $message = sprintf(
-        // translators: First parameter is transaction ID, the other is the name of the payment provider.
+        // translators: First parameter is transaction ID, and the other whether 3DS authentication was required.
             __(
                 'Transaction %1$s created by token payment using card. Requires 3DS: %2$s',
                 'op-payment-service-woocommerce'
@@ -805,7 +805,9 @@ final class Gateway extends \WC_Payment_Gateway
 
         $order->add_order_note( $message );
 
-        $order->payment_complete( $response->getTransactionId() );
+        if (!$requires_threeds) {
+            $order->payment_complete( $response->getTransactionId() );
+        }
 
         $redirect_url = $response->getThreeDSecureUrl() ?? $this->get_return_url($order);
 

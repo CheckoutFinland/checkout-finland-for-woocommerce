@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Checkout Finland WooCommerce Payment Gateway\n"
-"POT-Creation-Date: 2020-05-15 05:44+0000\n"
-"PO-Revision-Date: 2020-05-15 05:45+0000\n"
+"POT-Creation-Date: 2020-05-15 08:13+0000\n"
+"PO-Revision-Date: 2020-05-15 08:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi\n"
@@ -236,10 +236,10 @@ msgstr ""
 
 #: src/Gateway.php:780
 msgid "Failed to create token payment using card."
-msgstr "Maksutapahtuma tokenisoidulla kortilla epäonnistui."
+msgstr "Maksutapahtuma tallennetulla kortilla epäonnistui."
 
-#. First parameter is transaction ID, the other is the name of the payment provider.
-#: src/Gateway.php:796
+#. First parameter is transaction ID, and the other whether 3DS authentication was required.
+#: src/Gateway.php:798
 #, php-format
 msgid ""
 "Transaction %1$s created by token payment using card. Requires 3DS: %2$s"
@@ -247,36 +247,36 @@ msgstr ""
 "Maksu ID:llä %1$s luotu tokenisoidulla maksukortilla. 3DS autentikointi "
 "vaadittu: %2$s"
 
-#: src/Gateway.php:801
+#: src/Gateway.php:803
 msgid "yes"
 msgstr "kyllä"
 
-#: src/Gateway.php:801
+#: src/Gateway.php:803
 msgid "no"
 msgstr "ei"
 
-#: src/Gateway.php:920
+#: src/Gateway.php:924
 msgid "There was too big error in rounding the prices."
 msgstr "Liian suuri virhe hintojen pyöristämisessä."
 
-#: src/Gateway.php:927
+#: src/Gateway.php:931
 msgid "Rounding"
 msgstr "Pyöristys"
 
-#: src/Gateway.php:981
+#: src/Gateway.php:985
 msgid "The refund amount must be larger than 0."
 msgstr "Maksun palautuksen arvon on oltava suurempi kuin 0."
 
-#: src/Gateway.php:1004
+#: src/Gateway.php:1008
 #, php-format
 msgid "Refunding process started.%s"
 msgstr "Palautusprosessi on aloitettu. %s"
 
-#: src/Gateway.php:1005
+#: src/Gateway.php:1009
 msgid " Reason: "
 msgstr " Syy: "
 
-#: src/Gateway.php:1042
+#: src/Gateway.php:1046
 msgid ""
 "The payment provider does not support either regular or email refunds. The "
 "refund was cancelled."
@@ -284,27 +284,27 @@ msgstr ""
 "Maksupalveluntarjoaja ei tue tavallisia tai sähköpostipalautuksia. "
 "Palautustoiminto peruttiin."
 
-#: src/Gateway.php:1052
+#: src/Gateway.php:1056
 msgid "Something went wrong with the email refund and it was cancelled."
 msgstr "Sähköpostipalautuksessa tapahtui virhe ja se peruutettiin."
 
-#: src/Gateway.php:1065
+#: src/Gateway.php:1069
 msgid "Something went wrong with the refund and it was cancelled."
 msgstr "Palautuksessa tapahtui virhe ja se peruutettiin."
 
-#: src/Gateway.php:1238
+#: src/Gateway.php:1242
 msgid "An error occurred loading the payment providers."
 msgstr "Maksupalveluntarjoajien lataamisessa tapahtui virhe."
 
-#: src/Gateway.php:1334
+#: src/Gateway.php:1338
 msgid "fee"
 msgstr "maksu"
 
-#: src/Gateway.php:1338
+#: src/Gateway.php:1342
 msgid "shipping"
 msgstr "toimitus"
 
-#: src/Gateway.php:1534
+#: src/Gateway.php:1538
 msgid "An error occurred validating the signature."
 msgstr "Allekirjoituksen vahvistamisessa tapahtui virhe."
 
@@ -317,10 +317,12 @@ msgid "Card could not be deleted"
 msgstr "Kortin poistaminen epäonnistui."
 
 #: src/Controllers/CardCancel.php:12 src/Controllers/CardCancel.php:19
+#: src/Controllers/CardSuccess.php:21 src/Controllers/CardSuccess.php:23
+#: src/Controllers/CardSuccess.php:36 src/Controllers/CardSuccess.php:38
 msgid "Could not add card details"
 msgstr "Kortin lisääminen epäonnistui."
 
-#: src/Controllers/CardSuccess.php:22 src/Controllers/CardSuccess.php:35
+#: src/Controllers/CardSuccess.php:19 src/Controllers/CardSuccess.php:34
 msgid "Card was added successfully"
 msgstr "Kortti lisättiin onnistuneesti."
 
