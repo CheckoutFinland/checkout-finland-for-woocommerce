@@ -5,6 +5,9 @@
 
 namespace OpMerchantServices\WooCommercePaymentGateway\Controllers;
 
+use OpMerchantServices\SDK\Exception\HmacException;
+use OpMerchantServices\SDK\Exception\ValidationException;
+use OpMerchantServices\WooCommercePaymentGateway\Gateway;
 use OpMerchantServices\WooCommercePaymentGateway\Plugin;
 use WC_Payment_Tokens;
 use WP_Error;
@@ -13,6 +16,16 @@ use Exception;
 
 class Card extends AbstractController
 {
+    protected function add()
+    {
+        $gateway = new Gateway();
+        try {
+            $gateway->add_card_form();
+        } catch (HmacException $e) {
+        } catch (ValidationException $e) {
+        }
+    }
+
     /**
      * @return WP_Error|WP_HTTP_Response
      * @throws Exception

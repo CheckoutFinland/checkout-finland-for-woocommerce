@@ -1,16 +1,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Checkout Finland WooCommerce Payment Gateway\n"
-"POT-Creation-Date: 2019-10-21 15:56+0300\n"
-"PO-Revision-Date: 2019-10-21 16:39+0300\n"
-"Last-Translator: Henryk Helsky <traone@gmail.com>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2020-05-15 05:44+0000\n"
+"PO-Revision-Date: 2020-05-15 05:45+0000\n"
+"Last-Translator: \n"
+"Language-Team: Finnish\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Loco https://localise.biz/\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
 "X-Poedit-WPHeader: plugin.php\n"
@@ -20,9 +20,43 @@ msgstr ""
 "_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
+"Report-Msgid-Bugs-To: \n"
+"X-Loco-Version: 2.3.3; wp-5.3.2"
+
+#: plugin.php:214
+msgid "Payment page personalization"
+msgstr ""
+
+#: plugin.php:219
+msgid "Payment group background"
+msgstr ""
+
+#: plugin.php:224
+msgid "Payment group text"
+msgstr ""
+
+#: plugin.php:229
+msgid "Highlighted payment group background"
+msgstr ""
+
+#: plugin.php:234
+msgid "Highlighted payment group text"
+msgstr ""
+
+#: plugin.php:239
+msgid "Payment group background hover"
+msgstr ""
+
+#: plugin.php:249
+msgid "Highlighted payment method"
+msgstr ""
+
+#: plugin.php:254
+msgid "Payment method hover"
+msgstr ""
 
 #. translators: The placeholder contains the current PHP version.
-#: plugin.php:213
+#: plugin.php:356
 #, php-format
 msgid ""
 "OP Payment Service gateway plugin requires a PHP version of at least 7.1. "
@@ -31,13 +65,13 @@ msgstr ""
 "OP Payment Service-maksutapalisäosa vaatii vähintään PHP-version 7.1. Tällä "
 "hetkellä käytössäsi on versio %1$s."
 
-#: plugin.php:228
+#: plugin.php:371
 msgid "OP Payment Service gateway plugin requires WooCommerce to be activated."
 msgstr ""
 "Checkout Finland -maksutapalisäosa vaatii, että WooCommerce-lisäosa on "
 "aktivoitu."
 
-#: plugin.php:244
+#: plugin.php:387
 msgid ""
 "OP Payment Service gateway plugin requires WooCommerce version of 3.5 or "
 "greater."
@@ -46,11 +80,11 @@ msgstr ""
 "uudemman."
 
 #. Plugin Name of the plugin/theme
-#: src/Gateway.php:182
+#: src/Gateway.php:183
 msgid "OP Payment Service for WooCommerce"
 msgstr "OP Payment Service for WooCommerce"
 
-#: src/Gateway.php:183
+#: src/Gateway.php:184
 msgid ""
 "OP Payment Service for WooCommerce - the most comprehensive suite of payment "
 "methods in the market with a single contract"
@@ -58,32 +92,32 @@ msgstr ""
 "OP Payment Service for WooCommerce - markkinoiden kattavimmat maksutavat "
 "yhdellä sopimuksella"
 
-#: src/Gateway.php:197
+#: src/Gateway.php:198
 msgid "Payment gateway status"
 msgstr "Maksutapalisäosan tila"
 
-#: src/Gateway.php:199
+#: src/Gateway.php:200
 msgid "Enable OP Payment Service for WooCommerce"
 msgstr "Ota OP Payment Service for WooCommerce käyttöön"
 
-#: src/Gateway.php:204
+#: src/Gateway.php:205
 msgid "Test mode"
 msgstr "Testitila"
 
-#: src/Gateway.php:206
+#: src/Gateway.php:207
 msgid "Enable test mode"
 msgstr "Ota testitila käyttöön"
 
-#: src/Gateway.php:211
+#: src/Gateway.php:212
 msgid "Debug log"
 msgstr "Testaustilan loki"
 
-#: src/Gateway.php:213
+#: src/Gateway.php:214
 msgid "Enable logging"
 msgstr "Ota testitilan lokitus käytöön"
 
 #. translators: %s: URL
-#: src/Gateway.php:216
+#: src/Gateway.php:217
 #, php-format
 msgid ""
 "This enables logging all payment gateway events. The log will be written in "
@@ -93,89 +127,105 @@ msgstr ""
 "kirjoitetaan sijaintiin %s. Toimintoa suositellaan vain "
 "virheenkorjaustarkoistuksiin, sillä se voi tallentaa henkilötietoja."
 
-#: src/Gateway.php:220
+#: src/Gateway.php:221
+msgid "Payment provider title"
+msgstr ""
+
+#: src/Gateway.php:223 src/Gateway.php:230
+msgid "Used on the Checkout page title"
+msgstr ""
+
+#: src/Gateway.php:225
+msgid ""
+"This title is displayed on the Checkout page before the payment provider "
+"images."
+msgstr ""
+
+#: src/Gateway.php:228
+msgid "Payment provider description"
+msgstr ""
+
+#: src/Gateway.php:232
+msgid ""
+"Depending on your theme, this description might be displayed on the Checkout "
+"page before the payment provider images."
+msgstr ""
+
+#: src/Gateway.php:236
 msgid "Payment provider selection"
 msgstr "Maksupalveluntarjoajan valinta"
 
-#: src/Gateway.php:222
+#: src/Gateway.php:238
 msgid "Enable payment provider selection in the checkout page"
 msgstr "Ota maksupalveluntarjoajan valinta käyttöön"
 
-#: src/Gateway.php:224
+#: src/Gateway.php:240
 msgid ""
 "Choose whether you want the payment provider selection to happen in the "
 "checkout page or in a separate page."
 msgstr ""
 "Valitse, haluatko maksupalvelun valinnan tapahtuvan kassalla tai erillisellä "
-"sivulla."
+"sivulla"
 
-#: src/Gateway.php:228 src/Gateway.php:230
+#: src/Gateway.php:244 src/Gateway.php:246
 msgid "Merchant ID"
 msgstr "Kauppiastunnus"
 
-#: src/Gateway.php:234 src/Gateway.php:236
+#: src/Gateway.php:250 src/Gateway.php:252
 msgid "Secret key"
 msgstr "Salainen avain"
 
 #. translators: First parameter is transaction ID, the other is the name of the payment provider.
-#: src/Gateway.php:363
+#: src/Gateway.php:502
 #, php-format
 msgid "Payment completed with transaction ID %1$s and payment provider %2$s."
 msgstr ""
 "Maksu suoritettiin tapahtuman tunnuksella %1$s ja maksupalveluntarjoajalla "
 "%2$s."
 
-#: src/Gateway.php:374
+#: src/Gateway.php:512
 #, php-format
 msgid "Payment completed with transaction ID %s."
 msgstr "Maksu on suoritettu tapahtumatunnuksella %s."
 
-#: src/Gateway.php:388
+#: src/Gateway.php:527
 msgid "Payment pending."
 msgstr "Maksua odotetaan."
 
-#: src/Gateway.php:392
+#: src/Gateway.php:531
 msgid "Payment failed."
 msgstr "Maksu epäonnistui."
 
-#: src/Gateway.php:439
+#: src/Gateway.php:578
 msgid "Refund cannot be found."
 msgstr "Palautusta ei löydy."
 
-#: src/Gateway.php:457
+#: src/Gateway.php:596
 msgid "Refund process completed."
 msgstr "Palautusprosessi on valmis."
 
-#: src/Gateway.php:466
+#: src/Gateway.php:604
 msgid "Refund was cancelled by the payment provider."
 msgstr "Maksupalveluntarjoaja peruutti palautuksen."
 
-#: src/Gateway.php:506
+#: src/Gateway.php:654
 msgid "The payment provider was not chosen."
 msgstr "Maksunpalvelutarjoajaa ei ole valittu."
 
-#: src/Gateway.php:598
-msgid "There was too big error in rounding the prices."
-msgstr "Liian suuri virhe hintojen pyöristämisessä."
-
-#: src/Gateway.php:604
-msgid "Rounding"
-msgstr "Pyöristys"
-
-#: src/Gateway.php:639
+#: src/Gateway.php:691
 msgid "An error occurred validating the payment."
 msgstr "Maksun vahvistamisessa tapahtui virhe."
 
-#: src/Gateway.php:650
+#: src/Gateway.php:702
 msgid "An error occurred performing the payment request."
 msgstr "Maksun suorittamisessa tapahtui virhe."
 
-#: src/Gateway.php:676
+#: src/Gateway.php:736
 #, php-format
 msgid "Transaction %1$s created with payment provider %2$s."
 msgstr "Maksu ID:llä %1$s luotu maksupalveluntarjoajalla %2$s."
 
-#: src/Gateway.php:694
+#: src/Gateway.php:754
 #, php-format
 msgid ""
 "Transaction %1$s created and user redirected to the payment provider "
@@ -184,51 +234,95 @@ msgstr ""
 "Luotu maksutapahtuma ID:llä %1$s ja käyttäjä ohjattu maksutavan "
 "valintasivulle."
 
-#: src/Gateway.php:738
+#: src/Gateway.php:780
+msgid "Failed to create token payment using card."
+msgstr "Maksutapahtuma tokenisoidulla kortilla epäonnistui."
+
+#. First parameter is transaction ID, the other is the name of the payment provider.
+#: src/Gateway.php:796
+#, php-format
+msgid ""
+"Transaction %1$s created by token payment using card. Requires 3DS: %2$s"
+msgstr ""
+"Maksu ID:llä %1$s luotu tokenisoidulla maksukortilla. 3DS autentikointi "
+"vaadittu: %2$s"
+
+#: src/Gateway.php:801
+msgid "yes"
+msgstr "kyllä"
+
+#: src/Gateway.php:801
+msgid "no"
+msgstr "ei"
+
+#: src/Gateway.php:920
+msgid "There was too big error in rounding the prices."
+msgstr "Liian suuri virhe hintojen pyöristämisessä."
+
+#: src/Gateway.php:927
+msgid "Rounding"
+msgstr "Pyöristys"
+
+#: src/Gateway.php:981
 msgid "The refund amount must be larger than 0."
 msgstr "Maksun palautuksen arvon on oltava suurempi kuin 0."
 
-#: src/Gateway.php:760
+#: src/Gateway.php:1004
 #, php-format
 msgid "Refunding process started.%s"
 msgstr "Palautusprosessi on aloitettu. %s"
 
-#: src/Gateway.php:761
+#: src/Gateway.php:1005
 msgid " Reason: "
 msgstr " Syy: "
 
-#: src/Gateway.php:799
+#: src/Gateway.php:1042
 msgid ""
-"The payment provider does not support either regular\n"
-"                                                    or email refunds. The "
+"The payment provider does not support either regular or email refunds. The "
 "refund was cancelled."
 msgstr ""
 "Maksupalveluntarjoaja ei tue tavallisia tai sähköpostipalautuksia. "
 "Palautustoiminto peruttiin."
 
-#: src/Gateway.php:810
+#: src/Gateway.php:1052
 msgid "Something went wrong with the email refund and it was cancelled."
 msgstr "Sähköpostipalautuksessa tapahtui virhe ja se peruutettiin."
 
-#: src/Gateway.php:823
+#: src/Gateway.php:1065
 msgid "Something went wrong with the refund and it was cancelled."
 msgstr "Palautuksessa tapahtui virhe ja se peruutettiin."
 
-#: src/Gateway.php:967
+#: src/Gateway.php:1238
 msgid "An error occurred loading the payment providers."
 msgstr "Maksupalveluntarjoajien lataamisessa tapahtui virhe."
 
-#: src/Gateway.php:1062
+#: src/Gateway.php:1334
 msgid "fee"
 msgstr "maksu"
 
-#: src/Gateway.php:1066
+#: src/Gateway.php:1338
 msgid "shipping"
 msgstr "toimitus"
 
-#: src/Gateway.php:1267
+#: src/Gateway.php:1534
 msgid "An error occurred validating the signature."
 msgstr "Allekirjoituksen vahvistamisessa tapahtui virhe."
+
+#: src/Controllers/Card.php:62
+msgid "Card was deleted successfully"
+msgstr "Kortti poistettiin onnistuneesti."
+
+#: src/Controllers/Card.php:66
+msgid "Card could not be deleted"
+msgstr "Kortin poistaminen epäonnistui."
+
+#: src/Controllers/CardCancel.php:12 src/Controllers/CardCancel.php:19
+msgid "Could not add card details"
+msgstr "Kortin lisääminen epäonnistui."
+
+#: src/Controllers/CardSuccess.php:22 src/Controllers/CardSuccess.php:35
+msgid "Card was added successfully"
+msgstr "Kortti lisättiin onnistuneesti."
 
 #: src/View/CheckoutForm.php:24
 msgid ""
@@ -241,26 +335,17 @@ msgstr ""
 msgid "Submit"
 msgstr "Lähetä"
 
-#: src/View/ProviderForm.php:23
-msgid "Mobile payment methods"
-msgstr "Mobiilimaksutavat"
+#: src/View/SavedPaymentMethods.php:18
+msgid "Pay with saved card"
+msgstr "Maksa tallennetulla kortilla"
 
-#: src/View/ProviderForm.php:24
-msgid "Bank payment methods"
-msgstr "Pankkimaksutavat"
+#: src/View/SavedPaymentMethods.php:23
+msgid "Delete selected card"
+msgstr "Poista valittu kortti"
 
-#: src/View/ProviderForm.php:25
-msgid "Card payment methods"
-msgstr "Korttimaksutavat"
-
-#: src/View/ProviderForm.php:26
-msgid "Invoice and instalment payment methods"
-msgstr "Lasku- ja osamaksutavat"
-
-#. Plugin URI of the plugin/theme
-msgid ""
-"https://github.com/OPMerchantServices/op-payment-service-for-woocommerce"
-msgstr ""
+#: src/View/SavedPaymentMethods.php:27
+msgid "Add new card"
+msgstr "Lisää uusi kortti"
 
 #. Description of the plugin/theme
 msgid ""
@@ -268,10 +353,15 @@ msgid ""
 "gateway that offers 20+ payment methods for Finnish customers."
 msgstr ""
 
+#. Plugin URI of the plugin/theme
+msgid ""
+"https://github.com/OPMerchantServices/op-payment-service-for-woocommerce"
+msgstr ""
+
 #. Author of the plugin/theme
 msgid "OP Merchant Services"
 msgstr ""
 
-#. Author URI of the plugin/theme
-msgid "https://www.op-kauppiaspalvelut.fi"
+#. Author URI of the plugin
+msgid "https://www.checkout.fi/"
 msgstr ""

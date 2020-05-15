@@ -84,7 +84,7 @@ echo "
 <script>
 
     const providerGroups = document.getElementsByClassName('provider-group');
-    const methods = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields--list-item');
+    const methods = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields--list-item op-payment-service-woocommerce-tokenized-payment-method');
     
     for (let i = 0; i < providerGroups.length; i++) {
         providerGroups[i].addEventListener('click', function(e) {

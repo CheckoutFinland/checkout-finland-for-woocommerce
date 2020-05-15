@@ -57,8 +57,6 @@ final class Plugin {
 
     public const BASE_URL = 'op-payment-service/';
 
-    public const ADD_CARD_FORM_URL = 'add-card-form';
-
     public const ADD_CARD_REDIRECT_SUCCESS_URL = 'card-success';
 
     public const ADD_CARD_REDIRECT_CANCEL_URL = 'card-cancel';

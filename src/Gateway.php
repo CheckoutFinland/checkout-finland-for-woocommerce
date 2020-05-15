@@ -237,7 +237,7 @@ final class Gateway extends \WC_Payment_Gateway
                 'type'        => 'checkbox',
                 'label'       => __( 'Enable payment provider selection in the checkout page', 'op-payment-service-woocommerce' ),
                 'default'     => 'yes',
-                'description' => __( 'Choose whether you want the payment provider selection to happen in the checkout page or in a separate page.' ),
+                'description' => __( 'Choose whether you want the payment provider selection to happen in the checkout page or in a separate page.', 'op-payment-service-woocommerce' ),
             ],
             // Checkout Finland credentials
             'merchant_id' => [
@@ -317,15 +317,12 @@ final class Gateway extends \WC_Payment_Gateway
                 break;
         }
 
-        $success_url = home_url() . '/' . Plugin::BASE_URL . Plugin::ADD_CARD_REDIRECT_SUCCESS_URL;
-        $cancel_url = home_url() . '/' . Plugin::BASE_URL . Plugin::ADD_CARD_REDIRECT_CANCEL_URL;
-
         if ($context == Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT) {
-            $success_url .= '/' . Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT;
-            $cancel_url .= '/' . Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT;
+            $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
+            $cancel_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_CANCEL_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
         } else {
-            $success_url .= '/' . Plugin::ADD_CARD_CONTEXT_CHECKOUT;
-            $cancel_url .= '/' . Plugin::ADD_CARD_CONTEXT_CHECKOUT;
+            $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_CHECKOUT);
+            $cancel_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_CANCEL_URL, Plugin::ADD_CARD_CONTEXT_CHECKOUT);
         }
 
         $add_card_form_request = new AddCardFormRequest();
@@ -777,7 +774,19 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws ValidationException
      */
     private function create_cit_payment($payment, $order) {
-        $response = $this->client->createCitPaymentCharge($payment);
+        try {
+            $response = $this->client->createCitPaymentCharge($payment);
+        } catch (\Exception $e) {
+            $fail_message = __('Failed to create token payment using card.', 'op-payment-service-woocommerce');
+
+            wc_add_notice( $fail_message, 'error' );
+
+            $order->add_order_note( $fail_message );
+
+            return [
+                'result'   => 'fail'
+            ];
+        }
         $requires_threeds = $response->getThreeDSecureUrl() !== null;
 
         if ($response->getTransactionId() === null && $requires_threeds) {
@@ -791,7 +800,7 @@ final class Gateway extends \WC_Payment_Gateway
                 'op-payment-service-woocommerce'
             ),
             $response->getTransactionId(),
-            $requires_threeds ? 'yes' : 'no'
+            $requires_threeds ? __('yes', 'op-payment-service-woocommerce') : __('no', 'op-payment-service-woocommerce')
         );
 
         $order->add_order_note( $message );
@@ -1033,8 +1042,7 @@ final class Gateway extends \WC_Payment_Gateway
                                             $refund_object->delete( true );
                                             $order->add_order_note(
                                                 __(
-                                                    'The payment provider does not support either regular
-                                                    or email refunds. The refund was cancelled.',
+                                                    'The payment provider does not support either regular or email refunds. The refund was cancelled.',
                                                     'op-payment-service-woocommerce'
                                                 )
                                             );
