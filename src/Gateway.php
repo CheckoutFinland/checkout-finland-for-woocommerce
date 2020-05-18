@@ -888,6 +888,7 @@ final class Gateway extends \WC_Payment_Gateway
 
         // Create and assign the return urls
         $payment->setRedirectUrls( $this->create_redirect_url( $order ) );
+        $payment->setCallbackUrls( $this->create_callback_url());
 
         return $payment;
     }
@@ -1401,6 +1402,20 @@ final class Gateway extends \WC_Payment_Gateway
 
         $callback->setSuccess( $this->get_return_url( $order ) );
         $callback->setCancel( $order->get_cancel_order_url_raw() );
+
+        return $callback;
+    }
+
+    /**
+     * Create SDK callback URL object for Callback urls.
+     *
+     * @return CallbackUrl
+     */
+    protected function create_callback_url() : CallbackUrl {
+        $callback = new CallbackUrl();
+
+        $callback->setSuccess( Router::get_url(Plugin::CALLBACK_URL, 'index') );
+        $callback->setCancel( Router::get_url(Plugin::CALLBACK_URL, 'index') );
 
         return $callback;
     }

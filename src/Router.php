@@ -5,6 +5,7 @@
 
 namespace OpMerchantServices\WooCommercePaymentGateway;
 
+use OpMerchantServices\WooCommercePaymentGateway\Controllers\Callback;
 use OpMerchantServices\WooCommercePaymentGateway\Controllers\Card;
 use OpMerchantServices\WooCommercePaymentGateway\Controllers\CardCancel;
 use OpMerchantServices\WooCommercePaymentGateway\Controllers\CardSuccess;
@@ -69,6 +70,9 @@ class Router
                 break;
             case Plugin::CARD_ENDPOINT:
                 $controller = new Card();
+                break;
+            case Plugin::CALLBACK_URL:
+                $controller = new Callback();
                 break;
             default:
                 echo 'Route did not match';

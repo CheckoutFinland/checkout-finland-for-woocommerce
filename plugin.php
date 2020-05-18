@@ -67,6 +67,8 @@ final class Plugin {
 
     public const CARD_ENDPOINT = 'card';
 
+    public const CALLBACK_URL = 'callback';
+
     /**
      * Singleton instance.
      *
