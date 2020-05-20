@@ -403,17 +403,60 @@ final class Gateway extends \WC_Payment_Gateway
         echo apply_filters('wc_payment_gateway_form_saved_payment_methods_html', $html, $this); // @codingStandardsIgnoreLine
     }
 
+    /**
+     * @param $html
+     * @param $token
+     * @return string
+     */
     public function get_token_payment_option_html($html, $token) {
         $html = sprintf(
             '<li class="woocommerce-SavedPaymentMethods-token op-payment-service-woocommerce-tokenized-payment-method">
 				<label for="wc-%1$s-payment-token-%2$s">
-				<input id="wc-%1$s-payment-token-%2$s" type="radio" name="wc-%1$s-payment-token" value="%2$s" class="op-payment-service-woocommerce-tokenized-payment-method-input" />
-				<div class="op-payment-service-woocommerce-tokenized-payment-method-title">%3$s</div>
+				<input id="wc-%1$s-payment-token-%2$s" type="radio" name="wc-%1$s-payment-token" value="%2$s" class="op-payment-service-woocommerce-tokenized-payment-method-input" %6$s />
+				<div class="op-payment-service-woocommerce-tokenized-payment-method-title" title="%4$s">%5$s%3$s</div>
 				</label>
 			</li>',
             esc_attr( $this->id ),
             esc_attr( $token->get_id() ),
-            esc_html( $token->get_display_name() )
+            $this->get_display_name($token),
+            esc_html( $token->get_display_name() ),
+            $this->get_card_image($token),
+            checked( $token->is_default(), true, false )
+        );
+
+        return $html;
+    }
+
+    /**
+     * @param $token
+     * @return string
+     */
+    private function get_display_name($token) {
+        $display = sprintf(
+        /* translators: 1: last 4 digits 2: expiry month 3: expiry year */
+            __( 'xxxx xxxx xxxx %1$s %2$s/%3$s', 'op-payment-service-woocommerce' ),
+            $token->get_last4(),
+            '<span id="op-payment-service-woocommerce-tokenized-payment-method-card-expire-date">'.$token->get_expiry_month(),
+            substr( $token->get_expiry_year(), 2 ).'</span>'
+        );
+
+        return $display;
+    }
+
+    /**
+     * @param $token
+     * @return string
+     */
+    private function get_card_image($token) {
+        $token_card_type = strtolower($token->get_card_type());
+
+        if ($token_card_type === 'amex') {
+            $token_card_type = 'american-express';
+        }
+
+        $html = sprintf(
+            '<img alt="'.$token->get_card_type().'" src="'.Plugin::PAYMENT_METHOD_IMG_URL.'/%1$s.svg" class="op-payment-service-woocommerce-tokenized-payment-method-title-image" />',
+            esc_html( preg_replace('/[[:space:]]+/', '-', $token_card_type) )
         );
 
         return $html;

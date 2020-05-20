@@ -55,6 +55,8 @@ final class Plugin {
      */
     public const ICON_URL = 'https://cdn2.hubspot.net/hubfs/2610868/ext-media/op-psp-master-logo.svg';
 
+    public const PAYMENT_METHOD_IMG_URL = 'https://payment.checkout.fi/static/img/payment-methods';
+
     public const BASE_URL = 'op-payment-service/';
 
     public const ADD_CARD_REDIRECT_SUCCESS_URL = 'card-success';
@@ -137,6 +139,10 @@ final class Plugin {
         add_action( 'customize_register', [ $this, 'checkout_customizations' ] );
         // Add custom styles
         add_action( 'wp_head', [ $this, 'op_checkout_customize_css' ] );
+        // Enable WP Dashicons on frontend
+        add_action( 'wp_enqueue_scripts', function() {
+            wp_enqueue_style( 'dashicons' );
+        } );
     }
 
     /**

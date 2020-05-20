@@ -24,11 +24,27 @@ $delete_card_url = Router::get_url(Plugin::CARD_ENDPOINT, 'delete');
 <?php endif; ?>
 <a class="op-payment-service-woocommerce-tokenized-payment-method-links add-card-button button"
    href="<?php echo $add_card_form_url ?>">
+    <span class="op-payment-service-woocommerce-tokenized-payment-add-card-button dashicons dashicons-plus"></span>
     <?php esc_html_e('Add new card', 'op-payment-service-woocommerce') ?>
 </a>
 
 <script>
-    jQuery('.op-payment-service-woocommerce-payment-fields input[type=radio]').change(function () {
+    jQuery(document).ready(function () {
+        openTokenizedCardProviderGroupSelection();
+    });
+
+    function openTokenizedCardProviderGroupSelection() {
+        jQuery("input.op-payment-service-woocommerce-tokenized-payment-method-input[type='radio']").each(function () {
+            let creditCardProviderGroup = jQuery('.provider-group-title.creditcard').parent();
+
+            if (jQuery(this).prop('checked')) {
+                jQuery(creditCardProviderGroup).closest(creditCardProviderGroup).addClass('selected');
+                jQuery(this).closest('.op-payment-service-woocommerce-payment-fields').removeClass('hidden');
+            }
+        });
+    }
+
+    jQuery('.op-payment-service-woocommerce-payment-fields input[type=radio]').click(function () {
         jQuery('.op-payment-service-woocommerce-payment-fields input[type=radio]:checked').not(this).prop('checked', false);
     });
 
