@@ -288,8 +288,15 @@ final class Gateway extends \WC_Payment_Gateway
         $view->render( $provider );
     }
 
-    public function render_saved_payment_methods() {
+    /**
+     * Renders SavedPaymentMethods view
+     *
+     * @return void
+     */
+    public function render_saved_payment_methods()
+    {
         $view = new View( 'SavedPaymentMethods' );
+
         $view->render();
     }
 
@@ -297,7 +304,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws HmacException
      * @throws ValidationException
      */
-    public function add_card_form($context = Plugin::ADD_CARD_CONTEXT_CHECKOUT) {
+    public function add_card_form($context = Plugin::ADD_CARD_CONTEXT_CHECKOUT)
+    {
         $datetime = new \DateTime();
         $checkout_nonce = sha1(uniqid(true));
 
@@ -317,7 +325,7 @@ final class Gateway extends \WC_Payment_Gateway
                 break;
         }
 
-        if ($context == Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT) {
+        if (Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT === $context) {
             $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
             $cancel_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_CANCEL_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
         } else {
@@ -350,7 +358,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws HmacException
      * @throws ValidationException
      */
-    public function process_card_token() {
+    public function process_card_token()
+    {
         $getTokenRequest = new GetTokenRequest();
         $getTokenRequest->setCheckoutTokenizationId(filter_input( INPUT_GET, 'checkout-tokenization-id' ));
 
@@ -362,7 +371,8 @@ final class Gateway extends \WC_Payment_Gateway
     /**
      * @param GetTokenResponse $card_token
      */
-    private function save_card_token(GetTokenResponse $card_token) {
+    private function save_card_token(GetTokenResponse $card_token)
+    {
         $token = new WC_Payment_Token_CC();
         $token->set_card_type($card_token->getCard()->getType());
         $token->set_expiry_month($card_token->getCard()->getExpireMonth());
@@ -866,7 +876,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @return mixed
      * @throws \Exception
      */
-    private function set_base_payment_data($payment, $order) {
+    private function set_base_payment_data($payment, $order)
+    {
         // Set the order ID as the stamp to the payment request
         $payment->setStamp( get_current_blog_id() . '-' . $order->get_id() . '-' . time() );
 
@@ -985,7 +996,13 @@ final class Gateway extends \WC_Payment_Gateway
         return $items;
     }
 
-    private function get_wanted_provider($providers, $payment_provider) {
+    /**
+     * @param $providers
+     * @param $payment_provider
+     * @return mixed|null
+     */
+    private function get_wanted_provider($providers, $payment_provider)
+    {
         // Get only the wanted payment provider object
         return
             array_reduce(
@@ -1454,7 +1471,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return CallbackUrl
      */
-    protected function create_callback_url() : CallbackUrl {
+    protected function create_callback_url() : CallbackUrl
+    {
         $callback = new CallbackUrl();
 
         $callback->setSuccess( Router::get_url(Plugin::CALLBACK_URL, 'index') );

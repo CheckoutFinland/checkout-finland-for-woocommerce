@@ -25,6 +25,13 @@ class Router
         add_filter('template_include', [$this, 'routes']);
     }
 
+    /**
+     * Get route action url
+     *
+     * @param $route
+     * @param $action
+     * @return string
+     */
     public static function get_url($route, $action)
     {
         $home_url = home_url();
@@ -39,6 +46,9 @@ class Router
         return "{$home_url}/{$base_url}{$route}/{$action}";
     }
 
+    /**
+     * Register router rewrites
+     */
     public function register_rewrites()
     {
         $base_url = Plugin::BASE_URL;
