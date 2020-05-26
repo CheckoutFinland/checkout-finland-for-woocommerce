@@ -4,7 +4,7 @@ Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.4
-Stable tag: 1.2
+Stable tag: 1.4
 Requires PHP: 7.1
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -82,8 +82,12 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
-= 1.3.1 =
+= 1.4.0 =
+* Add support for adding and using tokenized cards as payment methods
+* Add tokenized card CIT payments functionalities
+* Add Callback controller class and implementation
 
+= 1.3.1 =
 * Fixed the hosted payment method selection
 
 = 1.3.0 =
