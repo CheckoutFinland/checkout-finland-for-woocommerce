@@ -173,12 +173,79 @@
     margin-left: 3px;
     margin-right: 3px;
 }
+.woocommerce-checkout .op-payment-service-woocommerce-tokenized-payment-method {
+    width: 100%;
+    max-width: 275px;
+    position: relative;
+    display: inline-block;
+
+    &-title {
+        border: 2px solid #ebebeb;
+        padding: 8px;
+
+        &:hover {
+            border: 2px solid #33798d;
+        }
+    }
+    &-input {
+        display: none;
+    }
+    &-input:checked + div {
+        border: 2px solid #33798d;
+    }
+}
+.op-payment-service-woocommerce-tokenized-payment-methods-saved-payment-methods-title {
+    font-weight: bold;
+}
+.woocommerce-checkout .op-payment-service-woocommerce-tokenized-payment-method-links {
+    display: inline-block !important;
+    font-size: 75%;
+    max-width: 50%;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    margin-right: 5px !important;
+    text-align: center;
+}
+.woocommerce-checkout #payment .payment_methods li .payment_box .woocommerce-SavedPaymentMethods {
+    padding-top: 0;
+    padding-bottom: 5px;
+}
+.woocommerce-checkout #payment .payment_methods li .payment_box .woocommerce-SavedPaymentMethods li {
+    margin-top: 5px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+.woocommerce-checkout #payment .payment_methods li .payment_box .woocommerce-SavedPaymentMethods label {
+    cursor: pointer;
+}
+.woocommerce-checkout .op-payment-service-woocommerce-tokenized-payment-method-title-image {
+    float: left !important;
+    margin-left: -5px;
+    display: inline-block;
+    max-width: 55px;
+    margin-top: 2px;
+    margin-right: 7px;
+}
+.woocommerce-checkout #op-payment-service-woocommerce-tokenized-payment-method-card-expire-date {
+    font-weight: bold;
+    margin-left: 15px;
+}
+.woocommerce-checkout span.op-payment-service-woocommerce-tokenized-payment-add-card-button.dashicons.dashicons-plus {
+    float: left;
+    text-align: left;
+    margin-left: -8px;
+    margin-right: 5px;
+}
+
 .theme-generatepress .op-payment-service-woocommerce-payment-fields .op-payment-service-woocommerce-payment-fields--list-item--img {
     margin-left: -4px !important;
     max-width: 90% !important;
 }
 .col-wide .op-payment-service-woocommerce-payment-fields--list-item {
     width: 18%;
+}
+.col-wide .op-payment-service-woocommerce-tokenized-payment-method {
+    width: 30%;
 }
 
 .col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
@@ -187,12 +254,17 @@
 @media only screen and (max-width: 1000px) {
     .col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
         width: 31%;
-    }    
+    }
 }
 @media only screen and (max-width: 600px) {
     .col-narrow .op-payment-service-woocommerce-payment-fields--list-item {
         width: 47%;
-    }    
+    }
+}
+@media only screen and (max-width: 360px) {
+    .woocommerce-checkout .op-payment-service-woocommerce-tokenized-payment-method-links {
+        max-width: 75%;
+    }
 }
 .col-narrow .provider-list {
     display: none;

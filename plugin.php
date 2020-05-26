@@ -3,7 +3,7 @@
  * Plugin Name: OP Payment Service for WooCommerce
  * Plugin URI: https://github.com/OPMerchantServices/op-payment-service-for-woocommerce
  * Description: OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
- * Version: 1.3.1
+ * Version: 1.4.0
  * Requires at least: 4.9
  * Tested up to: 5.4
  * Requires PHP: 7.1
@@ -54,6 +54,22 @@ final class Plugin {
      * The URL of the payment method icon
      */
     public const ICON_URL = 'https://cdn2.hubspot.net/hubfs/2610868/ext-media/op-psp-master-logo.svg';
+
+    public const PAYMENT_METHOD_IMG_URL = 'https://payment.checkout.fi/static/img/payment-methods';
+
+    public const BASE_URL = 'op-payment-service/';
+
+    public const ADD_CARD_REDIRECT_SUCCESS_URL = 'card-success';
+
+    public const ADD_CARD_REDIRECT_CANCEL_URL = 'card-cancel';
+
+    public const ADD_CARD_CONTEXT_MY_ACCOUNT = 'my_account';
+
+    public const ADD_CARD_CONTEXT_CHECKOUT= 'checkout';
+
+    public const CARD_ENDPOINT = 'card';
+
+    public const CALLBACK_URL = 'callback';
 
     /**
      * Singleton instance.
@@ -123,6 +139,10 @@ final class Plugin {
         add_action( 'customize_register', [ $this, 'checkout_customizations' ] );
         // Add custom styles
         add_action( 'wp_head', [ $this, 'op_checkout_customize_css' ] );
+        // Enable WP Dashicons on frontend
+        add_action( 'wp_enqueue_scripts', function() {
+            wp_enqueue_style( 'dashicons' );
+        } );
     }
 
     /**
@@ -266,6 +286,9 @@ final class Plugin {
             if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
                 require_once __DIR__ . '/vendor/autoload.php';
             }
+
+            // Create new instance of Router class
+            new Router();
 
             // Add the gateway class to WooCommerce.
             add_filter( 'woocommerce_payment_gateways', function( $gateways ) {
