@@ -82,6 +82,11 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.4.1 =
+* Tokenized card automatically set as users default payment method
+* Updated to the latest PHP-SDK version
+* Fixed idn_to_ascii() Guzzle error
+
 = 1.4.0 =
 * Add support for adding and using tokenized cards as payment methods
 * Add tokenized card CIT payments functionalities
