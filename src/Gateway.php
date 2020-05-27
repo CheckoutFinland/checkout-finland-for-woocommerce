@@ -381,6 +381,7 @@ final class Gateway extends \WC_Payment_Gateway
         $token->set_token($card_token->getToken());
         $token->set_user_id(get_current_user_id());
         $token->set_gateway_id(Plugin::GATEWAY_ID);
+        \WC_Payment_Tokens::set_users_default(get_current_user_id(), $token->get_id());
 
         return $token->save();
     }
