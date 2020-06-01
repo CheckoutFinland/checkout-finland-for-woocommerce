@@ -9,6 +9,7 @@ use OpMerchantServices\SDK\Exception\ValidationException;
 use OpMerchantServices\SDK\Request\AddCardFormRequest;
 use OpMerchantServices\SDK\Request\CitPaymentRequest;
 use OpMerchantServices\SDK\Request\GetTokenRequest;
+use OpMerchantServices\SDK\Request\MitPaymentRequest;
 use OpMerchantServices\SDK\Request\PaymentRequest;
 use OpMerchantServices\SDK\Model\Customer;
 use OpMerchantServices\SDK\Model\Address;
@@ -72,7 +73,14 @@ final class Gateway extends \WC_Payment_Gateway
     public $supports = [
         'products',
         'refunds',
-        'tokenization'
+        'tokenization',
+        'subscriptions',
+        'subscription_cancellation',
+        'subscription_suspension',
+        'subscription_reactivation',
+        'subscription_amount_changes',
+        'subscription_date_changes',
+        'multiple_subscriptions'
     ];
 
     /**
@@ -167,6 +175,7 @@ final class Gateway extends \WC_Payment_Gateway
      */
     protected function add_actions() {
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
+        add_action( 'woocommerce_scheduled_subscription_payment_'.Plugin::GATEWAY_ID, [ $this, 'scheduled_subscription_payment' ], 10, 2 );
         add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
         add_filter( 'woocommerce_admin_order_items_after_refunds', [ $this, 'refund_items' ], 10, 1 );
         add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_custom_searches' ], 10, 2 );
@@ -689,6 +698,7 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws \Exception If the processing fails, this error is handled by WooCommerce.
      */
     public function process_payment( $order_id ) {
+        /** @var WC_Order $order */
         $order = wc_get_order( $order_id );
         $token_id = filter_input(INPUT_POST,'wc-checkout_finland-payment-token');
 
@@ -715,6 +725,14 @@ final class Gateway extends \WC_Payment_Gateway
 
         if ($is_token_payment) {
             $token = \WC_Payment_Tokens::get($token_id);
+
+            $order->add_payment_token($token);
+            $subscriptions = wcs_get_subscriptions_for_order($order_id);
+
+            foreach ($subscriptions as $subscription) {
+                $subscription->add_payment_token($token);
+            }
+
             $payment = new CitPaymentRequest();
 
             $payment->setToken($token->get_token());
@@ -872,7 +890,44 @@ final class Gateway extends \WC_Payment_Gateway
     }
 
     /**
-     * @param PaymentRequest|CitPaymentRequest $payment
+     * @param MitPaymentRequest $payment
+     * @param WC_Order $order
+     * @return bool
+     * @throws \Exception
+     */
+    private function create_mit_payment($payment, $order) {
+        try {
+            $response = $this->client->createMitPaymentCharge($payment);
+        } catch (\Exception $e) {
+            $fail_message = __('Failed to create token payment using card.', 'op-payment-service-woocommerce');
+
+            $order->add_order_note( $fail_message );
+
+            return false;
+        }
+
+        if ($response->getTransactionId() === null) {
+            throw new \Exception('Transcaction Id not found');
+        }
+
+        $message = sprintf(
+        // translators: First parameter is transaction ID.
+            __(
+                'Transaction %1$s created by token payment using card.',
+                'op-payment-service-woocommerce'
+            ),
+            $response->getTransactionId()
+        );
+
+        $order->add_order_note( $message );
+
+        $order->payment_complete( $response->getTransactionId() );
+
+        return true;
+    }
+
+    /**
+     * @param PaymentRequest|CitPaymentRequest|MitPaymentRequest $payment
      * @param WC_Order $order
      * @return mixed
      * @throws \Exception
@@ -949,7 +1004,7 @@ final class Gateway extends \WC_Payment_Gateway
     }
 
     /**
-     * @param WC_Order $order
+     * @param WC_Order|\WC_Subscription $order
      * @return array
      * @throws \Exception
      */
@@ -1014,6 +1069,29 @@ final class Gateway extends \WC_Payment_Gateway
                     return $carry;
                 }
             );
+    }
+
+    /**
+     * @param $amount
+     * @param WC_Order $order
+     * @param $product_id
+     */
+    public function scheduled_subscription_payment($amount, $order) {
+        $tokens = \WC_Payment_Tokens::get_order_tokens($order->get_id());
+        $token = reset($tokens);
+
+        $payment = new MitPaymentRequest();
+        $payment->setToken($token->get_token());
+
+        $this->set_base_payment_data($payment, $order);
+
+        // Save the reference for possible later use.
+        update_post_meta( $order->get_id(), '_checkout_reference', $payment->getReference() );
+
+        // Save it also as a key for fast indexed searches.
+        update_post_meta( $order->get_id(), '_checkout_reference_' . $payment->getReference(), true );
+
+        $result = $this->create_mit_payment($payment, $order);
     }
 
     /**
@@ -1277,8 +1355,17 @@ final class Gateway extends \WC_Payment_Gateway
      * @return array
      */
     protected function get_grouped_payment_providers( int $payment_amount, string $locale ) : array {
+        $groups = [];
+
+        if (
+            (class_exists('WC_Subscriptions_Cart') && \WC_Subscriptions_Cart::cart_contains_subscription()) ||
+            (function_exists('wcs_cart_contains_renewal') && wcs_cart_contains_renewal())
+        ) {
+            $groups = ['creditcard'];
+        }
+
         try {
-            $providers = $this->client->getGroupedPaymentProviders( $payment_amount, $locale );
+            $providers = $this->client->getGroupedPaymentProviders( $payment_amount, $locale, $groups );
         }
         catch ( HmacException $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );

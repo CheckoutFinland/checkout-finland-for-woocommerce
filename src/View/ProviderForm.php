@@ -61,16 +61,19 @@ EOL;
     echo '</div>';
     echo '</div>';
     echo '<ul class="op-payment-service-woocommerce-payment-fields hidden">';
-    array_walk( $group['providers'], function ($provider) {
-        echo '<li class="op-payment-service-woocommerce-payment-fields--list-item">';
-        echo '<label>';
-        echo '<input class="op-payment-service-woocommerce-payment-fields--list-item--input" type="radio" name="payment_provider" value="' . $provider->getId() . '">';
-        echo '<div class="op-payment-service-woocommerce-payment-fields--list-item--wrapper">';
-        echo '<img class="op-payment-service-woocommerce-payment-fields--list-item--img" src="' . $provider->getSvg() . '">';
-        echo '</div>';
-        echo '</label>';
-        echo '</li>';
-    });
+    if ((!class_exists('WC_Subscriptions_Cart') || \WC_Subscriptions_Cart::cart_contains_subscription() === false) &&
+        (!function_exists('wcs_cart_contains_renewal') || !wcs_cart_contains_renewal())) {
+        array_walk( $group['providers'], function ($provider) {
+            echo '<li class="op-payment-service-woocommerce-payment-fields--list-item">';
+            echo '<label>';
+            echo '<input class="op-payment-service-woocommerce-payment-fields--list-item--input" type="radio" name="payment_provider" value="' . $provider->getId() . '">';
+            echo '<div class="op-payment-service-woocommerce-payment-fields--list-item--wrapper">';
+            echo '<img class="op-payment-service-woocommerce-payment-fields--list-item--img" src="' . $provider->getSvg() . '">';
+            echo '</div>';
+            echo '</label>';
+            echo '</li>';
+        });
+    }
     if (is_user_logged_in() && $group['id'] == 'creditcard') {
         (new \OpMerchantServices\WooCommercePaymentGateway\Gateway)->render_saved_payment_methods();
     }
