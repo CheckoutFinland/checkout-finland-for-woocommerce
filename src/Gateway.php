@@ -787,13 +787,23 @@ final class Gateway extends \WC_Payment_Gateway
     /**
      * @param PaymentRequest|CitPaymentRequest $payment
      * @param WC_Order $order
+     * @param $payment_provider
      * @return array
      * @throws HmacException
      * @throws ValidationException
      * @throws \Exception
      */
     private function create_normal_payment($payment, $order, $payment_provider) {
-        $response = $this->client->createPayment( $payment );
+        try {
+            $response = $this->client->createPayment( $payment );
+
+            // Log the payment request if debug log is enabled.
+            $this->log('OpMerchantServices\SDK\Request\PaymentRequest: ' . json_encode($payment), 'info');
+        } catch (\Exception $exception) {
+            // Log the error message if debug log is enabled.
+            $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+            new \WP_Error( $exception->getCode(), $exception->getMessage() );
+        }
 
         if ( $this->use_provider_selection() ) {
             $providers = $response->getProviders();
@@ -848,8 +858,15 @@ final class Gateway extends \WC_Payment_Gateway
     private function create_cit_payment($payment, $order) {
         try {
             $response = $this->client->createCitPaymentCharge($payment);
-        } catch (\Exception $e) {
+
+            // Log the payment request if debug log is enabled.
+            $this->log('OpMerchantServices\SDK\Request\CitPaymentRequest: ' . json_encode($payment), 'info');
+        } catch (\Exception $exception) {
             $fail_message = __('Failed to create token payment using card.', 'op-payment-service-woocommerce');
+
+            // Log the error message if debug log is enabled.
+            $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+            new \WP_Error( $exception->getCode(), $exception->getMessage() );
 
             wc_add_notice( $fail_message, 'error' );
 
@@ -898,8 +915,15 @@ final class Gateway extends \WC_Payment_Gateway
     private function create_mit_payment($payment, $order) {
         try {
             $response = $this->client->createMitPaymentCharge($payment);
-        } catch (\Exception $e) {
+
+            // Log the payment request if debug log is enabled.
+            $this->log('OpMerchantServices\SDK\Request\MitPaymentRequest: ' . json_encode($payment), 'info');
+        } catch (\Exception $exception) {
             $fail_message = __('Failed to create token payment using card.', 'op-payment-service-woocommerce');
+
+            // Log the error message if debug log is enabled.
+            $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+            new \WP_Error( $exception->getCode(), $exception->getMessage() );
 
             $order->add_order_note( $fail_message );
 
@@ -1074,7 +1098,6 @@ final class Gateway extends \WC_Payment_Gateway
     /**
      * @param $amount
      * @param WC_Order $order
-     * @param $product_id
      */
     public function scheduled_subscription_payment($amount, $order) {
         $tokens = \WC_Payment_Tokens::get_order_tokens($order->get_id());
