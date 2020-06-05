@@ -61,9 +61,7 @@ EOL;
     echo '</div>';
     echo '</div>';
     echo '<ul class="op-payment-service-woocommerce-payment-fields hidden">';
-    if ((!class_exists('WC_Subscriptions_Cart') || \WC_Subscriptions_Cart::cart_contains_subscription() === false) &&
-        (!function_exists('wcs_cart_contains_renewal') || !wcs_cart_contains_renewal()) &&
-        (!class_exists('WC_Subscriptions_Change_Payment_Gateway'))) {
+    if (!\OpMerchantServices\WooCommercePaymentGateway\Helper::getIsSubscriptionsEnabled()) {
         array_walk( $group['providers'], function ($provider) {
             echo '<li class="op-payment-service-woocommerce-payment-fields--list-item">';
             echo '<label>';
