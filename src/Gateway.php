@@ -80,6 +80,9 @@ final class Gateway extends \WC_Payment_Gateway
         'subscription_reactivation',
         'subscription_amount_changes',
         'subscription_date_changes',
+        'subscription_payment_method_change',
+        'subscription_payment_method_change_customer',
+        'subscription_payment_method_change_admin',
         'multiple_subscriptions'
     ];
 
@@ -740,6 +743,15 @@ final class Gateway extends \WC_Payment_Gateway
             $payment = new PaymentRequest();
         }
 
+        if (0 == floatval($order->get_total())) {
+            $order->payment_complete();
+
+            return [
+                'result'   => 'success',
+                'redirect' => $this->get_return_url($order)
+            ];
+        }
+
         $this->set_base_payment_data($payment, $order);
 
         // Save the reference for possible later use.
@@ -856,6 +868,15 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws ValidationException
      */
     private function create_cit_payment($payment, $order) {
+        if (0 == floatval($order->get_total())) {
+            $order->payment_complete();
+
+            return [
+                'result'   => 'success',
+                'redirect' => $this->get_return_url($order)
+            ];
+        }
+
         try {
             $response = $this->client->createCitPaymentCharge($payment);
 
@@ -1098,6 +1119,7 @@ final class Gateway extends \WC_Payment_Gateway
     /**
      * @param $amount
      * @param WC_Order $order
+     * @throws \Exception
      */
     public function scheduled_subscription_payment($amount, $order) {
         $tokens = \WC_Payment_Tokens::get_order_tokens($order->get_id());
@@ -1382,7 +1404,8 @@ final class Gateway extends \WC_Payment_Gateway
 
         if (
             (class_exists('WC_Subscriptions_Cart') && \WC_Subscriptions_Cart::cart_contains_subscription()) ||
-            (function_exists('wcs_cart_contains_renewal') && wcs_cart_contains_renewal())
+            (function_exists('wcs_cart_contains_renewal') && wcs_cart_contains_renewal()) ||
+            (class_exists('WC_Subscriptions_Change_Payment_Gateway'))
         ) {
             $groups = ['creditcard'];
         }
