@@ -24,7 +24,7 @@ class Helper
         return (
             \WC_Subscriptions_Cart::cart_contains_subscription() ||
             wcs_cart_contains_renewal() ||
-            class_exists('WC_Subscriptions_Change_Payment_Gateway')
+            filter_input(INPUT_GET, 'change_payment_method')
         );
     }
 
