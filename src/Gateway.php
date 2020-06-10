@@ -752,10 +752,13 @@ final class Gateway extends \WC_Payment_Gateway
             $token = \WC_Payment_Tokens::get($token_id);
 
             $order->add_payment_token($token);
-            $subscriptions = wcs_get_subscriptions_for_order($order_id);
 
-            foreach ($subscriptions as $subscription) {
-                $subscription->add_payment_token($token);
+            if ($this->helper::getIsSubscriptionsEnabled()) {
+                $subscriptions = wcs_get_subscriptions_for_order($order_id);
+
+                foreach ($subscriptions as $subscription) {
+                    $subscription->add_payment_token($token);
+                }
             }
 
             $payment = new CitPaymentRequest();
