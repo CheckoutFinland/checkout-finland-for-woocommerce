@@ -29,6 +29,14 @@ class Helper
     }
 
     /**
+     * @return mixed
+     */
+    public static function getIsChangeSubscriptionPaymentMethod()
+    {
+        return filter_input(INPUT_GET, 'change_payment_method');
+    }
+
+    /**
      * Currency specific formattings
      *
      * @param int|double $sum The sum to format.

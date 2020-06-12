@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 $saved_methods = wc_get_customer_saved_methods_list(get_current_user_id());
 $has_methods = (bool)$saved_methods;
 
-if (\OpMerchantServices\WooCommercePaymentGateway\Helper::getIsSubscriptionsEnabled()) {
+if (\OpMerchantServices\WooCommercePaymentGateway\Helper::getIsChangeSubscriptionPaymentMethod()) {
     $add_card_form_url = Router::get_url(Plugin::CARD_ENDPOINT, 'add') . '?change_payment_method=1';
 } else {
     $add_card_form_url = Router::get_url(Plugin::CARD_ENDPOINT, 'add');
