@@ -351,6 +351,15 @@ final class Gateway extends \WC_Payment_Gateway
         if (Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT === $context) {
             $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
             $cancel_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_CANCEL_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
+        } else if (Helper::getIsSubscriptionsEnabled()) {
+            $success_url = Router::get_url(
+                Plugin::ADD_CARD_REDIRECT_SUCCESS_URL,
+                Plugin::ADD_CARD_CONTEXT_CHANGE_PAYMENT_METHOD
+            );
+            $cancel_url = Router::get_url(
+                Plugin::ADD_CARD_REDIRECT_CANCEL_URL,
+                Plugin::ADD_CARD_CONTEXT_CHANGE_PAYMENT_METHOD
+            );
         } else {
             $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_CHECKOUT);
             $cancel_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_CANCEL_URL, Plugin::ADD_CARD_CONTEXT_CHECKOUT);

@@ -67,6 +67,8 @@ final class Plugin {
 
     public const ADD_CARD_CONTEXT_CHECKOUT= 'checkout';
 
+    public const ADD_CARD_CONTEXT_CHANGE_PAYMENT_METHOD = 'change_payment_method';
+
     public const CARD_ENDPOINT = 'card';
 
     public const CALLBACK_URL = 'callback';
