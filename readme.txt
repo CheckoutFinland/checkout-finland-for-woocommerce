@@ -82,6 +82,13 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.5.0 =
+* Add support for WooCommerce Subscriptions plugin
+* Add tokenized card MIT payments functionalities
+* Add new Helper class
+* Add info and error logging for payment requests if debug log enabled
+* Updated to the latest PHP-SDK version
+
 = 1.4.1 =
 * Tokenized card automatically set as users default payment method
 * Updated to the latest PHP-SDK version
