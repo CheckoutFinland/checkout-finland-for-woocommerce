@@ -9,6 +9,7 @@ use OpMerchantServices\SDK\Exception\ValidationException;
 use OpMerchantServices\SDK\Request\AddCardFormRequest;
 use OpMerchantServices\SDK\Request\CitPaymentRequest;
 use OpMerchantServices\SDK\Request\GetTokenRequest;
+use OpMerchantServices\SDK\Request\MitPaymentRequest;
 use OpMerchantServices\SDK\Request\PaymentRequest;
 use OpMerchantServices\SDK\Model\Customer;
 use OpMerchantServices\SDK\Model\Address;
@@ -72,7 +73,15 @@ final class Gateway extends \WC_Payment_Gateway
     public $supports = [
         'products',
         'refunds',
-        'tokenization'
+        'tokenization',
+        'subscriptions',
+        'subscription_cancellation',
+        'subscription_suspension',
+        'subscription_reactivation',
+        'subscription_amount_changes',
+        'subscription_payment_method_change',
+        'subscription_payment_method_change_customer',
+        'multiple_subscriptions'
     ];
 
     /**
@@ -95,6 +104,11 @@ final class Gateway extends \WC_Payment_Gateway
      * @var \CheckoutFinland\SDK\Client
      */
     protected $client = null;
+
+    /**
+     * @var Helper
+     */
+    protected $helper = null;
 
     /**
      * Object constructor
@@ -158,6 +172,9 @@ final class Gateway extends \WC_Payment_Gateway
 
         // Check if we are in response phase
         $this->check_checkout_response();
+
+        // Create Helper instance
+        $this->helper = new Helper();
     }
 
     /**
@@ -165,8 +182,10 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return void
      */
-    protected function add_actions() {
+    protected function add_actions()
+    {
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
+        add_action( 'woocommerce_scheduled_subscription_payment_'.Plugin::GATEWAY_ID, [ $this, 'scheduled_subscription_payment' ], 10, 2 );
         add_action( 'woocommerce_receipt_' . $this->id, [ $this, 'receipt_page' ] );
         add_filter( 'woocommerce_admin_order_items_after_refunds', [ $this, 'refund_items' ], 10, 1 );
         add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_custom_searches' ], 10, 2 );
@@ -178,7 +197,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return array
      */
-    protected function get_method_info() : array {
+    protected function get_method_info() : array
+    {
         $method_info = [
             'title' => __('OP Payment Service for WooCommerce', 'op-payment-service-woocommerce'),
             'description' => __('OP Payment Service for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract', 'op-payment-service-woocommerce'),
@@ -191,7 +211,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return void
      */
-    protected function set_form_fields() {
+    protected function set_form_fields()
+    {
         $this->form_fields = [
             // Whether the payment gateway is enabled.
             'enabled'     => [
@@ -260,7 +281,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return boolean
      */
-    public function process_admin_options() {
+    public function process_admin_options()
+    {
         $saved = parent::process_admin_options();
 
         // Clear logs if debugging was disabled.
@@ -280,7 +302,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return void
      */
-    public function receipt_page() {
+    public function receipt_page()
+    {
         $view = new View( 'CheckoutForm' );
 
         $provider = WC()->session->get( 'payment_provider' );
@@ -328,6 +351,15 @@ final class Gateway extends \WC_Payment_Gateway
         if (Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT === $context) {
             $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
             $cancel_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_CANCEL_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
+        } else if (Helper::getIsChangeSubscriptionPaymentMethod()) {
+            $success_url = Router::get_url(
+                Plugin::ADD_CARD_REDIRECT_SUCCESS_URL,
+                Plugin::ADD_CARD_CONTEXT_CHANGE_PAYMENT_METHOD
+            );
+            $cancel_url = Router::get_url(
+                Plugin::ADD_CARD_REDIRECT_CANCEL_URL,
+                Plugin::ADD_CARD_CONTEXT_CHANGE_PAYMENT_METHOD
+            );
         } else {
             $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_CHECKOUT);
             $cancel_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_CANCEL_URL, Plugin::ADD_CARD_CONTEXT_CHECKOUT);
@@ -391,7 +423,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws HmacException
      * @throws ValidationException
      */
-    public function add_payment_method() {
+    public function add_payment_method()
+    {
         $this->add_card_form(Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
 
         return array(
@@ -403,7 +436,8 @@ final class Gateway extends \WC_Payment_Gateway
     /**
      * Grab and display users saved card payment methods.
      */
-    public function saved_payment_methods() {
+    public function saved_payment_methods()
+    {
         $html = '<ul class="woocommerce-SavedPaymentMethods wc-saved-payment-methods" data-count="' . esc_attr(count($this->get_tokens())) . '">';
         foreach ($this->get_tokens() as $token) {
             $html .= $this->get_saved_payment_method_option_html($token);
@@ -419,7 +453,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param $token
      * @return string
      */
-    public function get_token_payment_option_html($html, $token) {
+    public function get_token_payment_option_html($html, $token)
+    {
         $html = sprintf(
             '<li class="woocommerce-SavedPaymentMethods-token op-payment-service-woocommerce-tokenized-payment-method">
 				<label for="wc-%1$s-payment-token-%2$s">
@@ -442,7 +477,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param $token
      * @return string
      */
-    private function get_display_name($token) {
+    private function get_display_name($token)
+    {
         $display = sprintf(
         /* translators: 1: last 4 digits 2: expiry month 3: expiry year */
             __( 'xxxx xxxx xxxx %1$s %2$s/%3$s', 'op-payment-service-woocommerce' ),
@@ -458,7 +494,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param $token
      * @return string
      */
-    private function get_card_image($token) {
+    private function get_card_image($token)
+    {
         $token_card_type = strtolower($token->get_card_type());
 
         if ($token_card_type === 'amex') {
@@ -478,7 +515,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return void
      */
-    public function check_checkout_response() {
+    public function check_checkout_response()
+    {
         $status           = filter_input( INPUT_GET, 'checkout-status' );
         $refund_callback  = filter_input( INPUT_GET, 'refund_callback' );
         $refund_unique_id = filter_input( INPUT_GET, 'refund_unique_id' );
@@ -500,7 +538,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return void
      */
-    public function handle_payment_response( string $status ) {
+    public function handle_payment_response( string $status )
+    {
         // Check the HMAC
         try {
             $this->client->validateHmac( filter_input_array( INPUT_GET ), '', filter_input( INPUT_GET, 'signature' ) );
@@ -593,7 +632,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return boolean
      */
-    protected function use_provider_selection() : bool {
+    protected function use_provider_selection() : bool
+    {
         return 'yes' === $this->get_option( 'provider_selection', 'yes' );
     }
 
@@ -605,7 +645,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param string $order_id         Order ID.
      * @return void
      */
-    public function handle_refund_response( string $refund_callback, string $refund_unique_id, string $order_id ) {
+    public function handle_refund_response( string $refund_callback, string $refund_unique_id, string $order_id )
+    {
         // Remove the callback indicators from the GET array
         $get = filter_input_array( INPUT_GET );
 
@@ -676,7 +717,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @return void
      */
     public function payment_fields() {
-        if ( is_checkout() && $this->use_provider_selection() ) {
+        if ( is_checkout() && $this->use_provider_selection() )
+        {
             $this->provider_form();
         }
     }
@@ -688,7 +730,9 @@ final class Gateway extends \WC_Payment_Gateway
      * @return array
      * @throws \Exception If the processing fails, this error is handled by WooCommerce.
      */
-    public function process_payment( $order_id ) {
+    public function process_payment( $order_id )
+    {
+        /** @var WC_Order $order */
         $order = wc_get_order( $order_id );
         $token_id = filter_input(INPUT_POST,'wc-checkout_finland-payment-token');
 
@@ -715,11 +759,31 @@ final class Gateway extends \WC_Payment_Gateway
 
         if ($is_token_payment) {
             $token = \WC_Payment_Tokens::get($token_id);
+
+            $order->add_payment_token($token);
+
+            if ($this->helper::getIsSubscriptionsEnabled()) {
+                $subscriptions = wcs_get_subscriptions_for_order($order_id);
+
+                foreach ($subscriptions as $subscription) {
+                    $subscription->add_payment_token($token);
+                }
+            }
+
             $payment = new CitPaymentRequest();
 
             $payment->setToken($token->get_token());
         } else {
             $payment = new PaymentRequest();
+        }
+
+        if (0 == floatval($order->get_total())) {
+            $order->payment_complete();
+
+            return [
+                'result'   => 'success',
+                'redirect' => $this->get_return_url($order)
+            ];
         }
 
         $this->set_base_payment_data($payment, $order);
@@ -769,13 +833,24 @@ final class Gateway extends \WC_Payment_Gateway
     /**
      * @param PaymentRequest|CitPaymentRequest $payment
      * @param WC_Order $order
+     * @param $payment_provider
      * @return array
      * @throws HmacException
      * @throws ValidationException
      * @throws \Exception
      */
-    private function create_normal_payment($payment, $order, $payment_provider) {
-        $response = $this->client->createPayment( $payment );
+    private function create_normal_payment($payment, $order, $payment_provider)
+    {
+        try {
+            $response = $this->client->createPayment( $payment );
+
+            // Log the payment request if debug log is enabled.
+            $this->log('OpMerchantServices\SDK\Request\PaymentRequest: ' . json_encode($payment), 'info');
+        } catch (\Exception $exception) {
+            // Log the error message if debug log is enabled.
+            $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+            new \WP_Error( $exception->getCode(), $exception->getMessage() );
+        }
 
         if ( $this->use_provider_selection() ) {
             $providers = $response->getProviders();
@@ -827,11 +902,19 @@ final class Gateway extends \WC_Payment_Gateway
      * @throws HmacException
      * @throws ValidationException
      */
-    private function create_cit_payment($payment, $order) {
+    private function create_cit_payment($payment, $order)
+    {
         try {
             $response = $this->client->createCitPaymentCharge($payment);
-        } catch (\Exception $e) {
+
+            // Log the payment request if debug log is enabled.
+            $this->log('OpMerchantServices\SDK\Request\CitPaymentRequest: ' . json_encode($payment), 'info');
+        } catch (\Exception $exception) {
             $fail_message = __('Failed to create token payment using card.', 'op-payment-service-woocommerce');
+
+            // Log the error message if debug log is enabled.
+            $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+            new \WP_Error( $exception->getCode(), $exception->getMessage() );
 
             wc_add_notice( $fail_message, 'error' );
 
@@ -872,7 +955,52 @@ final class Gateway extends \WC_Payment_Gateway
     }
 
     /**
-     * @param PaymentRequest|CitPaymentRequest $payment
+     * @param MitPaymentRequest $payment
+     * @param WC_Order $order
+     * @return bool
+     * @throws \Exception
+     */
+    private function create_mit_payment($payment, $order)
+    {
+        try {
+            $response = $this->client->createMitPaymentCharge($payment);
+
+            // Log the payment request if debug log is enabled.
+            $this->log('OpMerchantServices\SDK\Request\MitPaymentRequest: ' . json_encode($payment), 'info');
+        } catch (\Exception $exception) {
+            $fail_message = __('Failed to create token payment using card.', 'op-payment-service-woocommerce');
+
+            // Log the error message if debug log is enabled.
+            $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+            new \WP_Error( $exception->getCode(), $exception->getMessage() );
+
+            $order->add_order_note( $fail_message );
+
+            return false;
+        }
+
+        if ($response->getTransactionId() === null) {
+            throw new \Exception('Transcaction Id not found');
+        }
+
+        $message = sprintf(
+        // translators: First parameter is transaction ID.
+            __(
+                'Transaction %1$s created by token payment using card.',
+                'op-payment-service-woocommerce'
+            ),
+            $response->getTransactionId()
+        );
+
+        $order->add_order_note( $message );
+
+        $order->payment_complete( $response->getTransactionId() );
+
+        return true;
+    }
+
+    /**
+     * @param PaymentRequest|CitPaymentRequest|MitPaymentRequest $payment
      * @param WC_Order $order
      * @return mixed
      * @throws \Exception
@@ -890,7 +1018,7 @@ final class Gateway extends \WC_Payment_Gateway
 
         // Fetch current currency and the cart total
         $currency    = get_woocommerce_currency();
-        $order_total = $this->handle_currency( $order->get_total() );
+        $order_total = $this->helper->handle_currency( $order->get_total() );
 
         // Set the aforementioned values to the payment request
         $payment->setCurrency( $currency )
@@ -949,14 +1077,15 @@ final class Gateway extends \WC_Payment_Gateway
     }
 
     /**
-     * @param WC_Order $order
+     * @param WC_Order|\WC_Subscription $order
      * @return array
      * @throws \Exception
      */
-    private function get_order_items($order) {
+    private function get_order_items($order)
+    {
         // Get the items from the order
         $order_items = $order->get_items( [ 'line_item', 'fee', 'shipping' ] );
-        $order_total = $this->handle_currency( $order->get_total() );
+        $order_total = $this->helper->handle_currency( $order->get_total() );
 
         // Convert items to SDK Item objects.
         $items = array_map(
@@ -1017,6 +1146,30 @@ final class Gateway extends \WC_Payment_Gateway
     }
 
     /**
+     * @param $amount
+     * @param WC_Order $order
+     * @throws \Exception
+     */
+    public function scheduled_subscription_payment($amount, $order)
+    {
+        $tokens = \WC_Payment_Tokens::get_order_tokens($order->get_id());
+        $token = reset($tokens);
+
+        $payment = new MitPaymentRequest();
+        $payment->setToken($token->get_token());
+
+        $this->set_base_payment_data($payment, $order);
+
+        // Save the reference for possible later use.
+        update_post_meta( $order->get_id(), '_checkout_reference', $payment->getReference() );
+
+        // Save it also as a key for fast indexed searches.
+        update_post_meta( $order->get_id(), '_checkout_reference_' . $payment->getReference(), true );
+
+        $this->create_mit_payment($payment, $order);
+    }
+
+    /**
      * Process refunds.
      *
      * @param integer $order_id Order ID to refund from.
@@ -1024,7 +1177,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param string  $reason   Optional reason for the refund.
      * @return boolean|\WP_Error
      */
-    public function process_refund( $order_id, $amount = null, $reason = '' ) {
+    public function process_refund( $order_id, $amount = null, $reason = '' )
+    {
         try {
             $order = \wc_get_order( $order_id );
 
@@ -1034,10 +1188,10 @@ final class Gateway extends \WC_Payment_Gateway
             $refund = new RefundRequest();
 
             if ( $amount ) {
-                $refund->setAmount( $this->handle_currency( $amount ) );
+                $refund->setAmount( $this->helper->handle_currency( $amount ) );
             }
             else {
-                $refund->setAmount( $this->handle_currency( $order->get_total() ) );
+                $refund->setAmount( $this->helper->handle_currency( $order->get_total() ) );
                 $amount = $order->get_total();
             }
 
@@ -1169,7 +1323,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param int $order_id Order ID to handle.
      * @return void
      */
-    public function refund_items( $order_id ) {
+    public function refund_items( $order_id )
+    {
         $order = new \WC_Order( $order_id );
 
         $refunds = $order->get_refunds();
@@ -1196,8 +1351,9 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return void
      */
-    protected function provider_form() {
-        $cart_total = $this->get_cart_total();
+    protected function provider_form()
+    {
+        $cart_total = $this->helper->get_cart_total();
         $res = [];
 
         $full_locale = get_locale();
@@ -1239,7 +1395,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return \CheckoutFinland\SDK\Model\Customer
      */
-    protected function create_customer( \WC_Order $order ) : Customer {
+    protected function create_customer( \WC_Order $order ) : Customer
+    {
         $customer = new Customer();
 
         $customer->setEmail( $order->get_billing_email() ?? null )
@@ -1256,7 +1413,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param integer $payment_amount Payment amount in currency minor unit, eg. cents.
      * @return array
      */
-    protected function get_payment_providers( int $payment_amount ) : array {
+    protected function get_payment_providers( int $payment_amount ) : array
+    {
         try {
             $providers = $this->client->getPaymentProviders( $payment_amount );
         }
@@ -1276,9 +1434,16 @@ final class Gateway extends \WC_Payment_Gateway
      * @param integer $payment_amount Payment amount in currency minor unit, eg. cents.
      * @return array
      */
-    protected function get_grouped_payment_providers( int $payment_amount, string $locale ) : array {
+    protected function get_grouped_payment_providers( int $payment_amount, string $locale ) : array
+    {
+        $groups = [];
+
+        if ($this->helper::getIsSubscriptionsEnabled()) {
+            $groups = ['creditcard'];
+        }
+
         try {
-            $providers = $this->client->getGroupedPaymentProviders( $payment_amount, $locale );
+            $providers = $this->client->getGroupedPaymentProviders( $payment_amount, $locale, $groups );
         }
         catch ( HmacException $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );
@@ -1296,7 +1461,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param \Exception $exception Exception to handle.
      * @return array
      */
-    protected function get_payment_providers_error_handler( \Exception $exception ) : array {
+    protected function get_payment_providers_error_handler( \Exception $exception ) : array
+    {
 
         // Log the error message.
         $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
@@ -1322,7 +1488,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param string    $type  Whether we are creating an invoicing or a delivery address.
      * @return Address
      */
-    protected function create_address( \WC_Order $order, string $type = 'invoicing' ) : ?Address {
+    protected function create_address( \WC_Order $order, string $type = 'invoicing' ) : ?Address
+    {
         $address = new Address();
 
         switch ( $type ) {
@@ -1363,12 +1530,13 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return Item|null
      */
-    protected function create_item( WC_Order_Item $order_item, WC_Order $order ) : Item {
+    protected function create_item( WC_Order_Item $order_item, WC_Order $order ) : Item
+    {
         $item = new Item();
 
         // Get the item total with taxes and without rounding.
         // Then convert it into the integer format required by Checkout Finland.
-        $sub_total = $this->handle_currency( $order->get_item_total( $order_item, true, false ) );
+        $sub_total = $this->helper->handle_currency( $order->get_item_total( $order_item, true, false ) );
         $item->setUnitPrice( $sub_total )
             ->setUnits( (int) $order_item->get_quantity() );
 
@@ -1390,7 +1558,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return string
      */
-    protected function get_item_product_code( WC_Order_Item $item ) : string {
+    protected function get_item_product_code( WC_Order_Item $item ) : string
+    {
         $product_code = '';
         switch ( get_class( $item ) ) {
             case WC_Order_Item_Product::class:
@@ -1414,7 +1583,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return string
      */
-    protected function get_item_description( WC_Order_Item $item ) : string {
+    protected function get_item_description( WC_Order_Item $item ) : string
+    {
         switch ( get_class( $item ) ) {
             case WC_Order_Item_Product::class:
                 $description = $item->get_product()->get_description();
@@ -1438,7 +1608,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return int The tax percentage.
      */
-    protected function get_item_tax_rate( WC_Order_Item $item, WC_Order $order ) {
+    protected function get_item_tax_rate( WC_Order_Item $item, WC_Order $order )
+    {
         $total     = $order->get_line_total( $item, false );
         $tax_total = $order->get_line_tax( $item );
 
@@ -1458,7 +1629,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param \WC_Order $order The order object.
      * @return CallbackUrl
      */
-    protected function create_redirect_url( \WC_Order $order ) : CallbackUrl {
+    protected function create_redirect_url( \WC_Order $order ) : CallbackUrl
+    {
         $callback = new CallbackUrl();
 
         $callback->setSuccess( $this->get_return_url( $order ) );
@@ -1483,45 +1655,14 @@ final class Gateway extends \WC_Payment_Gateway
     }
 
     /**
-     * Get current WooCommerce cart total.
-     *
-     * @return integer
-     */
-    protected function get_cart_total() : int {
-        $sum = WC()->cart->total;
-
-        return $this->handle_currency( $sum );
-    }
-
-    /**
-     * Currency specific formattings
-     *
-     * @param int|double $sum The sum to format.
-     * @return integer
-     */
-    protected function handle_currency( $sum ) : int {
-        $currency = \get_woocommerce_currency();
-
-        switch ( $currency ) {
-            case 'EUR':
-                $sum = round( $sum * 100 );
-                break;
-            default:
-                $sum = round( $sum * 100 );
-                break;
-        }
-
-        return $sum;
-    }
-
-    /**
      * Handle custom search query vars to get orders by certain reference or refund identifier.
      *
      * @param array $query      Args for WP_Query.
      * @param array $query_vars Query vars from WC_Order_Query.
      * @return array
      */
-    public function handle_custom_searches( array $query, array $query_vars ) : array {
+    public function handle_custom_searches( array $query, array $query_vars ) : array
+    {
         if ( ! empty( $query_vars['checkout_reference'] ) ) {
             $query['meta_query'][] = [
                 'key'     => '_checkout_reference_' . esc_attr( $query_vars['checkout_reference'] ),
@@ -1545,7 +1686,8 @@ final class Gateway extends \WC_Payment_Gateway
      *
      * @return void
      */
-    protected function register_styles() {
+    protected function register_styles()
+    {
         $plugin_instance = Plugin::instance();
 
         $plugin_dir_url = $plugin_instance->get_plugin_dir_url();
@@ -1567,7 +1709,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param string $level   Log level. Defaults to 'info'. Possible values:
      *                        emergency|alert|critical|error|warning|notice|info|debug.
      */
-    public function log( $message, $level = 'info' ) {
+    public function log( $message, $level = 'info' )
+    {
         if ( $this->debug ) {
             if ( empty( $this->logger ) ) {
                 $this->logger = \wc_get_logger();
@@ -1587,7 +1730,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param bool       $die       Defines if the process should be terminated.
      * @throws \Exception If the process is not killed, the error is passed on.
      */
-    protected function error( \Exception $exception, string $message, bool $die = true ) {
+    protected function error( \Exception $exception, string $message, bool $die = true )
+    {
         $glue = PHP_EOL . '- ';
 
         $log_message = $message . $glue;
@@ -1611,7 +1755,8 @@ final class Gateway extends \WC_Payment_Gateway
      * @param HmacException $exception The exception instance.
      * @param bool          $die       Defines if the process should be terminated.
      */
-    protected function signature_error( HmacException $exception, bool $die = true ) {
+    protected function signature_error( HmacException $exception, bool $die = true )
+    {
         $message = __(
             'An error occurred validating the signature.',
             'op-payment-service-woocommerce'

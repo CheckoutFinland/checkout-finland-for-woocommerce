@@ -11,7 +11,13 @@ if (!defined('ABSPATH')) {
 
 $saved_methods = wc_get_customer_saved_methods_list(get_current_user_id());
 $has_methods = (bool)$saved_methods;
-$add_card_form_url = Router::get_url(Plugin::CARD_ENDPOINT, 'add');
+
+if (\OpMerchantServices\WooCommercePaymentGateway\Helper::getIsChangeSubscriptionPaymentMethod()) {
+    $add_card_form_url = Router::get_url(Plugin::CARD_ENDPOINT, 'add') . '?change_payment_method=1';
+} else {
+    $add_card_form_url = Router::get_url(Plugin::CARD_ENDPOINT, 'add');
+}
+
 $delete_card_url = Router::get_url(Plugin::CARD_ENDPOINT, 'delete');
 ?>
 <div class="provider-group-title mobile op-payment-service-woocommerce-tokenized-payment-methods-saved-payment-methods-title">
