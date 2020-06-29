@@ -273,6 +273,14 @@ final class Gateway extends \WC_Payment_Gateway
                 'label'   => __( 'Secret key', 'op-payment-service-woocommerce' ),
                 'default' => '',
             ],
+            'fallback_country'  => [
+                'title'   => __( 'Fallback country', 'op-payment-service-woocommerce' ),
+                'type'    => 'select',
+                'label'   => __( 'Fallback country', 'op-payment-service-woocommerce' ),
+                'default' => '',
+                'description' => __( 'Select country to be used as fallback if no country specified in checkout.', 'op-payment-service-woocommerce' ),
+                'options' => array_merge(['' => 'Select country'], WC()->countries->get_countries())
+            ],
         ];
     }
 
@@ -1509,7 +1517,7 @@ final class Gateway extends \WC_Payment_Gateway
             ->setPostalCode( $order->{ 'get_' . $prefix . 'postcode' }() ?? null )
             ->setCity( $order->{ 'get_' . $prefix . 'city' }() ?? null )
             ->setCounty( $order->{ 'get_' . $prefix . 'state' }() ?? null )
-            ->setCountry( $order->{ 'get_' . $prefix . 'country' }() ?? null );
+            ->setCountry( $order->{ 'get_' . $prefix . 'country' }() ?: $this->get_option( 'fallback_country', '' ) );
 
         // If we have any of the listed properties, we are good to go
         $has_values = array_filter(

@@ -65,3 +65,7 @@ Choose whether you want the payment provider selection to happen in the checkout
 ### Merchant ID and Secret key
 
 Your OP Payment Service credentials. You can obtain the keys by registering at our [website](https://www.checkout.fi) (in Finnish only) or contact [asiakaspalvelu@checkout.fi](mailto:asiakaspalvelu@checkout.fi) directly.
+
+### Fallback Country
+
+Setup fallback country to be used if no country is provided from Woocommerce checkout. Use only if billing_country/shipping_country is removed from checkout fields.
