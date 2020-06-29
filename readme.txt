@@ -82,6 +82,9 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.5.1 =
+* Add setting for fallback country in payment gateway settings 
+
 = 1.5.0 =
 * Add support for WooCommerce Subscriptions plugin
 * Add tokenized card MIT payments functionalities
