@@ -1113,13 +1113,6 @@ final class Gateway extends \WC_Payment_Gateway
         if ( $sub_sum !== $order_total ) {
             $diff = absint( $sub_sum - $order_total );
 
-            if ( $diff > $qty_sum ) {
-                throw new \Exception( __(
-                    'There was too big error in rounding the prices.',
-                    'op-payment-service-woocommerce'
-                ));
-            }
-
             $rounding_item = new Item();
             $rounding_item->setDescription( __( 'Rounding', 'op-payment-service-woocommerce' ) );
             $rounding_item->setDeliveryDate( date( 'Y-m-d' ) );
