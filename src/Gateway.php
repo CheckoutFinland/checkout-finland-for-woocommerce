@@ -592,8 +592,11 @@ final class Gateway extends \WC_Payment_Gateway
                         else {
                             // Get only the wanted payment provider object
                             $wanted_provider = $this->get_wanted_provider($providers, $payment_provider);
-
-                            $provider_name = $wanted_provider->getName() ?? ucfirst( $wanted_provider->getId() );
+                            if (null !== $wanted_provider) {
+                                $provider_name = $wanted_provider->getName() ?? ucfirst( $wanted_provider->getId() );
+                            } else {
+                                $provider_name = ucfirst( $payment_provider );
+                            }
                         }
 
                         WC()->session->set( 'payment_provider', $wanted_provider );
