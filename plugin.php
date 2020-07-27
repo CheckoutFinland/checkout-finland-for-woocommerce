@@ -3,7 +3,7 @@
  * Plugin Name: OP Payment Service for WooCommerce
  * Plugin URI: https://github.com/OPMerchantServices/op-payment-service-for-woocommerce
  * Description: OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
- * Version: 1.5.1
+ * Version: 1.5.2
  * Requires at least: 4.9
  * Tested up to: 5.4
  * Requires PHP: 7.1
