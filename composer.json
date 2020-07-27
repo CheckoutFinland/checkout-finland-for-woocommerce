@@ -68,6 +68,7 @@
         "php": ">=7.1",
         "composer/installers": ">=1.0.12",
         "op-merchant-services/op-payment-service-php-sdk": ">=1.3.0",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "guzzlehttp/guzzle": "^6.5.4"
     }
 }
