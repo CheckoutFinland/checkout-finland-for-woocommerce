@@ -8,7 +8,7 @@
  * Tested up to: 5.4
  * Requires PHP: 7.1
  * WC requires at least: 3.0
- * WC tested up to: 4.2
+ * WC tested up to: 4.3
  * Author: OP Merchant Services
  * Author URI: https://www.checkout.fi/
  * Text Domain: op-payment-service-woocommerce
