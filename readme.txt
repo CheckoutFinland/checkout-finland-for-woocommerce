@@ -82,6 +82,13 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.5.2 =
+* Add extra validation to check that wanted_provider is not null, otherwise use capitalized provider name from checkout-provider parameter.
+* Change get_item_description function item description for product items to use either product name or product id
+* Add composer.json to require guzzlehttp/guzzle version 6.5.4
+* Update finnish translations
+* Fix issue when using a gift card code after placing an order
+
 = 1.5.1 =
 * Add setting for fallback country in payment gateway settings 
 
