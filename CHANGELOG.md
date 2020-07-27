@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2] - 2020-07-27
+### Changed
+- Add extra validation to check that wanted_provider is not null, otherwise use capitalized provider name from checkout-provider parameter.
+- Change get_item_description function item description for product items to use either product name or product id
+- Add composer.json to require guzzlehttp/guzzle version 6.5.4
+- Update finnish translations
+
+### Fixed
+- Fix issue when using a gift card code after placing an order
+
 ## [1.5.1] - 2020-06-29
 ### Changed
 - Add setting for fallback country in payment gateway settings 
