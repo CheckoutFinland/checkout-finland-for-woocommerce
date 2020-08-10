@@ -109,6 +109,9 @@ echo "
             // Show current group            
             this.classList.add('selected');
             this.nextSibling.classList.remove('hidden');
+            // Use scrolIntoView(alignTo) method
+            const closestUl = this.nextSibling.closest('ul');
+            closestUl.scrollIntoView(false); // align to the bottom of the scrollable element
         });
     }
     for (let i = 0; i < methods.length; i++) {
