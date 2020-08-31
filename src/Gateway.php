@@ -548,6 +548,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     public function handle_payment_response( string $status )
     {
+        $this->log('OpMerchantServices: Start handle_payment_response', 'debug');
+
         // Check the HMAC
         try {
             $this->client->validateHmac( filter_input_array( INPUT_GET ), '', filter_input( INPUT_GET, 'signature' ) );
@@ -565,19 +567,23 @@ final class Gateway extends \WC_Payment_Gateway
 
             switch ( $status ) {
                 case 'ok':
+                    $this->log('OpMerchantServices: handle_payment_response, case = ok', 'debug');
                     $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
 
                     $order_status = $order->get_status();
 
                     if ( $order_status === 'completed' || $order_status === 'processing' ) {
+                        $this->log('OpMerchantServices: handle_payment_response, order already processed', 'debug');
                         // This order has already been processed.
                         return;
                     }
 
+                    $this->log('OpMerchantServices: handle_payment_response payment_complete, order needs processing '.$order->needs_processing(), 'debug');
                     // Mark payment completed and store the transaction ID.
                     $order->payment_complete( $transaction_id );
 
                     if ( ! $this->use_provider_selection() ) {
+                        $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = false', 'debug');
                         // Get the chosen payment provider and save it to the order
                         $payment_provider = filter_input( INPUT_GET, 'checkout-provider' );
                         $payment_amount   = filter_input( INPUT_GET, 'checkout-amount' );
@@ -607,6 +613,7 @@ final class Gateway extends \WC_Payment_Gateway
                             $transaction_id,
                             $provider_name
                         );
+                        $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = false, add_order_note', 'debug');
 
                         $order->add_order_note( $message );
                     }
@@ -619,6 +626,7 @@ final class Gateway extends \WC_Payment_Gateway
                             ),
                             $transaction_id
                         );
+                        $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = true, add_order_note', 'debug');
 
                         $order->add_order_note( $order_note );
                     }
@@ -627,10 +635,12 @@ final class Gateway extends \WC_Payment_Gateway
                     WC()->cart->empty_cart();
                     break;
                 case 'pending':
+                    $this->log('OpMerchantServices: handle_payment_response, case = pending', 'debug');
                     $order->update_status( 'on-hold' );
                     $order->add_order_note( __( 'Payment pending.', 'op-payment-service-woocommerce' ) );
                     break;
                 default:
+                    $this->log('OpMerchantServices: handle_payment_response, case = failed', 'debug');
                     $order->update_status( 'failed' );
                     $order->add_order_note( __( 'Payment failed.', 'op-payment-service-woocommerce' ) );
                     break;
@@ -743,6 +753,7 @@ final class Gateway extends \WC_Payment_Gateway
      */
     public function process_payment( $order_id )
     {
+        $this->log('OpMerchantServices: process_payment', 'debug');
         /** @var WC_Order $order */
         $order = wc_get_order( $order_id );
         $token_id = filter_input(INPUT_POST,'wc-checkout_finland-payment-token');
@@ -765,17 +776,19 @@ final class Gateway extends \WC_Payment_Gateway
                 'op-payment-service-woocommerce'
             ));
         } elseif ($is_token_payment) {
+            $this->log('OpMerchantServices: process_payment, is token payment', 'debug');
             $payment_provider = 'creditcard';
         }
 
         if ($is_token_payment) {
             $token = \WC_Payment_Tokens::get($token_id);
 
+            $this->log('OpMerchantServices: process_payment, add_payment_token', 'debug');
             $order->add_payment_token($token);
 
             if ($this->helper::getIsSubscriptionsEnabled()) {
                 $subscriptions = wcs_get_subscriptions_for_order($order_id);
-
+                $this->log('OpMerchantServices: add_payment_token to subscriptions', 'debug');
                 foreach ($subscriptions as $subscription) {
                     $subscription->add_payment_token($token);
                 }
@@ -785,10 +798,12 @@ final class Gateway extends \WC_Payment_Gateway
 
             $payment->setToken($token->get_token());
         } else {
+            $this->log('OpMerchantServices: init PaymentRequest', 'debug');
             $payment = new PaymentRequest();
         }
 
         if (0 == floatval($order->get_total())) {
+            $this->log('OpMerchantServices: process_payment, order total 0, payment complete, order needs processing'.$order->needs_processing(), 'debug');
             $order->payment_complete();
 
             return [
@@ -799,6 +814,7 @@ final class Gateway extends \WC_Payment_Gateway
 
         $this->set_base_payment_data($payment, $order);
 
+        $this->log('OpMerchantServices: process_payment, update_post_meta', 'debug');
         // Save the reference for possible later use.
         update_post_meta( $order->get_id(), '_checkout_reference', $payment->getReference() );
 
@@ -852,6 +868,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     private function create_normal_payment($payment, $order, $payment_provider)
     {
+        $this->log('OpMerchantServices: create_normal_payment', 'debug');
+
         try {
             $response = $this->client->createPayment( $payment );
 
@@ -864,6 +882,7 @@ final class Gateway extends \WC_Payment_Gateway
         }
 
         if ( $this->use_provider_selection() ) {
+            $this->log('OpMerchantServices: create_normal_payment, use_provider_selection = true', 'debug');
             $providers = $response->getProviders();
 
             // Get only the wanted payment provider object
@@ -880,7 +899,7 @@ final class Gateway extends \WC_Payment_Gateway
                 $response->getTransactionId(),
                 $wanted_provider->getName() ?? ucfirst( $payment_provider )
             );
-
+            $this->log('OpMerchantServices: create_normal_payment, use_provider_selection = true, redirect', 'debug');
             $order->add_order_note( $message );
 
             return [
@@ -889,6 +908,7 @@ final class Gateway extends \WC_Payment_Gateway
             ];
         }
         else {
+            $this->log('OpMerchantServices: create_normal_payment, use_provider_selection = false', 'debug');
             $message = sprintf(
             // translators: First parameter is transaction ID, the other is the name of the payment provider.
                 __(
@@ -899,7 +919,7 @@ final class Gateway extends \WC_Payment_Gateway
             );
 
             $order->add_order_note( $message );
-
+            $this->log('OpMerchantServices: create_normal_payment, use_provider_selection = false, redirect', 'debug');
             return [
                 'result'   => 'success',
                 'redirect' => $response->getHref(),
@@ -915,6 +935,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     private function create_cit_payment($payment, $order)
     {
+        $this->log('OpMerchantServices: create_cit_payment', 'debug');
+
         try {
             $response = $this->client->createCitPaymentCharge($payment);
 
@@ -954,6 +976,7 @@ final class Gateway extends \WC_Payment_Gateway
         $order->add_order_note( $message );
 
         if (!$requires_threeds) {
+            $this->log('OpMerchantServices: create_cit_payment, No 3DS required, payment_complete ', 'info');
             $order->payment_complete( $response->getTransactionId() );
         }
 
@@ -1004,7 +1027,7 @@ final class Gateway extends \WC_Payment_Gateway
         );
 
         $order->add_order_note( $message );
-
+        $this->log('OpMerchantServices: create_mit_payment payment_complete ', 'info');
         $order->payment_complete( $response->getTransactionId() );
 
         return true;
@@ -1156,6 +1179,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     public function scheduled_subscription_payment($amount, $order)
     {
+        $this->log('OpMerchantServices: scheduled_subscription_payment', 'debug');
+
         $tokens = \WC_Payment_Tokens::get_order_tokens($order->get_id());
         $token = reset($tokens);
 
@@ -1183,6 +1208,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     public function process_refund( $order_id, $amount = null, $reason = '' )
     {
+        $this->log('OpMerchantServices: process_refund', 'debug');
+
         try {
             $order = \wc_get_order( $order_id );
 
