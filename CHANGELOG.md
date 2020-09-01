@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.5.3] - 2020-09-01
 ### Changed
 - Add more debug logging to payment gateway processing
+- Use scrolIntoView method after clicking payment method group button on checkout
 
 ## [1.5.2] - 2020-07-27
 ### Changed
