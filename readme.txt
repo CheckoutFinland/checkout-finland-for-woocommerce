@@ -3,8 +3,8 @@ Contributors: loueranta, henrykhelskygeniem
 Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
-Tested up to: 5.4
-Stable tag: 1.4
+Tested up to: 5.5
+Stable tag: 1.5
 Requires PHP: 7.1
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -81,6 +81,10 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 
 == Changelog ==
+
+= 1.5.3 =
+* Add more debug logging to payment gateway processing
+* Use scrolIntoView method after clicking payment method group button on checkout
 
 = 1.5.2 =
 * Add extra validation to check that wanted_provider is not null, otherwise use capitalized provider name from checkout-provider parameter.
