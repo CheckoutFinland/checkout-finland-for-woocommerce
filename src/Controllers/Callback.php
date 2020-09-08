@@ -11,7 +11,6 @@ class Callback extends AbstractController
 {
     protected function index()
     {
-        sleep(5);
-        new Gateway();
+        new Gateway(['callbackMode' => true]);
     }
 }
