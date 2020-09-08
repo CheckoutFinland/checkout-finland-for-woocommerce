@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Fixed 'Highlighted payment method' custom color issue
 - Changed the payment page customization texts
+- Add callback mode as parameter to gateway and move sleep to gateway, add order ids to log messages
 
 ## [1.5.5] - 2020-09-07
 ### Changed

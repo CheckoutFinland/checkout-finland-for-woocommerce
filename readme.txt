@@ -85,6 +85,7 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 = 1.5.6 =
 * Fixed 'Highlighted payment method' custom color issue
 * Changed the payment page customization texts
+* Add callback mode as parameter to gateway and move sleep to gateway, add order ids to log messages
 
 = 1.5.5 =
 * Changed to use the order number as a reference for the payment service providers instead of a random number
