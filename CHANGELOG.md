@@ -6,12 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.6] - 2020-09-08
 ### Changed
-- Fixed 'Highlighted payment method' custom color issue.
-- Changed the payment page customization texts.
+- Fixed 'Highlighted payment method' custom color issue
+- Changed the payment page customization texts
 
 ## [1.5.5] - 2020-09-07
 ### Changed
-- Changed to use the order number as a reference for the payment service providers instead of a random number.
+- Changed to use the order number as a reference for the payment service providers instead of a random number
+- Add delay to callback controller to prevent simultaneous processing of payments
 
 ## [1.5.3] - 2020-09-01
 ### Changed
