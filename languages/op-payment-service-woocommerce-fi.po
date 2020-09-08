@@ -28,27 +28,27 @@ msgid "Payment page personalization"
 msgstr "Maksusivun mukauttaminen"
 
 #: plugin.php:229
-msgid "Payment group background"
+msgid "Payment method group background"
 msgstr "Maksuryhmän tausta"
 
 #: plugin.php:234
-msgid "Payment group text"
+msgid "Payment method group text"
 msgstr "Maksuryhmän teksti"
 
 #: plugin.php:239
-msgid "Highlighted payment group background"
+msgid "Selected payment method group background"
 msgstr "Korostetun maksuryhmän tausta"
 
 #: plugin.php:244
-msgid "Highlighted payment group text"
+msgid "Selected payment method group text"
 msgstr "Korostetun maksuryhmän teksti"
 
 #: plugin.php:249
-msgid "Payment group background hover"
+msgid "Payment method group background hover"
 msgstr "Maksuryhmän taustan hover"
 
 #: plugin.php:259
-msgid "Highlighted payment method"
+msgid "Selected payment method"
 msgstr "Korostettu maksutapa"
 
 #: plugin.php:264

@@ -3,7 +3,7 @@
  * Plugin Name: OP Payment Service for WooCommerce
  * Plugin URI: https://github.com/OPMerchantServices/op-payment-service-for-woocommerce
  * Description: OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
- * Version: 1.5.5
+ * Version: 1.5.6
  * Requires at least: 4.9
  * Tested up to: 5.5
  * Requires PHP: 7.1
@@ -172,7 +172,7 @@ final class Plugin {
                     background-color: <?php echo get_theme_mod('op_group_highlighted_background', '#33798d'); ?> !important;
                     color: <?php echo get_theme_mod('op_group_highlighted_text', '#ffffff'); ?> !important;
                 }
-                .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item.selected .op-payment-service-woocommerce-payment-fields--list-item--wrapper {
+                .woocommerce-checkout #payment .op-payment-service-woocommerce-payment-fields--list-item--input:checked+.op-payment-service-woocommerce-payment-fields--list-item--wrapper, .woocommerce-checkout #payment .op-payment-service-woocommerce-payment-fields--list-item:hover .op-payment-service-woocommerce-payment-fields--list-item--wrapper {                    
                     border: 2px solid <?php echo get_theme_mod('op_method_highlighted', '#33798d'); ?> !important;
                 }
                 .woocommerce-checkout #payment ul.payment_methods li.op-payment-service-woocommerce-payment-fields--list-item .op-payment-service-woocommerce-payment-fields--list-item--wrapper:hover {
@@ -226,37 +226,37 @@ final class Plugin {
         ) );
         // Controls
         $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bgcolor', array(
-            'label'      => __( 'Payment group background', 'op-payment-service-woocommerce' ),
+            'label'      => __( 'Payment method group background', 'op-payment-service-woocommerce' ),
             'section'    => 'op_checkout_customize_section',
             'settings'   => 'op_group_background',
         ) ) );
         $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_fgcolor', array(
-            'label'      => __( 'Payment group text', 'op-payment-service-woocommerce' ),
+            'label'      => __( 'Payment method group text', 'op-payment-service-woocommerce' ),
             'section'    => 'op_checkout_customize_section',
             'settings'   => 'op_group_text',
         ) ) );
         $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bgcolor_selected', array(
-            'label'      => __( 'Highlighted payment group background', 'op-payment-service-woocommerce' ),
+            'label'      => __( 'Selected payment method group background', 'op-payment-service-woocommerce' ),
             'section'    => 'op_checkout_customize_section',
             'settings'   => 'op_group_highlighted_background',
         ) ) );
         $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_fgcolor_selected', array(
-            'label'      => __( 'Highlighted payment group text', 'op-payment-service-woocommerce' ),
+            'label'      => __( 'Selected payment method group text', 'op-payment-service-woocommerce' ),
             'section'    => 'op_checkout_customize_section',
             'settings'   => 'op_group_highlighted_text',
         ) ) );
         $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bgcolor_hover', array(
-            'label'      => __( 'Payment group background hover', 'op-payment-service-woocommerce' ),
+            'label'      => __( 'Payment method group background hover', 'op-payment-service-woocommerce' ),
             'section'    => 'op_checkout_customize_section',
             'settings'   => 'op_group_hover_background',
         ) ) );
         $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_fgcolor_hover', array(
-            'label'      => __( 'Payment group text hover', 'op hover-payment-service-woocommerce' ),
+            'label'      => __( 'Payment method group text hover', 'op hover-payment-service-woocommerce' ),
             'section'    => 'op_checkout_customize_section',
             'settings'   => 'op_group_hover_text',
         ) ) );
         $wp_customize->add_control( new \WP_Customize_Color_Control( $wp_customize, 'op_bordercolor_selected', array(
-            'label'      => __( 'Highlighted payment method', 'op-payment-service-woocommerce' ),
+            'label'      => __( 'Selected payment method', 'op-payment-service-woocommerce' ),
             'section'    => 'op_checkout_customize_section',
             'settings'   => 'op_method_highlighted',
         ) ) );
