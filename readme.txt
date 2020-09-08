@@ -4,7 +4,7 @@ Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.5
-Stable tag: 1.5.5
+Stable tag: 1.5.6
 Requires PHP: 7.1
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -82,12 +82,12 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
-= 1.5.5 =
-* Changed to use the order number as a reference for the payment service providers instead of a random number
-
-= 1.5.4 =
+= 1.5.6 =
 * Fixed 'Highlighted payment method' custom color issue
 * Changed the payment page customization texts
+
+= 1.5.5 =
+* Changed to use the order number as a reference for the payment service providers instead of a random number
 
 = 1.5.3 =
 * Add more debug logging to payment gateway processing
