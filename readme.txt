@@ -88,6 +88,7 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 = 1.5.5 =
 * Changed to use the order number as a reference for the payment service providers instead of a random number
+* Add delay to callback controller to prevent simultaneous processing of payments
 
 = 1.5.3 =
 * Add more debug logging to payment gateway processing
