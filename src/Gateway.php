@@ -65,6 +65,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     public $debug = false;
 
+    public $callbackMode = false;
+
     /**
      * Supported features.
      *
@@ -113,7 +115,7 @@ final class Gateway extends \WC_Payment_Gateway
     /**
      * Object constructor
      */
-    public function __construct() {
+    public function __construct($params = []) {
         // Set payment gateway ID
         $this->id = Plugin::GATEWAY_ID;
 
@@ -163,6 +165,10 @@ final class Gateway extends \WC_Payment_Gateway
 
         // Whether we are in debug mode or not.
         $this->debug = 'yes' === $this->get_option( 'debug', 'no' );
+
+        if (!empty($params) && isset($params['callbackMode'])) {
+            $this->callbackMode = true;
+        }
 
         // Add actions and filters.
         $this->add_actions();
@@ -530,11 +536,21 @@ final class Gateway extends \WC_Payment_Gateway
         $refund_unique_id = filter_input( INPUT_GET, 'refund_unique_id' );
         $order_id         = filter_input( INPUT_GET, 'order_id' );
 
+        if (true === $this->callbackMode) {
+            $this->log('OpMerchantServices: Callback check_checkout_response for order '.$order_id, 'debug');
+            $this->log('OpMerchantServices: Wait for 5 seconds until processing order '.$order_id, 'debug');
+            sleep(5);
+        } else {
+            $this->log('OpMerchantServices: Redirect check_checkout_response for order '.$order_id, 'debug');
+        }
+
         // Handle the response only if the status exists.
         if ( $status && ! $refund_callback ) {
+            $this->log('OpMerchantServices: Start handle_payment_response for order '.$order_id, 'debug');
             $this->handle_payment_response( $status );
         }
         elseif ( $status && $refund_callback ) {
+            $this->log('OpMerchantServices: Start handle_refund_response for order '.$order_id, 'debug');
             $this->handle_refund_response( $refund_callback, $refund_unique_id, $order_id );
         }
     }
@@ -548,8 +564,6 @@ final class Gateway extends \WC_Payment_Gateway
      */
     public function handle_payment_response( string $status )
     {
-        $this->log('OpMerchantServices: Start handle_payment_response', 'debug');
-
         // Check the HMAC
         try {
             $this->client->validateHmac( filter_input_array( INPUT_GET ), '', filter_input( INPUT_GET, 'signature' ) );
@@ -567,23 +581,23 @@ final class Gateway extends \WC_Payment_Gateway
 
             switch ( $status ) {
                 case 'ok':
-                    $this->log('OpMerchantServices: handle_payment_response, case = ok', 'debug');
+                    $this->log('OpMerchantServices: handle_payment_response, case = ok for order '.$order->get_id(), 'debug');
                     $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
 
                     $order_status = $order->get_status();
 
                     if ( $order_status === 'completed' || $order_status === 'processing' ) {
-                        $this->log('OpMerchantServices: handle_payment_response, order already processed', 'debug');
+                        $this->log('OpMerchantServices: handle_payment_response, order already processed '.$order->get_id(), 'debug');
                         // This order has already been processed.
                         return;
                     }
 
-                    $this->log('OpMerchantServices: handle_payment_response payment_complete, order needs processing '.$order->needs_processing(), 'debug');
+                    $this->log('OpMerchantServices: handle_payment_response payment_complete, order '.$order->get_id().' needs processing '.$order->needs_processing(), 'debug');
                     // Mark payment completed and store the transaction ID.
                     $order->payment_complete( $transaction_id );
 
                     if ( ! $this->use_provider_selection() ) {
-                        $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = false', 'debug');
+                        $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = false for order '.$order->get_id(), 'debug');
                         // Get the chosen payment provider and save it to the order
                         $payment_provider = filter_input( INPUT_GET, 'checkout-provider' );
                         $payment_amount   = filter_input( INPUT_GET, 'checkout-amount' );
