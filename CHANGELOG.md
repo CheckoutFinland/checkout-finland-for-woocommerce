@@ -4,10 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.4] - 2020-09-03
+## [1.5.6] - 2020-09-08
 ### Changed
 - Fixed 'Highlighted payment method' custom color issue.
 - Changed the payment page customization texts.
+
+## [1.5.5] - 2020-09-07
+### Changed
+- Changed to use the order number as a reference for the payment service providers instead of a random number.
 
 ## [1.5.3] - 2020-09-01
 ### Changed

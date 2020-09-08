@@ -1044,10 +1044,11 @@ final class Gateway extends \WC_Payment_Gateway
         // Set the order ID as the stamp to the payment request
         $payment->setStamp( get_current_blog_id() . '-' . $order->get_id() . '-' . time() );
 
-        // Create a random reference for the order
-        $reference = sha1( uniqid( true ) );
+        // Use WooCom order number as reference
+        // https://trello.com/c/i6GUZACP/83-reference-kentt%C3%A4%C3%A4n-woon-tilausnumero
+        $reference = $order->get_order_number();
 
-        // Create a unique hash to be used as the request reference
+        // Set WooCommerce order number as the payment reference
         $payment->setReference( $reference );
 
         // Fetch current currency and the cart total
