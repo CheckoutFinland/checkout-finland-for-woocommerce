@@ -163,6 +163,9 @@ final class Gateway extends \WC_Payment_Gateway
             $cofPluginVersion
         );
 
+        // Create Helper instance
+        $this->helper = new Helper();
+
         // Whether we are in debug mode or not.
         $this->debug = 'yes' === $this->get_option( 'debug', 'no' );
 
@@ -178,9 +181,6 @@ final class Gateway extends \WC_Payment_Gateway
 
         // Check if we are in response phase
         $this->check_checkout_response();
-
-        // Create Helper instance
-        $this->helper = new Helper();
     }
 
     /**
@@ -535,23 +535,30 @@ final class Gateway extends \WC_Payment_Gateway
         $refund_callback  = filter_input( INPUT_GET, 'refund_callback' );
         $refund_unique_id = filter_input( INPUT_GET, 'refund_unique_id' );
         $order_id         = filter_input( INPUT_GET, 'order_id' );
+        $reference        = filter_input( INPUT_GET, 'checkout-reference' );
+
+        if (!$status) {
+            return;
+        }
+        $sleepTime = rand(1,3);
+        $sleepTimeCallback = rand(3,6);
 
         if (true === $this->callbackMode) {
-            $this->log('OpMerchantServices: Callback check_checkout_response for order '.$order_id, 'debug');
-            $this->log('OpMerchantServices: Wait for 5 seconds until processing order '.$order_id, 'debug');
-            sleep(5);
+            $this->log('OpMerchantServices: Callback check_checkout_response for reference '.$reference, 'debug');
+            $this->log('OpMerchantServices: Wait for '.$sleepTimeCallback.' seconds until processing reference '.$reference, 'debug');
+            sleep($sleepTimeCallback);
         } else {
-            $this->log('OpMerchantServices: Redirect check_checkout_response for order '.$order_id, 'debug');
+            $this->log('OpMerchantServices: Redirect check_checkout_response for reference '.$reference, 'debug');
+            sleep($sleepTime);
         }
-
         // Handle the response only if the status exists.
-        if ( $status && ! $refund_callback ) {
-            $this->log('OpMerchantServices: Start handle_payment_response for order '.$order_id, 'debug');
-            $this->handle_payment_response( $status );
-        }
-        elseif ( $status && $refund_callback ) {
-            $this->log('OpMerchantServices: Start handle_refund_response for order '.$order_id, 'debug');
+        if ( $refund_callback ) {
+            $this->log('OpMerchantServices: Start handle_refund_response for order_id '.$order_id, 'debug');
             $this->handle_refund_response( $refund_callback, $refund_unique_id, $order_id );
+
+        } else {
+            $this->log('OpMerchantServices: Start handle_payment_response for reference '.$reference, 'debug');
+            $this->handle_payment_response( $status );
         }
     }
 
