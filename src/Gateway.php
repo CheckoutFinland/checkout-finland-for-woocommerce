@@ -540,8 +540,8 @@ final class Gateway extends \WC_Payment_Gateway
         if (!$status) {
             return;
         }
-        $sleepTime = rand (1,3);
-        $sleepTimeCallback = rand ( 3, 6);
+        $sleepTime = rand(1,3);
+        $sleepTimeCallback = rand(3,6);
 
         if (true === $this->callbackMode) {
             $this->log('OpMerchantServices: Callback check_checkout_response for reference '.$reference, 'debug');
@@ -1701,8 +1701,8 @@ final class Gateway extends \WC_Payment_Gateway
     {
         $callback = new CallbackUrl();
 
-        $callback->setSuccess('https://webhook.site/970c521a-2ddf-4c4c-815c-1b121c02f9aa' );
-        $callback->setCancel( 'https://webhook.site/970c521a-2ddf-4c4c-815c-1b121c02f9aa');
+        $callback->setSuccess( Router::get_url(Plugin::CALLBACK_URL, 'index') );
+        $callback->setCancel( Router::get_url(Plugin::CALLBACK_URL, 'index') );
 
         return $callback;
     }
