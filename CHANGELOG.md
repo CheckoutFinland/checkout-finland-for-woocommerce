@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.7] - 2020-09-11
+### Changed
+- Modify callback handling by adding random sleep amount time, add sleep amount to redirect handler as well, if no status set do not try to process, modify log reference
+
 ## [1.5.6] - 2020-09-08
 ### Changed
 - Changed the payment page customization texts
