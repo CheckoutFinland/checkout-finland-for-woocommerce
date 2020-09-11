@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.7] - 2020-09-11
 ### Changed
-- Modify callback handling by adding random sleep amount time, add sleep amount to redirect handler as well, if no status set do not try to process, modify log reference
+- Changed callback handling 
+- Changed log reference
 
 ## [1.5.6] - 2020-09-08
 ### Changed
