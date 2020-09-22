@@ -537,11 +537,18 @@ final class Gateway extends \WC_Payment_Gateway
         $order_id         = filter_input( INPUT_GET, 'order_id' );
         $reference        = filter_input( INPUT_GET, 'checkout-reference' );
 
-        if (!$status) {
+        if (!$status || !$reference) {
             return;
         }
-        $sleepTime = rand(1,3);
+        $sleepTime = rand(0,3);
         $sleepTimeCallback = rand(3,6);
+
+        $orderLock = $this->helper->waitLockForProcessing($reference);
+        if ($orderLock) {
+            $this->log('OpMerchantServices: order ' . $reference . ' locked for processing', 'debug');
+        } else {
+            $this->log('OpMerchantServices: could not lock order ' . $reference . ' for processing, continue without lock', 'debug');
+        }
 
         if (true === $this->callbackMode) {
             $this->log('OpMerchantServices: Callback check_checkout_response for reference '.$reference, 'debug');
@@ -560,6 +567,9 @@ final class Gateway extends \WC_Payment_Gateway
             $this->log('OpMerchantServices: Start handle_payment_response for reference '.$reference, 'debug');
             $this->handle_payment_response( $status );
         }
+
+        $this->log('OpMerchantServices: remove lock file for order ' . $reference, 'debug');
+        $this->helper->removeOrderLockFile($reference);
     }
 
     /**
