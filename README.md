@@ -69,3 +69,17 @@ Your OP Payment Service credentials. You can obtain the keys by registering at o
 ### Fallback Country
 
 Setup fallback country to be used if no country is provided from Woocommerce checkout. Use only if billing_country/shipping_country is removed from checkout fields.
+
+## Router
+
+### Callback Routes
+
+Permalinks enabled:
+
+    Success: /op-payment-service/callback/index
+    Cancel: /op-payment-service/callback/index
+
+Permalinks disabled:
+
+    Success: /index.php?op-payment-service-route=callback&op-payment-service-action=index
+    Cancel: /index.php?op-payment-service-route=callback&op-payment-service-action=index
