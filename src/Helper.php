@@ -112,9 +112,9 @@ class Helper
                 return false;
             }
             if ('unlock' === $status) {
-                $flock = flock($handle, LOCK_UN | LOCK_NB);
+                $flock = flock($handle, LOCK_UN);
             } else {
-                $flock = flock($handle, LOCK_EX | LOCK_NB);
+                $flock = flock($handle, LOCK_EX);
             }
             if (!$flock) {
                 fclose($handle);

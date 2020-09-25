@@ -537,30 +537,39 @@ final class Gateway extends \WC_Payment_Gateway
         $order_id         = filter_input( INPUT_GET, 'order_id' );
         $reference        = filter_input( INPUT_GET, 'checkout-reference' );
 
-        if (!$status || !$reference) {
+        if ((!$status || !$reference) && !$refund_callback && !$refund_unique_id) {
             return;
         }
         $sleepTime = rand(0,3);
         $sleepTimeCallback = rand(3,6);
 
-        $orderLock = $this->helper->waitLockForProcessing($reference);
-        if ($orderLock) {
-            $this->log('OpMerchantServices: order ' . $reference . ' locked for processing', 'debug');
-        } else {
-            $this->log('OpMerchantServices: could not lock order ' . $reference . ' for processing, continue without lock', 'debug');
-        }
-
         if (true === $this->callbackMode) {
-            $this->log('OpMerchantServices: Callback check_checkout_response for reference '.$reference, 'debug');
-            $this->log('OpMerchantServices: Wait for '.$sleepTimeCallback.' seconds until processing reference '.$reference, 'debug');
+            $this->log('OpMerchantServices: Callback check_checkout_response for order '.$reference, 'debug');
+            $this->log('OpMerchantServices: Wait for '.$sleepTimeCallback.' seconds until processing order '.$reference, 'debug');
             sleep($sleepTimeCallback);
         } else {
             $this->log('OpMerchantServices: Redirect check_checkout_response for reference '.$reference, 'debug');
+            $this->log('OpMerchantServices: Wait for '.$sleepTime.' seconds until processing reference '.$reference, 'debug');
             sleep($sleepTime);
         }
+
+        $lockTries = 3;
+
+        while($lockTries > 0) {
+            $orderLock = $this->helper->waitLockForProcessing($reference);
+            if (!$orderLock) {
+                $this->log('OpMerchantServices: could not lock order ' . $reference . ' for processing, try locking again in second', 'debug');
+                sleep(1);
+                $lockTries--;
+            } else {
+                $this->log('OpMerchantServices: order ' . $reference . ' locked for processing', 'debug');
+                $lockTries = 0;
+            }
+        }
+
         // Handle the response only if the status exists.
         if ( $refund_callback ) {
-            $this->log('OpMerchantServices: Start handle_refund_response for order_id '.$order_id, 'debug');
+            $this->log('OpMerchantServices: Start handle_refund_response for order_id ' . $order_id, 'debug');
             $this->handle_refund_response( $refund_callback, $refund_unique_id, $order_id );
 
         } else {
