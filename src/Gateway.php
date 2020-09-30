@@ -553,20 +553,6 @@ final class Gateway extends \WC_Payment_Gateway
             sleep($sleepTime);
         }
 
-        $lockTries = 3;
-
-        while($lockTries > 0) {
-            $orderLock = $this->helper->waitLockForProcessing($reference);
-            if (!$orderLock) {
-                $this->log('OpMerchantServices: could not lock order ' . $reference . ' for processing, try locking again in second', 'debug');
-                sleep(1);
-                $lockTries--;
-            } else {
-                $this->log('OpMerchantServices: order ' . $reference . ' locked for processing', 'debug');
-                $lockTries = 0;
-            }
-        }
-
         // Handle the response only if the status exists.
         if ( $refund_callback ) {
             $this->log('OpMerchantServices: Start handle_refund_response for order_id ' . $order_id, 'debug');
@@ -576,9 +562,6 @@ final class Gateway extends \WC_Payment_Gateway
             $this->log('OpMerchantServices: Start handle_payment_response for reference '.$reference, 'debug');
             $this->handle_payment_response( $status );
         }
-
-        $this->log('OpMerchantServices: remove lock file for order ' . $reference, 'debug');
-        $this->helper->removeOrderLockFile($reference);
     }
 
     /**
