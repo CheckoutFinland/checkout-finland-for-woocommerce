@@ -894,14 +894,20 @@ final class Gateway extends \WC_Payment_Gateway
         $this->log('OpMerchantServices: create_normal_payment', 'debug');
 
         try {
-            $response = $this->client->createPayment( $payment );
-
             // Log the payment request if debug log is enabled.
             $this->log('OpMerchantServices\SDK\Request\PaymentRequest: ' . json_encode($payment), 'info');
+            $response = $this->client->createPayment( $payment );
         } catch (\Exception $exception) {
             // Log the error message if debug log is enabled.
             $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
             new \WP_Error( $exception->getCode(), $exception->getMessage() );
+        }
+
+        if (!isset($response) || null === $response) {
+            $this->log('FAILURE: Response is NULL or empty', 'error');
+            return [
+                'result'   => 'failure'
+            ];
         }
 
         if ( $this->use_provider_selection() ) {
