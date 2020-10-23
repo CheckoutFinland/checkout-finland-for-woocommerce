@@ -338,6 +338,7 @@ final class Gateway extends \WC_Payment_Gateway
     }
 
     /**
+     * @param string $context
      * @throws HmacException
      * @throws ValidationException
      */
@@ -345,22 +346,6 @@ final class Gateway extends \WC_Payment_Gateway
     {
         $datetime = new \DateTime();
         $checkout_nonce = sha1(uniqid(true));
-
-        $full_locale = get_locale();
-        $short_locale = substr($full_locale, 0, 2);
-
-        // Get and assign the WordPress locale
-        switch ($short_locale) {
-            case 'sv':
-                $locale = 'SV';
-                break;
-            case 'fi':
-                $locale = 'FI';
-                break;
-            default:
-                $locale = 'EN';
-                break;
-        }
 
         if (Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT === $context) {
             $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_MY_ACCOUNT);
@@ -387,7 +372,7 @@ final class Gateway extends \WC_Payment_Gateway
         $add_card_form_request->setCheckoutNonce($checkout_nonce);
         $add_card_form_request->setCheckoutRedirectSuccessUrl($success_url);
         $add_card_form_request->setCheckoutRedirectCancelUrl($cancel_url);
-        $add_card_form_request->setLanguage($locale);
+        $add_card_form_request->setLanguage(Helper::getLocale());
 
         // Create a addCardFormRequest via Checkout SDK
         /** @var \GuzzleHttp\Psr7\Response $response */
@@ -469,6 +454,9 @@ final class Gateway extends \WC_Payment_Gateway
      */
     public function get_token_payment_option_html($html, $token)
     {
+        if (Plugin::GATEWAY_ID !== $token->get_gateway_id()) {
+            return $html;
+        }
         $html = sprintf(
             '<li class="woocommerce-SavedPaymentMethods-token op-payment-service-woocommerce-tokenized-payment-method">
 				<label for="wc-%1$s-payment-token-%2$s">
@@ -1108,24 +1096,7 @@ final class Gateway extends \WC_Payment_Gateway
             $payment->setDeliveryAddress( $shipping_address );
         }
 
-        $full_locale = get_locale();
-
-        $short_locale = substr( $full_locale, 0, 2 );
-
-        // Get and assign the WordPress locale
-        switch ( $short_locale ) {
-            case 'sv':
-                $locale = 'SV';
-                break;
-            case 'fi':
-                $locale = 'FI';
-                break;
-            default:
-                $locale = 'EN';
-                break;
-        }
-
-        $payment->setLanguage( $locale );
+        $payment->setLanguage( Helper::getLocale() );
 
         // Get the items from the order
         $items = $this->get_order_items($order);
@@ -1160,10 +1131,6 @@ final class Gateway extends \WC_Payment_Gateway
 
         $sub_sum = array_sum( array_map( function( Item $item ) : int {
             return ( $item->getUnitPrice() * $item->getUnits() );
-        }, $items ) );
-
-        $qty_sum = array_sum( array_map( function( Item $item ) : int {
-            return $item->getUnits();
         }, $items ) );
 
         if ( $sub_sum !== $order_total ) {
@@ -1417,24 +1384,7 @@ final class Gateway extends \WC_Payment_Gateway
         $cart_total = $this->helper->get_cart_total();
         $res = [];
 
-        $full_locale = get_locale();
-
-        $short_locale = substr( $full_locale, 0, 2 );
-
-        // Get and assign the WordPress locale
-        switch ( $short_locale ) {
-            case 'sv':
-                $locale = 'SV';
-                break;
-            case 'fi':
-                $locale = 'FI';
-                break;
-            default:
-                $locale = 'EN';
-                break;
-        }
-
-        $providers = $this->get_grouped_payment_providers( $cart_total, $locale );
+        $providers = $this->get_grouped_payment_providers( $cart_total, Helper::getLocale() );
 
         // If there was an error getting the payment providers, show it
         if ( ! empty( $providers['error'] ) ) {
@@ -1493,6 +1443,7 @@ final class Gateway extends \WC_Payment_Gateway
      * Get the groupd list of payment providers
      *
      * @param integer $payment_amount Payment amount in currency minor unit, eg. cents.
+     * @param string $locale
      * @return array
      */
     protected function get_grouped_payment_providers( int $payment_amount, string $locale ) : array
@@ -1535,11 +1486,9 @@ final class Gateway extends \WC_Payment_Gateway
 
         // You can use this filter to modify the error message.
         $error     = apply_filters( 'checkout_finland_provider_form_error', $error );
-        $providers = [
+        return [
             'error' => $error,
         ];
-
-        return $providers;
     }
 
     /**
