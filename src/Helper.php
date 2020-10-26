@@ -70,4 +70,25 @@ class Helper
         return $this->handle_currency($sum);
     }
 
+    public static function getLocale(): string
+    {
+        $full_locale = get_locale();
+
+        $short_locale = substr( $full_locale, 0, 2 );
+
+        // Get and assign the WordPress locale
+        switch ( $short_locale ) {
+            case 'sv':
+                $locale = 'SV';
+                break;
+            case 'fi':
+                $locale = 'FI';
+                break;
+            default:
+                $locale = 'EN';
+                break;
+        }
+        return $locale;
+    }
+
 }
