@@ -526,6 +526,7 @@ final class Gateway extends \WC_Payment_Gateway
         $reference        = filter_input( INPUT_GET, 'checkout-reference' );
 
         if ((!$status || !$reference) && !$refund_callback && !$refund_unique_id) {
+            $this->log('OpMerchantServices: check_checkout_response, no status or reference found for reference: '.$reference, 'debug');
             return;
         }
         $sleepTime = rand(0,3);
@@ -573,90 +574,109 @@ final class Gateway extends \WC_Payment_Gateway
 
         $orders = \wc_get_orders( [ 'checkout_reference' => $reference ] );
 
-        if ( ! empty( $orders ) ) {
-            $order = $orders[0];
+        if ( empty( $orders ) ) {
+            $this->log('OpMerchantServices: handle_payment_response, orders collection empty for reference: '.$reference, 'debug');
+            return;
+        }
+        $order = $orders[0];
 
-            switch ( $status ) {
-                case 'ok':
-                    $this->log('OpMerchantServices: handle_payment_response, case = ok for order '.$order->get_id(), 'debug');
-                    $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
+        switch ( $status ) {
+            case 'ok':
+                $this->log('OpMerchantServices: handle_payment_response, case = ok for order '.$order->get_id(), 'debug');
+                if (!$this->validate_order_payment_processing($order)) {
+                    return;
+                }
+                $this->log('OpMerchantServices: handle_payment_response payment_complete, order '.$order->get_id().' needs processing '.$order->needs_processing(), 'debug');
 
-                    $order_status = $order->get_status();
+                $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
 
-                    if ( $order_status === 'completed' || $order_status === 'processing' ) {
-                        $this->log('OpMerchantServices: handle_payment_response, order already processed '.$order->get_id(), 'debug');
-                        // This order has already been processed.
-                        return;
-                    }
+                // Mark payment completed and store the transaction ID.
+                $order->payment_complete( $transaction_id );
 
-                    $this->log('OpMerchantServices: handle_payment_response payment_complete, order '.$order->get_id().' needs processing '.$order->needs_processing(), 'debug');
-                    // Mark payment completed and store the transaction ID.
-                    $order->payment_complete( $transaction_id );
+                if ( ! $this->use_provider_selection() ) {
+                    $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = false for order '.$order->get_id(), 'debug');
+                    // Get the chosen payment provider and save it to the order
+                    $payment_provider = filter_input( INPUT_GET, 'checkout-provider' );
+                    $payment_amount   = filter_input( INPUT_GET, 'checkout-amount' );
 
-                    if ( ! $this->use_provider_selection() ) {
-                        $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = false for order '.$order->get_id(), 'debug');
-                        // Get the chosen payment provider and save it to the order
-                        $payment_provider = filter_input( INPUT_GET, 'checkout-provider' );
-                        $payment_amount   = filter_input( INPUT_GET, 'checkout-amount' );
+                    $order->update_meta_data( '_checkout_payment_provider', $payment_provider );
 
-                        $order->update_meta_data( '_checkout_payment_provider', $payment_provider );
+                    $providers = $this->get_payment_providers( $payment_amount );
 
-                        $providers = $this->get_payment_providers( $payment_amount );
-
-                        if ( ! empty( $providers['error'] ) ) {
+                    if ( ! empty( $providers['error'] ) ) {
+                        $provider_name = ucfirst( $payment_provider );
+                    } else {
+                        // Get only the wanted payment provider object
+                        $wanted_provider = $this->get_wanted_provider($providers, $payment_provider);
+                        if (null !== $wanted_provider) {
+                            $provider_name = $wanted_provider->getName() ?? ucfirst( $wanted_provider->getId() );
+                        } else {
                             $provider_name = ucfirst( $payment_provider );
                         }
-                        else {
-                            // Get only the wanted payment provider object
-                            $wanted_provider = $this->get_wanted_provider($providers, $payment_provider);
-                            if (null !== $wanted_provider) {
-                                $provider_name = $wanted_provider->getName() ?? ucfirst( $wanted_provider->getId() );
-                            } else {
-                                $provider_name = ucfirst( $payment_provider );
-                            }
-                        }
-
-                        WC()->session->set( 'payment_provider', $wanted_provider );
-
-                        $message = sprintf(
-                            // translators: First parameter is transaction ID, the other is the name of the payment provider.
-                            __( 'Payment completed with transaction ID %1$s and payment provider %2$s.', 'op-payment-service-woocommerce' ),
-                            $transaction_id,
-                            $provider_name
-                        );
-                        $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = false, add_order_note', 'debug');
-
-                        $order->add_order_note( $message );
-                    }
-                    else {
-                        $order_note = sprintf(
-                            // Translators: The placeholder is a transaction ID.
-                            esc_html__(
-                                'Payment completed with transaction ID %s.',
-                                'op-payment-service-woocommerce'
-                            ),
-                            $transaction_id
-                        );
-                        $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = true, add_order_note', 'debug');
-
-                        $order->add_order_note( $order_note );
                     }
 
-                    // Clear the cart.
-                    WC()->cart->empty_cart();
-                    break;
-                case 'pending':
-                    $this->log('OpMerchantServices: handle_payment_response, case = pending', 'debug');
-                    $order->update_status( 'on-hold' );
-                    $order->add_order_note( __( 'Payment pending.', 'op-payment-service-woocommerce' ) );
-                    break;
-                default:
-                    $this->log('OpMerchantServices: handle_payment_response, case = failed', 'debug');
-                    $order->update_status( 'failed' );
-                    $order->add_order_note( __( 'Payment failed.', 'op-payment-service-woocommerce' ) );
-                    break;
-            }
+                    WC()->session->set( 'payment_provider', $wanted_provider );
+
+                    $message = sprintf(
+                        // translators: First parameter is transaction ID, the other is the name of the payment provider.
+                        __( 'Payment completed with transaction ID %1$s and payment provider %2$s.', 'op-payment-service-woocommerce' ),
+                        $transaction_id,
+                        $provider_name
+                    );
+                    $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = false, add_order_note', 'debug');
+
+                    $order->add_order_note( $message );
+                } else {
+                    $order_note = sprintf(
+                        // Translators: The placeholder is a transaction ID.
+                        esc_html__(
+                            'Payment completed with transaction ID %s.',
+                            'op-payment-service-woocommerce'
+                        ),
+                        $transaction_id
+                    );
+                    $this->log('OpMerchantServices: handle_payment_response, use_provider_selection = true, add_order_note', 'debug');
+
+                    $order->add_order_note( $order_note );
+                }
+
+                // Clear the cart.
+                WC()->cart->empty_cart();
+                break;
+            case 'pending':
+                $this->log('OpMerchantServices: handle_payment_response, case = pending', 'debug');
+                $order->update_status( 'on-hold' );
+                $order->add_order_note( __( 'Payment pending.', 'op-payment-service-woocommerce' ) );
+                break;
+            default:
+                $this->log('OpMerchantServices: handle_payment_response, case = failed', 'debug');
+                $order->update_status( 'failed' );
+                $order->add_order_note( __( 'Payment failed.', 'op-payment-service-woocommerce' ) );
+                break;
         }
+    }
+
+    /**
+     * @param WC_Order $order
+     * @return bool
+     */
+    protected function validate_order_payment_processing(WC_Order $order): bool
+    {
+        $transaction_id = filter_input( INPUT_GET, 'checkout-transaction-id' );
+
+        if (!$transaction_id) {
+            $this->log('OpMerchantServices: validate_order_payment_processing, transaction id empty for order: '.$order->get_id(), 'debug');
+            return false;
+        }
+
+        $order_status = $order->get_status();
+
+        if ( $order_status === 'completed' || $order_status === 'processing' ) {
+            $this->log('OpMerchantServices: validate_order_payment_processing, order already processed '.$order->get_id(), 'debug');
+            // This order has already been processed.
+            return false;
+        }
+        return true;
     }
 
     /**
