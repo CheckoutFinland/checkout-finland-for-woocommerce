@@ -45,7 +45,7 @@ Supported payment methods include:
 * Pivo
 * Siirto
 * Apple Pay*
-* Google Pay*
+* Google Pay**
 * AinaPay
 
 = International Credit Cards =
@@ -62,6 +62,7 @@ Supported payment methods include:
 * AfterPay
 
 *) Coming in 2020
+**) Coming in 2021
 
 
 == Installation ==
@@ -81,6 +82,10 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 
 == Changelog ==
+
+== 1.5.8 ==
+* Added order locking in redirect/callback processing
+* Improved logging
 
 = 1.5.7 =
 * Changed callback handling 
