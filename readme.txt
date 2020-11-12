@@ -64,7 +64,6 @@ Supported payment methods include:
 *) Coming in 2020
 **) Coming in 2021
 
-
 == Installation ==
 
 Follow these easy steps to install the plugin:
@@ -73,13 +72,11 @@ Follow these easy steps to install the plugin:
 1. Activate the plugin through the 'Plugins' screen in WordPress
 1. Use the WooCommerce -> Settings -> Payments screen to configure the plugin
 
-
 == Frequently Asked Questions ==
 
 = Where do I get the required keys to install the plugin? =
 
 Head over to [Checkout.fi](https://www.checkout.fi) and register for the service (currently in Finnish only) to obtain the necessary keys.
-
 
 == Changelog ==
 
