@@ -80,6 +80,9 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.5.11 =
+* Add missing register scripts
+
 = 1.5.10 =
 * Updated dist script
 
