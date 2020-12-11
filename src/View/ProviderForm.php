@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 wp_enqueue_style( 'op-payment-service-woocommerce-payment-fields' );
+wp_enqueue_script( 'op-payment-service-woocommerce-payment-fields' );
 
 // Something went wrong loading the providers.
 if ( ! empty( $data['error'] ) ) {
@@ -84,88 +85,8 @@ EOL;
 // add class to handle different theme layouts 2 or 5 items per row
 echo "
 <script>
-
-    const providerGroups = document.getElementsByClassName('provider-group');
-    const methods = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields--list-item op-payment-service-woocommerce-tokenized-payment-method');
-    
-    for (let i = 0; i < providerGroups.length; i++) {
-        providerGroups[i].addEventListener('click', function(e) {
-            e.preventDefault();
-            if (this.classList.contains('selected')) {
-                this.classList.remove('selected');
-                this.nextSibling.classList.add('hidden');
-                return;
-            }
-            // Clear active state
-            const active = document.getElementsByClassName('provider-group selected');
-            if (active.length !== 0) {
-                active[0].classList.remove('selected');
-            }
-            // Hide payment fields
-            const fields = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields');
-            for (let ii = 0; ii < fields.length; ii++) {
-                fields[ii].classList.add('hidden');
-            }
-            // Show current group            
-            this.classList.add('selected');
-            this.nextSibling.classList.remove('hidden');
-            // Use scrolIntoView(alignTo) method
-            const closestUl = this.nextSibling.closest('ul');
-            closestUl.scrollIntoView(false); // align to the bottom of the scrollable element
-        });
+    if (typeof initOpcheckout === 'function'){
+        initOpcheckout();
     }
-    for (let i = 0; i < methods.length; i++) {
-        
-        methods[i].addEventListener('click', function(e) {
-            e.preventDefault();
-            for (let ii = 0; ii < methods.length; ii++) {
-                methods[ii].classList.remove('selected');
-            }
-            let radio = this.childNodes[0].childNodes[0];
-            if (typeof radio !== 'undefined') {
-                radio.checked = true;
-                this.classList.add('selected');
-            }
-        });
-    }
-
-    let handleSize = function(elem, size) {
-        if (size < 600) {
-            elem.classList.remove('col-wide');
-            elem.classList.add('col-narrow');
-        } else {
-            elem.classList.remove('col-narrow');
-            elem.classList.add('col-wide');
-        }
-    };
-    
-    // Payment gateways container
-    const container = document.getElementById('payment');
-    // Checkout container
-    const checkoutContainer = document.getElementsByClassName('payment_method_checkout_finland');
-    // Add some css class to help out with different width columns
-    handleSize(checkoutContainer[0], Math.round(container.offsetWidth));
-
-    // handleSize for resize event
-    let timeout = false;
-    let delta = 300;
-    let startTime;
-    let handleResize = function() {
-        if (new Date() - startTime < delta) {
-            setTimeout(handleResize, delta)
-        } else {
-            timeout = false;
-            handleSize(checkoutContainer[0], Math.round(container.offsetWidth));
-        }
-    };
-    
-    window.addEventListener('resize', function() {
-        startTime = new Date();
-        if (timeout === false) {
-            timeout = true;
-            setTimeout(handleResize, delta);
-        }
-    });
-
 </script>
 ";
