@@ -80,10 +80,10 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
-== 1.5.9 ==
+= 1.5.9 =
 * Added support for WP 5.6 and WC 4.8
 
-== 1.5.8 ==
+= 1.5.8 =
 * Added order locking in redirect/callback processing
 * Improved logging
 
