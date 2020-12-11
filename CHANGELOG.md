@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.9] - 2020-12-11
 ### Changed
-- Added support for WP 5.6
+- Added support for WP 5.6 and WC 4.8
 
 ## [1.5.8] - 2020-11-10
 ### Changed
