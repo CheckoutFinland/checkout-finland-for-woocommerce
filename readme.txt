@@ -3,7 +3,7 @@ Contributors: loueranta, henrykhelskygeniem
 Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
-Tested up to: 5.5
+Tested up to: 5.6
 Stable tag: 1.5.8
 Requires PHP: 7.1
 License: MIT
@@ -61,7 +61,7 @@ Supported payment methods include:
 * Jousto
 * AfterPay
 
-*) Coming in 2020
+*) Partial support available, full support coming in 2021
 **) Coming in 2021
 
 == Installation ==
@@ -79,6 +79,9 @@ Follow these easy steps to install the plugin:
 Head over to [Checkout.fi](https://www.checkout.fi) and register for the service (currently in Finnish only) to obtain the necessary keys.
 
 == Changelog ==
+
+== 1.5.9 ==
+* Added support for WP 5.6 and WC 4.8
 
 == 1.5.8 ==
 * Added order locking in redirect/callback processing
