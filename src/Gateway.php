@@ -179,6 +179,9 @@ final class Gateway extends \WC_Payment_Gateway
         // Register stylesheet for payment fields
         $this->register_styles();
 
+        // Register scripts for payment fields
+        $this->register_scripts();
+
         // Check if we are in response phase
         $this->check_checkout_response();
     }
@@ -1709,6 +1712,27 @@ final class Gateway extends \WC_Payment_Gateway
         }
 
         return $query;
+    }
+
+    /**
+     * Register payment fields scripts
+     *
+     * @return void
+     */
+    protected function register_scripts()
+    {
+        $plugin_instance = Plugin::instance();
+
+        $plugin_dir_url = $plugin_instance->get_plugin_dir_url();
+
+        $plugin_version = $plugin_instance->get_plugin_info()['Version'];
+
+        wp_register_script(
+            'op-payment-service-woocommerce-payment-fields',
+            $plugin_dir_url . 'assets/dist/main.js',
+            [],
+            $plugin_version
+        );
     }
 
     /**
