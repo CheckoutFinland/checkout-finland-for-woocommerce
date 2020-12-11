@@ -80,6 +80,9 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.5.10 =
+* Updated dist script
+
 = 1.5.9 =
 * Added support for WP 5.6 and WC 4.8
 
