@@ -4,7 +4,7 @@ Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.6
-Stable tag: 1.5.9
+Stable tag: 1.5.10
 Requires PHP: 7.1
 License: MIT
 License URI: https://opensource.org/licenses/MIT
