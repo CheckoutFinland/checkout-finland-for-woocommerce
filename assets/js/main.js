@@ -67,6 +67,9 @@ window.initOpcheckout = () => {
     }
     handleResize()
 }
+document.addEventListener('DOMContentLoaded', function(event) {
+    initOpcheckout();
+});
 window.addEventListener('resize', function() {
     startTime = new Date();
     if (timeout === false) {

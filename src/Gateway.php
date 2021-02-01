@@ -366,6 +366,7 @@ final class Gateway extends \WC_Payment_Gateway
             $success_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_SUCCESS_URL, Plugin::ADD_CARD_CONTEXT_CHECKOUT);
             $cancel_url = Router::get_url(Plugin::ADD_CARD_REDIRECT_CANCEL_URL, Plugin::ADD_CARD_CONTEXT_CHECKOUT);
         }
+        $this->log('OpMerchantServices: try to add new card', 'debug');
 
         $add_card_form_request = new AddCardFormRequest();
         $add_card_form_request->setCheckoutAccount($this->merchant_id);
@@ -396,6 +397,7 @@ final class Gateway extends \WC_Payment_Gateway
     {
         $getTokenRequest = new GetTokenRequest();
         $getTokenRequest->setCheckoutTokenizationId(filter_input( INPUT_GET, 'checkout-tokenization-id' ));
+        $this->log('OpMerchantServices: process_card_token', 'debug');
 
         $response = $this->client->createGetTokenRequest($getTokenRequest);
 
@@ -407,6 +409,8 @@ final class Gateway extends \WC_Payment_Gateway
      */
     private function save_card_token(GetTokenResponse $card_token)
     {
+        $this->log('OpMerchantServices: save_card_token', 'debug');
+
         $token = new WC_Payment_Token_CC();
         $token->set_card_type($card_token->getCard()->getType());
         $token->set_expiry_month($card_token->getCard()->getExpireMonth());
@@ -805,10 +809,13 @@ final class Gateway extends \WC_Payment_Gateway
         $is_token_payment = !empty($token_id);
 
         if ( ! $payment_provider && ! $is_token_payment ) {
-            throw new \Exception( __(
+            wc_add_notice(__(
                 'The payment provider was not chosen.',
                 'op-payment-service-woocommerce'
-            ));
+            ), 'error');
+            return [
+                'result' => 'failure'
+            ];
         } elseif ($is_token_payment) {
             $this->log('OpMerchantServices: process_payment, is token payment', 'debug');
             $payment_provider = 'creditcard';
