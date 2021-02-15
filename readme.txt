@@ -53,7 +53,7 @@ Supported payment methods include:
 * MasterCard
 * American Express
 
-The plugin supports card tokenization that enables logged-in customers to save card details during checkout process in order to reuse them in future checkouts or with [WooCommerce Subscriptions](https://woocommerce.com/products/woocommerce-subscriptions/) recurring orders.
+The plugin supports card tokenization that enables logged-in customers to save card details during checkout process in order to reuse them in future checkouts or with [WooCommerce Subscriptions](https://woocommerce.com/products/woocommerce-subscriptions/) recurring payments.
 
 = B2C/B2B Invoices & Instalments =
 
