@@ -4,7 +4,7 @@ Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.6
-Stable tag: 1.5.11
+Stable tag: 1.5.12
 Requires PHP: 7.1
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -40,7 +40,6 @@ Supported payment methods include:
 
 = Mobile Payments =
 
-* Masterpass
 * MobilePay
 * Pivo
 * Siirto
@@ -54,9 +53,12 @@ Supported payment methods include:
 * MasterCard
 * American Express
 
+The plugin supports card tokenization that enables logged-in customers to save card details during checkout process in order to reuse them in future checkouts or with [WooCommerce Subscriptions](https://woocommerce.com/products/woocommerce-subscriptions/) recurring orders.
+
 = B2C/B2B Invoices & Instalments =
 
 * OP Osta laskulla
+* OP Lasku
 * Collector Bank
 * Jousto
 * AfterPay
@@ -79,6 +81,13 @@ Follow these easy steps to install the plugin:
 Head over to [Checkout.fi](https://www.checkout.fi) and register for the service (currently in Finnish only) to obtain the necessary keys.
 
 == Changelog ==
+
+= 1.5.12 =
+* Add more logging to gateway
+* Hide the payment method group title and expand the group if only one group is available
+* Fix payment method description support
+* Fix error handling when no payment provider chosen
+* Fix initialising of payment method groups in provider form
 
 = 1.5.11 =
 * Add missing register scripts
