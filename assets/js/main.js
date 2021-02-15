@@ -25,7 +25,13 @@ const handleResize = function() {
 };
 window.initOpcheckout = () => {
     const providerGroups = document.getElementsByClassName('provider-group');
-    if (providerGroups.length > 0) {
+    if (providerGroups.length === 1) {
+        Array.from(providerGroups).map(providerGroup => {
+            providerGroup.style = 'display: none;'
+            const fields = document.getElementsByClassName('op-payment-service-woocommerce-payment-fields');
+            Array.from(fields).map(field => field.classList.remove('hidden'))
+        })
+    } else if (providerGroups.length > 1) {
         Array.from(providerGroups).map(providerGroup => {
             providerGroup.addEventListener('click', function(e) {
                 e.preventDefault();
