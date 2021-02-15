@@ -119,7 +119,7 @@ final class Gateway extends \WC_Payment_Gateway
         // Set payment gateway ID
         $this->id = Plugin::GATEWAY_ID;
 
-        $this->has_fields = true;
+        $this->has_fields = $this->use_provider_selection();
 
         // Get dynamic payment method info.
         $this->method_info = $this->get_method_info();
@@ -779,6 +779,8 @@ final class Gateway extends \WC_Payment_Gateway
         if ( is_checkout() && $this->use_provider_selection() )
         {
             $this->provider_form();
+        } else if (is_checkout()) {
+            $this->payment_description();
         }
     }
 
@@ -1427,6 +1429,14 @@ final class Gateway extends \WC_Payment_Gateway
         $provider_form_view = new View( 'ProviderForm' );
 
         $provider_form_view->render( $res );
+    }
+
+    protected function payment_description()
+    {
+        $data['description'] = $this->description;
+
+        $view = new View('PaymentDescription');
+        $view->render($data);
     }
 
     /**
