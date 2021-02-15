@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.12] - 2021-02-15
+### Changed
+- Add more logging to gateway
+- Hide the payment method group title and expand the group if only one group is available
+
+### Fixed
+- Fix payment method description support
+- Fix error handling when no payment provider chosen
+- Fix initialising of payment method groups in provider form
+
 ## [1.5.11] - 2020-12-11
 ### Fixed
 - Add missing register scripts
