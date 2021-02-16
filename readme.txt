@@ -4,7 +4,7 @@ Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.6
-Stable tag: 1.5.12
+Stable tag: 1.5.13
 Requires PHP: 7.1
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -81,6 +81,9 @@ Follow these easy steps to install the plugin:
 Head over to [Checkout.fi](https://www.checkout.fi) and register for the service (currently in Finnish only) to obtain the necessary keys.
 
 == Changelog ==
+
+= 1.5.13 =
+* OP Payment Service PHP-SDK version updated
 
 = 1.5.12 =
 * Add more logging to gateway
