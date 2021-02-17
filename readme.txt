@@ -5,7 +5,7 @@ Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.6
 Stable tag: 1.5.13
-Requires PHP: 7.1
+Requires PHP: 7.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
