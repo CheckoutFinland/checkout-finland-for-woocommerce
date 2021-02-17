@@ -82,6 +82,10 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 
 == Changelog ==
 
+= 1.5.14 =
+* Update minimum PHP version to 7.3
+* OP Payment Service PHP-SDK version updated to 1.3.4
+
 = 1.5.13 =
 * OP Payment Service PHP-SDK version updated
 
