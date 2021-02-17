@@ -4,7 +4,7 @@
 
 **Required WordPress version:** 4.9
 
-**Required PHP version:** 7.1
+**Required PHP version:** 7.3
 
 **[OP Payment Service](https://www.checkout.fi) (previously known as Checkout Finland)** is a payment gateway that offers 20+ payment methods for Finnish customers.
 
