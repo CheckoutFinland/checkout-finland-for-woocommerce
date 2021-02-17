@@ -65,7 +65,7 @@
         "psr-4": {"OpMerchantServices\\WooCommercePaymentGateway\\": "src/"}
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.3",
         "composer/installers": ">=1.0.12",
         "op-merchant-services/op-payment-service-php-sdk": ">=1.3.0",
         "ext-mbstring": "*",
