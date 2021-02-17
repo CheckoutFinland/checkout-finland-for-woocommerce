@@ -1,6 +1,6 @@
 {
     "name": "op-payment-service-for-woocommerce",
-    "version": "1.5.13",
+    "version": "1.5.14",
     "description": "OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.",
     "private": true,
     "dependencies": {
