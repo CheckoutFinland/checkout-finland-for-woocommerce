@@ -6,7 +6,7 @@
  * Version: 1.5.13
  * Requires at least: 4.9
  * Tested up to: 5.6
- * Requires PHP: 7.1
+ * Requires PHP: 7.3
  * WC requires at least: 3.0
  * WC tested up to: 4.9
  * Author: OP Merchant Services
