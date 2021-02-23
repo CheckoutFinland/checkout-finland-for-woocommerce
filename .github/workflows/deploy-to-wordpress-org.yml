@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Build
-      uses: shivammathur/setup-php@v2
+    - uses: shivammathur/setup-php@v2
       with:
         php-version: '7.4'
         tools: composer:v1
+    - name: Build
       run: |
         composer install
     - name: WordPress Plugin Deploy
