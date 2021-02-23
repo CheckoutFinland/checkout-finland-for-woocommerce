@@ -4,7 +4,7 @@ Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.6
-Stable tag: 1.5.14
+Stable tag: 1.5.15
 Requires PHP: 7.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -81,6 +81,11 @@ Follow these easy steps to install the plugin:
 Head over to [Checkout.fi](https://www.checkout.fi) and register for the service (currently in Finnish only) to obtain the necessary keys.
 
 == Changelog ==
+
+= 1.5.15 =
+* Add validation for order tokens when creating scheduled Subscription/MIT payment
+* Add better error message if no tokens found
+* Change PHP version to 7.4 in Github Action
 
 = 1.5.14 =
 * Update minimum PHP version to 7.3
