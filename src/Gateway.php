@@ -1209,22 +1209,43 @@ final class Gateway extends \WC_Payment_Gateway
     public function scheduled_subscription_payment($amount, $order)
     {
         $this->log('OpMerchantServices: scheduled_subscription_payment', 'debug');
+        $fail_message = __('No valid tokens found for order.', 'op-payment-service-woocommerce');
 
         $tokens = \WC_Payment_Tokens::get_order_tokens($order->get_id());
-        $token = reset($tokens);
+        $validTokens = [];
+        foreach ($tokens as $token) {
+            if (!$token->validate()) {
+                continue;
+            }
+            $validTokens[] = $token;
+        }
+        if (empty($validTokens)) {
+            // Log the error message if debug log is enabled.
+            $this->log( $fail_message, 'error' );
+            $order->add_order_note( $fail_message );
+            return false;
+        }
+        try {
+            $token = reset($validTokens);
 
-        $payment = new MitPaymentRequest();
-        $payment->setToken($token->get_token());
+            $payment = new MitPaymentRequest();
+            $payment->setToken($token->get_token());
 
-        $this->set_base_payment_data($payment, $order);
+            $this->set_base_payment_data($payment, $order);
 
-        // Save the reference for possible later use.
-        update_post_meta( $order->get_id(), '_checkout_reference', $payment->getReference() );
+            // Save the reference for possible later use.
+            update_post_meta( $order->get_id(), '_checkout_reference', $payment->getReference() );
 
-        // Save it also as a key for fast indexed searches.
-        update_post_meta( $order->get_id(), '_checkout_reference_' . $payment->getReference(), true );
+            // Save it also as a key for fast indexed searches.
+            update_post_meta( $order->get_id(), '_checkout_reference_' . $payment->getReference(), true );
 
-        $this->create_mit_payment($payment, $order);
+            $this->create_mit_payment($payment, $order);
+        } catch (\Exception $exception) {
+            // Log the error message if debug log is enabled.
+            $this->log( $exception->getMessage() . $exception->getTraceAsString(), 'error' );
+            return false;
+        }
+        return true;
     }
 
     /**
