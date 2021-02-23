@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.15] - 2021-02-23
+### Changed
+- Add validation for order tokens when creating scheduled Subscription/MIT payment
+- Add better error message if no tokens found
+- Change PHP version to 7.4 in Github Action
+
 ## [1.5.14] - 2021-02-17
 ### Changed
 - Update minimum PHP version to 7.3
