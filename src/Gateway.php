@@ -1209,7 +1209,7 @@ final class Gateway extends \WC_Payment_Gateway
     public function scheduled_subscription_payment($amount, $order)
     {
         $this->log('OpMerchantServices: scheduled_subscription_payment', 'debug');
-        $fail_message = __('No valid tokens found for order.', 'op-payment-service-woocommerce');
+        $fail_message = __('Cannot schedule subscription payment. No valid tokens found for order.', 'op-payment-service-woocommerce');
 
         $tokens = \WC_Payment_Tokens::get_order_tokens($order->get_id());
         $validTokens = [];
