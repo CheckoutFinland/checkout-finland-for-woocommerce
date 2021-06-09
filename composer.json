@@ -1,7 +1,7 @@
 {
-    "name": "op-merchant-services/op-payment-service-for-woocommerce",
+    "name": "checkout-finland/checkout-finland-for-woocommerce",
     "type": "wordpress-plugin",
-    "description": "OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.",
+    "description": "Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers.",
     "authors": [
         {
             "name": "Miika Arponen",
@@ -48,17 +48,17 @@
     ],
     "support": {
         "email": "asiakaspalvelu@checkout.fi",
-        "issues": "https://github.com/OPMerchantServices/op-payment-service-for-woocommerce/issues",
-        "source": "https://github.com/OPMerchantServices/op-payment-service-for-woocommerce"
+        "issues": "https://github.com/CheckoutFinland/checkout-finland-for-woocommerce/issues",
+        "source": "https://github.com/CheckoutFinland/checkout-finland-for-woocommerce"
     },
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@github.com:OPMerchantServices/op-payment-service-php-sdk.git"
+            "url": "git@github.com:CheckoutFinland/checkout-finland-php-sdk.git"
         }
     ],
     "keywords": [
-        "wordpress", "woocommerce", "payment gateway", "op payment service", "checkout finland"
+        "wordpress", "woocommerce", "payment gateway", "checkout finland"
     ],
     "license": "MIT",
     "autoload": {
@@ -67,7 +67,7 @@
     "require": {
         "php": ">=7.3",
         "composer/installers": ">=1.0.12",
-        "op-merchant-services/op-payment-service-php-sdk": ">=1.3.4",
+        "checkout-finland/checkout-finland-php-sdk": ">=1.3.4",
         "ext-mbstring": "*",
         "guzzlehttp/guzzle": "^6.5.4",
         "symfony/polyfill-intl-idn": "v1.20.0",
