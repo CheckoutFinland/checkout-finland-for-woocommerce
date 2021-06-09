@@ -1,21 +1,21 @@
 <?php
 /**
- * Plugin Name: OP Payment Service for WooCommerce
- * Plugin URI: https://github.com/OPMerchantServices/op-payment-service-for-woocommerce
- * Description: OP Payment Service (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
- * Version: 1.5.15
+ * Plugin Name: Checkout Finland for WooCommerce
+ * Plugin URI: https://github.com/CheckoutFinland/checkout-finland-for-woocommerce
+ * Description: Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers.
+ * Version: 1.6
  * Requires at least: 4.9
  * Tested up to: 5.6
  * Requires PHP: 7.3
  * WC requires at least: 3.0
  * WC tested up to: 4.9
- * Author: OP Merchant Services
+ * Author: Checkout Finland
  * Author URI: https://www.checkout.fi/
- * Text Domain: op-payment-service-woocommerce
+ * Text Domain: op-payment-service-for-woocommerce
  * Domain Path: /languages
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
- * Copyright: OP Merchant Services
+ * Copyright: Checkout Finland
  */
 
 namespace OpMerchantServices\WooCommercePaymentGateway;
