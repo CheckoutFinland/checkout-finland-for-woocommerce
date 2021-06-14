@@ -1,7 +1,5 @@
 # Checkout Finland for WooCommerce
 
-**Contributors:** [Nomafin](https://github.com/nomafin), [villesiltala](https://github.com/villesiltala), [tommireinikainen](https://github.com/tommireinikainen), [onnimonni](https://github.com/onnimonni), [traone](https://github.com/traone), [villepietarinen](https://github.com/villepietarinen) & [loueranta](https://github.com/loueranta)
-
 **Required WordPress version:** 4.9
 
 **Required PHP version:** 7.3
@@ -83,3 +81,7 @@ Permalinks disabled:
 
     Success: /index.php?op-payment-service-route=callback&op-payment-service-action=index
     Cancel: /index.php?op-payment-service-route=callback&op-payment-service-action=index
+
+## Credits
+
+**Contributors:** [Nomafin](https://github.com/nomafin), [villesiltala](https://github.com/villesiltala), [tommireinikainen](https://github.com/tommireinikainen), [onnimonni](https://github.com/onnimonni), [traone](https://github.com/traone), [villepietarinen](https://github.com/villepietarinen) & [loueranta](https://github.com/loueranta)
