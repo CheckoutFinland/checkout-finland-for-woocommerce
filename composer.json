@@ -67,7 +67,7 @@
     "require": {
         "php": ">=7.3",
         "composer/installers": ">=1.0.12",
-        "checkout-finland/checkout-finland-php-sdk": ">=1.3.4",
+        "checkout-finland/checkout-finland-php-sdk": ">=1.4",
         "ext-mbstring": "*",
         "guzzlehttp/guzzle": "^6.5.4",
         "symfony/polyfill-intl-idn": "v1.20.0",
