@@ -209,8 +209,8 @@ final class Gateway extends \WC_Payment_Gateway
     protected function get_method_info() : array
     {
         $method_info = [
-            'title' => __('OP Payment Service for WooCommerce', 'op-payment-service-woocommerce'),
-            'description' => __('OP Payment Service for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract', 'op-payment-service-woocommerce'),
+            'title' => __('Checkout Finland for WooCommerce', 'op-payment-service-woocommerce'),
+            'description' => __('Checkout Finland for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract', 'op-payment-service-woocommerce'),
         ];
         return $method_info;
     }
@@ -227,7 +227,7 @@ final class Gateway extends \WC_Payment_Gateway
             'enabled'     => [
                 'title'   => __( 'Payment gateway status', 'op-payment-service-woocommerce' ),
                 'type'    => 'checkbox',
-                'label'   => __( 'Enable OP Payment Service for WooCommerce', 'op-payment-service-woocommerce' ),
+                'label'   => __( 'Enable Checkout Finland for WooCommerce', 'op-payment-service-woocommerce' ),
                 'default' => 'yes',
             ],
             // Whether test mode is enabled
@@ -251,14 +251,14 @@ final class Gateway extends \WC_Payment_Gateway
                 'title'       => __( 'Payment provider title', 'op-payment-service-woocommerce' ),
                 'type'        => 'text',
                 'label'       => __( 'Used on the Checkout page title', 'op-payment-service-woocommerce' ),
-                'default'     => 'OP Payment Service for WooCommerce',
+                'default'     => 'Checkout Finland for WooCommerce',
                 'description' => __( 'This title is displayed on the Checkout page before the payment provider images.', 'op-payment-service-woocommerce' )
             ],
             'custom_provider_description' => [
                 'title'       => __( 'Payment provider description', 'op-payment-service-woocommerce' ),
                 'type'        => 'text',
                 'label'       => __( 'Used on the Checkout page title', 'op-payment-service-woocommerce' ),
-                'default'     => 'OP Payment Service for WooCommerce',
+                'default'     => 'Checkout Finland for WooCommerce',
                 'description' => __( 'Depending on your theme, this description might be displayed on the Checkout page before the payment provider images.', 'op-payment-service-woocommerce' )
             ],
             // Whether to show the payment provider wall or choose the method in the store

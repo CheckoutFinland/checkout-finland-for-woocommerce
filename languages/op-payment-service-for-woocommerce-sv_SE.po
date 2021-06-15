@@ -25,28 +25,28 @@ msgstr ""
 #: plugin.php:213
 #, php-format
 msgid ""
-"OP Payment Service gateway plugin requires a PHP version of at least 7.1. "
+"Checkout Finland gateway plugin requires a PHP version of at least 7.1. "
 "You are currently running version %1$s."
 msgstr ""
 
 #: plugin.php:228
-msgid "OP Payment Service gateway plugin requires WooCommerce to be activated."
+msgid "Checkout Finland gateway plugin requires WooCommerce to be activated."
 msgstr ""
 
 #: plugin.php:244
 msgid ""
-"OP Payment Service gateway plugin requires WooCommerce version of 3.5 or "
+"Checkout Finland gateway plugin requires WooCommerce version of 3.5 or "
 "greater."
 msgstr ""
 
 #. Plugin Name of the plugin/theme
 #: src/Gateway.php:182
-msgid "OP Payment Service for WooCommerce"
+msgid "Checkout Finland for WooCommerce"
 msgstr ""
 
 #: src/Gateway.php:183
 msgid ""
-"OP Payment Service for WooCommerce - the most comprehensive suite of payment "
+"Checkout Finland for WooCommerce - the most comprehensive suite of payment "
 "methods in the market with a single contract"
 msgstr ""
 
@@ -55,7 +55,7 @@ msgid "Payment gateway status"
 msgstr ""
 
 #: src/Gateway.php:199
-msgid "Enable OP Payment Service for WooCommerce"
+msgid "Enable Checkout Finland for WooCommerce"
 msgstr ""
 
 #: src/Gateway.php:204
@@ -238,17 +238,17 @@ msgstr ""
 
 #. Plugin URI of the plugin/theme
 msgid ""
-"https://github.com/OPMerchantServices/op-payment-service-for-woocommerce"
+"https://github.com/CheckoutFinland/checkout-finland-for-woocommerce"
 msgstr ""
 
 #. Description of the plugin/theme
 msgid ""
-"OP Payment Service (previously known as Checkout Finland) is a payment "
+"Checkout Finland (previously known asOP Payment Service) is a payment "
 "gateway that offers 20+ payment methods for Finnish customers."
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "OP Merchant Services"
+msgid "Checkout Finland"
 msgstr ""
 
 #. Author URI of the plugin/theme
