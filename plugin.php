@@ -363,7 +363,7 @@ final class Plugin {
         if ( ! version_compare( PHP_VERSION, '7.1.0', '>=' ) ) {
             return sprintf(
                 // translators: The placeholder contains the current PHP version.
-                esc_html__( 'OP Payment Service gateway plugin requires a PHP version of at least 7.1. You are currently running version %1$s.', 'op-payment-service-woocommerce' ),
+                esc_html__( 'Checkout Finland gateway plugin requires a PHP version of at least 7.1. You are currently running version %1$s.', 'op-payment-service-woocommerce' ),
                 esc_html( PHP_VERSION )
             );
         }
@@ -378,7 +378,7 @@ final class Plugin {
      */
     public static function check_woocommerce_active_status() : ?string {
         if ( ! class_exists( '\WC_Payment_Gateway' ) ) {
-            return esc_html__( 'OP Payment Service gateway plugin requires WooCommerce to be activated.', 'op-payment-service-woocommerce' );
+            return esc_html__( 'Checkout Finland gateway plugin requires WooCommerce to be activated.', 'op-payment-service-woocommerce' );
         }
 
         return null;
@@ -394,7 +394,7 @@ final class Plugin {
             defined( 'WOO_COMMERCE_VERSION' ) &&
             version_compare( WOO_COMMERCE_VERSION, '3.5' ) === -1
         ) {
-            return esc_html__( 'OP Payment Service gateway plugin requires WooCommerce version of 3.5 or greater.', 'op-payment-service-woocommerce' );
+            return esc_html__( 'Checkout Finland gateway plugin requires WooCommerce version of 3.5 or greater.', 'op-payment-service-woocommerce' );
         }
 
         return null;

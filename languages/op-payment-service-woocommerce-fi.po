@@ -59,21 +59,21 @@ msgstr "Maksutavan hover"
 #: plugin.php:366
 #, php-format
 msgid ""
-"OP Payment Service gateway plugin requires a PHP version of at least 7.1. "
+"Checkout Finland gateway plugin requires a PHP version of at least 7.1. "
 "You are currently running version %1$s."
 msgstr ""
-"OP Payment Service-maksutapalisäosa vaatii vähintään PHP-version 7.1. Tällä "
+"Checkout Finland-maksutapalisäosa vaatii vähintään PHP-version 7.1. Tällä "
 "hetkellä käytössäsi on versio %1$s."
 
 #: plugin.php:381
-msgid "OP Payment Service gateway plugin requires WooCommerce to be activated."
+msgid "Checkout Finland gateway plugin requires WooCommerce to be activated."
 msgstr ""
 "Checkout Finland -maksutapalisäosa vaatii, että WooCommerce-lisäosa on "
 "aktivoitu."
 
 #: plugin.php:397
 msgid ""
-"OP Payment Service gateway plugin requires WooCommerce version of 3.5 or "
+"Checkout Finland gateway plugin requires WooCommerce version of 3.5 or "
 "greater."
 msgstr ""
 "Checkout Finland -maksutapalisäosa vaatii WooCommerce-version 3.5 tai "
@@ -81,15 +81,15 @@ msgstr ""
 
 #. Plugin Name of the plugin/theme
 #: src/Gateway.php:203
-msgid "OP Payment Service for WooCommerce"
-msgstr "OP Payment Service for WooCommerce"
+msgid "Checkout Finland for WooCommerce"
+msgstr "Checkout Finland for WooCommerce"
 
 #: src/Gateway.php:204
 msgid ""
-"OP Payment Service for WooCommerce - the most comprehensive suite of payment "
+"Checkout Finland for WooCommerce - the most comprehensive suite of payment "
 "methods in the market with a single contract"
 msgstr ""
-"OP Payment Service for WooCommerce - markkinoiden kattavimmat maksutavat "
+"Checkout Finland for WooCommerce - markkinoiden kattavimmat maksutavat "
 "yhdellä sopimuksella"
 
 #: src/Gateway.php:219
@@ -97,8 +97,8 @@ msgid "Payment gateway status"
 msgstr "Maksutapalisäosan tila"
 
 #: src/Gateway.php:221
-msgid "Enable OP Payment Service for WooCommerce"
-msgstr "Ota OP Payment Service for WooCommerce käyttöön"
+msgid "Enable Checkout Finland for WooCommerce"
+msgstr "Ota Checkout Finland for WooCommerce käyttöön"
 
 #: src/Gateway.php:226
 msgid "Test mode"
@@ -380,19 +380,19 @@ msgstr "Lisää uusi kortti"
 
 #. Description of the plugin/theme
 msgid ""
-"OP Payment Service (previously known as Checkout Finland) is a payment "
+"Checkout Finland (previously known asOP Payment Service) is a payment "
 "gateway that offers 20+ payment methods for Finnish customers."
 msgstr ""
-"OP Maksupalvelu (aiemmin Checkout Finland) tarjoaa yli kaksikymmentä "
+"Checkout Finland (aiemmin OP Maksupalvelu) tarjoaa yli kaksikymmentäv "
 "maksutapaa suomalaisille kuluttajille ja yrityksille."
 
 #. Plugin URI of the plugin/theme
 msgid ""
-"https://github.com/OPMerchantServices/op-payment-service-for-woocommerce"
+"https://github.com/CheckoutFinland/checkout-finland-for-woocommerce"
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "OP Merchant Services"
+msgid "Checkout Finland"
 msgstr ""
 
 #. Author URI of the plugin
