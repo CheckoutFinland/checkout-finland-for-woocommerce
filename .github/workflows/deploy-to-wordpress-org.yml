@@ -17,7 +17,7 @@ jobs:
       run: |
         composer install
     - name: WordPress Plugin Deploy
-      uses: OPMerchantServices/action-wordpress-plugin-deploy@master
+      uses: CheckoutFinland/action-wordpress-plugin-deploy@master
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}

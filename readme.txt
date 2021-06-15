@@ -1,27 +1,27 @@
-=== OP Payment Service for WooCommerce ===
+=== Checkout Finland for WooCommerce ===
 Contributors: loueranta, henrykhelskygeniem
 Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
-Tested up to: 5.6
-Stable tag: 1.5.15
+Tested up to: 5.7
+Stable tag: 1.6
 Requires PHP: 7.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
-[OP Payment Service](https://www.checkout.fi) (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
+[Checkout Finland](https://www.checkout.fi) is a payment gateway that offers 20+ payment methods for Finnish customers.
 
 == Description ==
 
-[OP Payment Service](https://www.checkout.fi) (previously known as Checkout Finland) is a payment gateway that offers 20+ payment methods for Finnish customers.
+[Checkout Finland](https://www.checkout.fi) is a payment gateway that offers 20+ payment methods for Finnish customers.
 
 The payment gateway provides 20+ popular payment methods for Finnish customers with one simple integration. The provided payment methods include but are not limited to credit cards, online banking and mobile payments. 
 
-To use this extension, you need to sign up for a OP Payment Service account. Transaction fees will be charged for every transaction. Transaction cost may vary from merchant to merchant, based on what is agreed upon with OP Merchant Services when negotiating your contract. For more information and to register, please visit [our website](https://www.checkout.fi)  (in Finnish only) or contact [asiakaspalvelu@checkout.fi](mailto:asiakaspalvelu@checkout.fi) directly.
+To use this extension, you need to sign up for a Checkout Finland account. Transaction fees will be charged for every transaction. Transaction cost may vary from merchant to merchant, based on what is agreed upon with Checkout Finland when negotiating your contract. For more information and to register, please visit [our website](https://www.checkout.fi)  (in Finnish only) or contact [asiakaspalvelu@checkout.fi](mailto:asiakaspalvelu@checkout.fi) directly.
 
-We employ the industry's best security practices and tools to maintain bank-level security for merchants and end customers. OP Payment Service is PCI DSS Level I and GDPR compliant. 
+We employ the industry's best security practices and tools to maintain bank-level security for merchants and end customers. Checkout Finland is PCI DSS Level I and GDPR compliant. 
 
-Upon checkout, customers are redirected to the OP Payment Service website. The customer enters his or her payment information directly into our secure environment so that the web shop never comes into contact with the customers payment data. Once the payment process is complete, customers will redirected back to your store. Tokenization is used to run transactions with stored payment information. No confidential card data is ever stored on your server.
+Upon checkout, customers are redirected to the Checkout Finland payment service. The customer enters his or her payment information directly into our secure environment so that the web shop never comes into contact with the customers payment data. Once the payment process is complete, customers will redirected back to your store. Tokenization is used to run transactions with stored payment information. No confidential card data is ever stored on your server.
 
 Supported payment methods include:
 
@@ -43,9 +43,8 @@ Supported payment methods include:
 * MobilePay
 * Pivo
 * Siirto
-* Apple Pay*
-* Google Pay**
 * AinaPay
+* Apple Pay*
 
 = International Credit Cards =
 
@@ -64,7 +63,6 @@ The plugin supports card tokenization that enables logged-in customers to save c
 * AfterPay
 
 *) Partial support available, full support coming in 2021
-**) Coming in 2021
 
 == Installation ==
 
@@ -81,6 +79,9 @@ Follow these easy steps to install the plugin:
 Head over to [Checkout.fi](https://www.checkout.fi) and register for the service (currently in Finnish only) to obtain the necessary keys.
 
 == Changelog ==
+
+= 1.6 =
+* Rebranding from "OP Payment Service" to "Checkout Finland"
 
 = 1.5.15 =
 * Add validation for order tokens when creating scheduled Subscription/MIT payment
