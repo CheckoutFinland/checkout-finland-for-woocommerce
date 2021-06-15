@@ -243,7 +243,7 @@ msgstr ""
 
 #. Description of the plugin/theme
 msgid ""
-"Checkout Finland (previously known asOP Payment Service) is a payment "
+"Checkout Finland is a payment "
 "gateway that offers 20+ payment methods for Finnish customers."
 msgstr ""
 
@@ -252,5 +252,5 @@ msgid "Checkout Finland"
 msgstr ""
 
 #. Author URI of the plugin/theme
-msgid "https://www.op-kauppiaspalvelut.fi"
+msgid "https://www.checkout.fi"
 msgstr ""
