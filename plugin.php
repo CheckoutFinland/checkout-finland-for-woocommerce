@@ -363,7 +363,7 @@ final class Plugin {
         if ( ! version_compare( PHP_VERSION, '7.1.0', '>=' ) ) {
             return sprintf(
                 // translators: The placeholder contains the current PHP version.
-                esc_html__( 'Checkout Finland gateway plugin requires a PHP version of at least 7.1. You are currently running version %1$s.', 'op-payment-service-woocommerce' ),
+                esc_html__( 'Checkout Finland payment gateway plugin requires a PHP version of at least 7.1. You are currently running version %1$s.', 'op-payment-service-woocommerce' ),
                 esc_html( PHP_VERSION )
             );
         }
@@ -378,7 +378,7 @@ final class Plugin {
      */
     public static function check_woocommerce_active_status() : ?string {
         if ( ! class_exists( '\WC_Payment_Gateway' ) ) {
-            return esc_html__( 'Checkout Finland gateway plugin requires WooCommerce to be activated.', 'op-payment-service-woocommerce' );
+            return esc_html__( 'Checkout Finland payment gateway plugin requires WooCommerce to be activated.', 'op-payment-service-woocommerce' );
         }
 
         return null;

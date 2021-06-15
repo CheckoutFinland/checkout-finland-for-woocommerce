@@ -380,10 +380,10 @@ msgstr "Lisää uusi kortti"
 
 #. Description of the plugin/theme
 msgid ""
-"Checkout Finland (previously known asOP Payment Service) is a payment "
+"Checkout Finland is a payment "
 "gateway that offers 20+ payment methods for Finnish customers."
 msgstr ""
-"Checkout Finland (aiemmin OP Maksupalvelu) tarjoaa yli kaksikymmentäv "
+"Checkout Finland tarjoaa yli kaksikymmentä "
 "maksutapaa suomalaisille kuluttajille ja yrityksille."
 
 #. Plugin URI of the plugin/theme
