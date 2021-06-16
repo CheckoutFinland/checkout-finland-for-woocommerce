@@ -11,7 +11,7 @@
  * WC tested up to: 5.3
  * Author: Checkout Finland
  * Author URI: https://www.checkout.fi/
- * Text Domain: op-payment-service-for-woocommerce
+ * Text Domain: op-payment-service-woocommerce
  * Domain Path: /languages
  * License: MIT
  * License URI: https://opensource.org/licenses/MIT
