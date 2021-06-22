@@ -4,20 +4,110 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e66e88415525b769b8847c884e3803ce",
+    "content-hash": "acf71565713a0fb7fef1c10388cd47b0",
     "packages": [
         {
-            "name": "composer/installers",
-            "version": "v1.10.0",
+            "name": "checkout-finland/checkout-finland-php-sdk",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/composer/installers.git",
-                "reference": "1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d"
+                "url": "https://github.com/CheckoutFinland/checkout-finland-php-sdk.git",
+                "reference": "ae7c36299a30197279d3ef51abcf773484859112"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d",
-                "reference": "1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d",
+                "url": "https://api.github.com/repos/CheckoutFinland/checkout-finland-php-sdk/zipball/ae7c36299a30197279d3ef51abcf773484859112",
+                "reference": "ae7c36299a30197279d3ef51abcf773484859112",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.5.2",
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "phpcompatibility/php-compatibility": "^9.3",
+                "phpunit/phpunit": "^8.4",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OpMerchantServices\\SDK\\": "src/"
+                }
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
+                ],
+                "post-update-cmd": [
+                    "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Miika Arponen",
+                    "email": "miika.arponen@geniem.com",
+                    "homepage": "http://github.com/nomafin",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Ville Siltala",
+                    "email": "ville.siltala@geniem.com",
+                    "homepage": "http://github.com/villesiltala",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Henryk Helsky",
+                    "email": "henryk.helsky@geniem.com",
+                    "homepage": "https://github.com/traone",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Joonas Loueranta",
+                    "email": "joonas.loueranta@op.fi",
+                    "homepage": "https://github.com/loueranta",
+                    "role": "Manager"
+                },
+                {
+                    "name": "Ville Pietarinen",
+                    "email": "ville.pietarinen@geniem.com",
+                    "homepage": "http://github.com/villepietarinen",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Kimmo Kava",
+                    "email": "kimmo.kava@ambientia.fi",
+                    "homepage": "https://github.com/ambkimmok",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP SDK for using Checkout Finland payment service",
+            "keywords": [
+                "checkout finland",
+                "payment service provider"
+            ],
+            "support": {
+                "source": "https://github.com/CheckoutFinland/checkout-finland-php-sdk/tree/1.4.0",
+                "issues": "https://github.com/CheckoutFinland/checkout-finland-php-sdk/issues"
+            },
+            "time": "2021-06-14T13:54:46+00:00"
+        },
+        {
+            "name": "composer/installers",
+            "version": "v1.11.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/installers.git",
+                "reference": "ae03311f45dfe194412081526be2e003960df74b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/installers/zipball/ae03311f45dfe194412081526be2e003960df74b",
+                "reference": "ae03311f45dfe194412081526be2e003960df74b",
                 "shasum": ""
             },
             "require": {
@@ -111,6 +201,7 @@
                 "majima",
                 "mako",
                 "mediawiki",
+                "miaoxing",
                 "modulework",
                 "modx",
                 "moodle",
@@ -128,31 +219,14 @@
                 "sydes",
                 "sylius",
                 "symfony",
+                "tastyigniter",
                 "typo3",
                 "wordpress",
                 "yawik",
                 "zend",
                 "zikula"
             ],
-            "support": {
-                "issues": "https://github.com/composer/installers/issues",
-                "source": "https://github.com/composer/installers/tree/v1.10.0"
-            },
-            "funding": [
-                {
-                    "url": "https://packagist.com",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/composer",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2021-01-14T11:07:16+00:00"
+            "time": "2021-04-28T06:42:17+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -219,24 +293,20 @@
                 "rest",
                 "web service"
             ],
-            "support": {
-                "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/6.5"
-            },
             "time": "2020-06-16T21:01:06+00:00"
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "60d379c243457e073cff02bc323a2a86cb355631"
+                "reference": "8e7d04f1f6450fef59366c399cfad4b9383aa30d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/60d379c243457e073cff02bc323a2a86cb355631",
-                "reference": "60d379c243457e073cff02bc323a2a86cb355631",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/8e7d04f1f6450fef59366c399cfad4b9383aa30d",
+                "reference": "8e7d04f1f6450fef59366c399cfad4b9383aa30d",
                 "shasum": ""
             },
             "require": {
@@ -274,24 +344,20 @@
             "keywords": [
                 "promise"
             ],
-            "support": {
-                "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/1.4.0"
-            },
-            "time": "2020-09-30T07:37:28+00:00"
+            "time": "2021-03-07T09:25:29+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.7.0",
+            "version": "1.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "53330f47520498c0ae1f61f7e2c90f55690c06a3"
+                "reference": "dc960a912984efb74d0a90222870c72c87f10c91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/53330f47520498c0ae1f61f7e2c90f55690c06a3",
-                "reference": "53330f47520498c0ae1f61f7e2c90f55690c06a3",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/dc960a912984efb74d0a90222870c72c87f10c91",
+                "reference": "dc960a912984efb74d0a90222870c72c87f10c91",
                 "shasum": ""
             },
             "require": {
@@ -349,102 +415,7 @@
                 "uri",
                 "url"
             ],
-            "support": {
-                "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/1.7.0"
-            },
-            "time": "2020-09-30T07:37:11+00:00"
-        },
-        {
-            "name": "op-merchant-services/op-payment-service-php-sdk",
-            "version": "1.3.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/OPMerchantServices/op-payment-service-php-sdk.git",
-                "reference": "ceae9294ced10be3429dff8c4f1214c990a2cc2b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/OPMerchantServices/op-payment-service-php-sdk/zipball/ceae9294ced10be3429dff8c4f1214c990a2cc2b",
-                "reference": "ceae9294ced10be3429dff8c4f1214c990a2cc2b",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "guzzlehttp/guzzle": "^6.5.2",
-                "php": ">=7.3"
-            },
-            "require-dev": {
-                "phpcompatibility/php-compatibility": "^9.3",
-                "phpunit/phpunit": "^8.4",
-                "squizlabs/php_codesniffer": "^3.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "OpMerchantServices\\SDK\\": "src/"
-                }
-            },
-            "scripts": {
-                "post-install-cmd": [
-                    "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
-                ],
-                "post-update-cmd": [
-                    "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Miika Arponen",
-                    "email": "miika.arponen@geniem.com",
-                    "homepage": "http://github.com/nomafin",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Ville Siltala",
-                    "email": "ville.siltala@geniem.com",
-                    "homepage": "http://github.com/villesiltala",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Henryk Helsky",
-                    "email": "henryk.helsky@geniem.com",
-                    "homepage": "https://github.com/traone",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Joonas Loueranta",
-                    "email": "joonas.loueranta@op.fi",
-                    "homepage": "https://github.com/loueranta",
-                    "role": "Manager"
-                },
-                {
-                    "name": "Ville Pietarinen",
-                    "email": "ville.pietarinen@geniem.com",
-                    "homepage": "http://github.com/villepietarinen",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Kimmo Kava",
-                    "email": "kimmo.kava@ambientia.fi",
-                    "homepage": "https://github.com/ambkimmok",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP SDK for using OP Payment Service (formerly Checkout Finland)",
-            "keywords": [
-                "checkout finland",
-                "op payment service",
-                "payment service provider"
-            ],
-            "support": {
-                "source": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/tree/1.3.4",
-                "issues": "https://github.com/OPMerchantServices/op-payment-service-php-sdk/issues"
-            },
-            "time": "2021-02-17T09:09:28+00:00"
+            "time": "2021-04-26T09:17:50+00:00"
         },
         {
             "name": "psr/http-message",
@@ -494,9 +465,6 @@
                 "request",
                 "response"
             ],
-            "support": {
-                "source": "https://github.com/php-fig/http-message/tree/master"
-            },
             "time": "2016-08-06T14:39:51+00:00"
         },
         {
@@ -537,10 +505,6 @@
                 }
             ],
             "description": "A polyfill for getallheaders.",
-            "support": {
-                "issues": "https://github.com/ralouphie/getallheaders/issues",
-                "source": "https://github.com/ralouphie/getallheaders/tree/develop"
-            },
             "time": "2019-03-08T08:55:37+00:00"
         },
         {
@@ -611,23 +575,6 @@
                 "portable",
                 "shim"
             ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.20.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
             "time": "2020-10-23T14:02:19+00:00"
         },
         {
@@ -695,37 +642,20 @@
                 "portable",
                 "shim"
             ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.20.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
             "time": "2020-10-23T14:02:19+00:00"
         },
         {
             "name": "symfony/polyfill-php72",
-            "version": "v1.22.1",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php72.git",
-                "reference": "cc6e6f9b39fe8075b3dabfbaf5b5f645ae1340c9"
+                "reference": "9a142215a36a3888e30d0a9eeea9766764e96976"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php72/zipball/cc6e6f9b39fe8075b3dabfbaf5b5f645ae1340c9",
-                "reference": "cc6e6f9b39fe8075b3dabfbaf5b5f645ae1340c9",
+                "url": "https://api.github.com/repos/symfony/polyfill-php72/zipball/9a142215a36a3888e30d0a9eeea9766764e96976",
+                "reference": "9a142215a36a3888e30d0a9eeea9766764e96976",
                 "shasum": ""
             },
             "require": {
@@ -734,7 +664,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.22-dev"
+                    "dev-main": "1.23-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -771,24 +701,7 @@
                 "portable",
                 "shim"
             ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-php72/tree/v1.22.1"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2021-01-07T16:49:33+00:00"
+            "time": "2021-05-27T09:17:38+00:00"
         }
     ],
     "packages-dev": [],
@@ -801,6 +714,5 @@
         "php": ">=7.3",
         "ext-mbstring": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "platform-dev": []
 }
