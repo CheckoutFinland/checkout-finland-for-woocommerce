@@ -3,7 +3,7 @@ Contributors: loueranta, henrykhelskygeniem
 Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
-Tested up to: 5.7
+Tested up to: 5.8
 Stable tag: 1.6
 Requires PHP: 7.3
 License: MIT

@@ -5,7 +5,7 @@
  * Description: Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers.
  * Version: 1.6
  * Requires at least: 4.9
- * Tested up to: 5.7
+ * Tested up to: 5.8
  * Requires PHP: 7.3
  * WC requires at least: 3.0
  * WC tested up to: 5.3
