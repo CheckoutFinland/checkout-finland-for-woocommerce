@@ -110,11 +110,11 @@ msgstr "Ota testitila käyttöön"
 
 #: src/Gateway.php:233
 msgid "Debug log"
-msgstr "Testaustilan loki"
+msgstr "Lokitus"
 
 #: src/Gateway.php:235
 msgid "Enable logging"
-msgstr "Ota testitilan lokitus käytöön"
+msgstr "Ota lokitus käytöön"
 
 #. translators: %s: URL
 #: src/Gateway.php:238
