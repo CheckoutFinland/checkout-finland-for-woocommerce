@@ -125,7 +125,7 @@ msgid ""
 msgstr ""
 "Tämä asetus käynnistää kaikkien maksutapahtumien lokituksen. Loki "
 "kirjoitetaan sijaintiin %s. Toimintoa suositellaan vain "
-"virheenkorjaustarkoistuksiin, sillä se voi tallentaa henkilötietoja."
+"virheenkorjaustarkoituksiin, sillä se voi tallentaa henkilötietoja."
 
 #: src/Gateway.php:242
 msgid "Payment provider title"
@@ -180,7 +180,7 @@ msgstr "Salainen avain"
 
 #: src/Gateway.php:277 src/Gateway.php:279
 msgid "Fallback country"
-msgstr "Varamaan (fallback) valinta"
+msgstr "Oletusmaan valinta"
 
 #: src/Gateway.php:281
 msgid ""
