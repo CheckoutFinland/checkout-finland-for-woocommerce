@@ -81,7 +81,7 @@ Head over to [Checkout.fi](https://www.checkout.fi) and register for the service
 == Changelog ==
 
 = 1.7 =
-* Update Checkout Finland PHP SDK to new version, remove dependency for GuzzleHttp
+* Updated Checkout Finland PHP SDK to new version, removed dependency for GuzzleHttp
 
 = 1.6 =
 * Rebranding from "OP Payment Service" to "Checkout Finland"
