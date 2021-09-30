@@ -26,7 +26,6 @@ use WC_Order_Item;
 use WC_Order_Item_Product;
 use WC_Order_Item_Fee;
 use WC_Order_Item_Shipping;
-use GuzzleHttp\Exception\RequestException;
 use WC_Payment_Token_CC;
 
 /**
@@ -886,7 +885,7 @@ final class Gateway extends \WC_Payment_Gateway
         catch ( HmacException $exception ) {
             $this->signature_error( $exception, $die_on_error );
         }
-        catch ( RequestException $exception ) {
+        catch ( \Exception $exception ) {
             $message = __(
                 'An error occurred performing the payment request.',
                 'op-payment-service-woocommerce'
@@ -1493,7 +1492,7 @@ final class Gateway extends \WC_Payment_Gateway
         catch ( HmacException $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );
         }
-        catch ( RequestException $exception ) {
+        catch ( \Exception $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );
         }
 
@@ -1521,7 +1520,7 @@ final class Gateway extends \WC_Payment_Gateway
         catch ( HmacException $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );
         }
-        catch ( RequestException $exception ) {
+        catch ( \Exception $exception ) {
             $providers = $this->get_payment_providers_error_handler( $exception );
         }
 

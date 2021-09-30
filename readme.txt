@@ -4,7 +4,7 @@ Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.8
-Stable tag: 1.6
+Stable tag: 1.7
 Requires PHP: 7.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
@@ -79,6 +79,9 @@ Follow these easy steps to install the plugin:
 Head over to [Checkout.fi](https://www.checkout.fi) and register for the service (currently in Finnish only) to obtain the necessary keys.
 
 == Changelog ==
+
+= 1.7 =
+* Update Checkout Finland PHP SDK to new version, remove dependency for GuzzleHttp
 
 = 1.6 =
 * Rebranding from "OP Payment Service" to "Checkout Finland"
