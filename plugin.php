@@ -3,7 +3,7 @@
  * Plugin Name: Checkout Finland for WooCommerce
  * Plugin URI: https://github.com/CheckoutFinland/checkout-finland-for-woocommerce
  * Description: Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers.
- * Version: 1.6
+ * Version: 1.7
  * Requires at least: 4.9
  * Tested up to: 5.8
  * Requires PHP: 7.3
