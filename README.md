@@ -4,7 +4,7 @@
 
 **Required PHP version:** 7.3
 
-**[Checkout Finland](https://www.checkout.fi)** is a payment gateway that offers 20+ payment methods for Finnish customers.
+**[Checkout Finland](https://www.checkout.fi)** is a payment gateway that offers 20+ payment methods for Finnish customers. NOTICE: This plugin is no longer maintained. Use Paytrail for Woocommerce instead.
 
 The payment gateway provides all the popular payment methods with one simple integration. The provided payment methods include but are not limited to credit cards, online banking and mobile payments.
 

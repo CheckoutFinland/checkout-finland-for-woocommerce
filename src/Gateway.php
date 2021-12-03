@@ -209,7 +209,7 @@ final class Gateway extends \WC_Payment_Gateway
     {
         $method_info = [
             'title' => __('Checkout Finland for WooCommerce', 'op-payment-service-woocommerce'),
-            'description' => __('Checkout Finland for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract', 'op-payment-service-woocommerce'),
+            'description' => __('<b>NOTICE: This plugin is no longer maintained. Use Paytrail for Woocommerce instead.</b></br>Checkout Finland for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract.', 'op-payment-service-woocommerce'),
         ];
         return $method_info;
     }
