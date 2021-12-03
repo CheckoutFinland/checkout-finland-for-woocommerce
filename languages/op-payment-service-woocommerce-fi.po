@@ -85,12 +85,8 @@ msgid "Checkout Finland for WooCommerce"
 msgstr "Checkout Finland for WooCommerce"
 
 #: src/Gateway.php:204
-msgid ""
-"Checkout Finland for WooCommerce - the most comprehensive suite of payment "
-"methods in the market with a single contract"
-msgstr ""
-"Checkout Finland for WooCommerce - markkinoiden kattavimmat maksutavat "
-"yhdellä sopimuksella"
+msgid "<b>NOTICE: This plugin is no longer maintained. Use Paytrail for Woocommerce instead.</b></br>Checkout Finland for WooCommerce - the most comprehensive suite of payment methods in the market with a single contract."
+msgstr "<b>HUOM: Tätä lisäosaa ei enään ylläpidetä. Käytä tämän sijaan Paytrail for Woocommercea.</b></br> Checkout Finland for Woocommerce - tarjoaa markkinoiden kattavimmat maksutavat yhdellä sopimuksella."
 
 #: src/Gateway.php:219
 msgid "Payment gateway status"
@@ -398,3 +394,6 @@ msgstr ""
 #. Author URI of the plugin
 msgid "https://www.checkout.fi/"
 msgstr ""
+
+msgid "Notice: This plugin is no longer maintained. Use Paytrail for woocommerce instead. Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers."
+msgstr "Huom: Tätä lisäosaa ei enään ylläpidetä. Käytä tämän pluginin sijaan Paytrail for Woocommercea. Checkout finland tarjoaa yli kaksikymmentä maksutapaa suomalaisille kuluttajille ja yrityksille."
