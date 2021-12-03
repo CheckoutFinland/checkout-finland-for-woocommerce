@@ -397,3 +397,6 @@ msgstr ""
 
 msgid "Notice: This plugin is no longer maintained. Use Paytrail for woocommerce instead. Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers."
 msgstr "Huom: Tätä lisäosaa ei enään ylläpidetä. Käytä tämän pluginin sijaan Paytrail for Woocommercea. Checkout finland tarjoaa yli kaksikymmentä maksutapaa suomalaisille kuluttajille ja yrityksille."
+
+msgid "Notice: Plugin Checkout Finland for Woocommerce is no longer maintained. Use Paytrail for Woocommerce instead."
+msgstr "Huom: Lisäosaa Checkout Finland for Woocommerce ei enään ylläpidetä. Käytä tämän sijaan Paytrail for Woocommercea."

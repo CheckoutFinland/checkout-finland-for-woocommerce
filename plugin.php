@@ -136,7 +136,8 @@ final class Plugin {
 
         // Load the plugin textdomain.
         load_plugin_textdomain( 'op-payment-service-woocommerce', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-
+        // Register admin notice about plugin status
+        add_action( 'admin_notices', [$this, 'admin_notice_maintain'] );
         // Register customizations
         add_action( 'customize_register', [ $this, 'checkout_customizations' ] );
         // Add custom styles
@@ -181,6 +182,13 @@ final class Plugin {
             </style>
         <?php
     }
+
+    public function admin_notice_maintain() {
+        $class = 'notice notice-error is-dismissible';
+        $message = __( 'Notice: Plugin Checkout Finland for Woocommerce is no longer maintained. Use Paytrail for Woocommerce instead.', 'op-payment-service-woocommerce' );
+        printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) ); 
+    }
+    
 
     /**
      * Customizer options
