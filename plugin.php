@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Checkout Finland for WooCommerce
  * Plugin URI: https://github.com/CheckoutFinland/checkout-finland-for-woocommerce
- * Description: Notice: This plugin is no longer maintained. Use Paytrail for woocommerce instead. Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers.
+ * Description: Notice: This plugin is no longer maintained. Use Paytrail for WooCommerce instead. Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers.
  * Version: 1.7.1
  * Requires at least: 4.9
  * Tested up to: 5.8
