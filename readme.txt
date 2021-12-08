@@ -4,14 +4,19 @@ Donate link: https://www.checkout.fi/
 Tags: woocommerce
 Requires at least: 4.9
 Tested up to: 5.8
-Stable tag: 1.7
+Stable tag: 1.7.1
 Requires PHP: 7.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
-[Checkout Finland](https://www.checkout.fi) is a payment gateway that offers 20+ payment methods for Finnish customers.
+DEPRECATED: Use Paytrail for WooCommerce instead.
 
 == Description ==
+
+DEPRECATED: This plugin has been deprecated.
+
+* All of its functionality now exists as the rebranded [Paytrail for WooCommerce](https://wordpress.org/plugins/paytrail-for-woocommerce/) plugin
+* It is advised to upgrade to the new plugin as this one is no longer maintained
 
 [Checkout Finland](https://www.checkout.fi) is a payment gateway that offers 20+ payment methods for Finnish customers.
 
@@ -79,6 +84,9 @@ Follow these easy steps to install the plugin:
 Head over to [Checkout.fi](https://www.checkout.fi) and register for the service (currently in Finnish only) to obtain the necessary keys.
 
 == Changelog ==
+
+= 1.7.1 =
+* Added deprecation notice
 
 = 1.7 =
 * Updated Checkout Finland PHP SDK to new version, removed dependency for GuzzleHttp

@@ -1,5 +1,14 @@
 # Checkout Finland for WooCommerce
 
+## ⚠️ DEPRECATED
+
+**This plugin has been deprecated**. 
+
+All of its functionality now exists as the rebranded [`paytrail/paytrail-for-woocommerce`](https://github.com/paytrail/paytrail-for-woocommerce) plugin.<br/>
+It is advised to upgrade to the new plugin as this one is no longer maintained.
+
+<hr/>
+
 **Required WordPress version:** 4.9
 
 **Required PHP version:** 7.3

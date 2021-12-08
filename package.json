@@ -1,6 +1,6 @@
 {
     "name": "checkout-finland-for-woocommerce",
-    "version": "1.7",
+    "version": "1.7.1",
     "description": "Checkout Finland is a payment gateway that offers 20+ payment methods for Finnish customers.",
     "private": true,
     "dependencies": {
