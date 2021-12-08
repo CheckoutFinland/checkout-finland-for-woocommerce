@@ -9,7 +9,7 @@ Requires PHP: 7.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
-[Checkout Finland](https://www.checkout.fi) is a payment gateway that offers 20+ payment methods for Finnish customers.
+DEPRECATED: This plugin has been deprecated.
 
 == Description ==
 
