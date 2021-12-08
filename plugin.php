@@ -184,9 +184,16 @@ final class Plugin {
     }
 
     public function admin_notice_maintain() {
+        $allowed_html = array(
+            'a'      => array(
+                'href'  => array(),
+                'title' => array(),
+                'target' => array(),
+            )
+        );
         $class = 'notice notice-error is-dismissible';
-        $message = __( 'Notice: Plugin Checkout Finland for Woocommerce is no longer maintained. Use Paytrail for Woocommerce instead.', 'op-payment-service-woocommerce' );
-        printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) ); 
+        $message = __( 'Notice: Checkout Finland for Woocommerce is deprecated. To continue using the payment service, install this plugin: <a href="https://wordpress.org/plugins/paytrail-for-woocommerce/" target="_blank">Paytrail for Woocommerce</a>.', 'op-payment-service-woocommerce' );
+        printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), wp_kses( $message,$allowed_html ) ); 
     }
     
 
