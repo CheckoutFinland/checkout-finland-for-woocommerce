@@ -9,7 +9,7 @@ Requires PHP: 7.3
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
-DEPRECATED: This plugin has been deprecated.
+DEPRECATED: Use Paytrail for WooCommerce instead.
 
 == Description ==
 
